@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="cash.z.ecc.android.ui.home.HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_nav_home_to_nav_receive"
+            app:destination="@id/nav_receive" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_send"
+            app:destination="@id/nav_send" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_detail"
+            app:destination="@id/nav_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_send"
+        android:name="cash.z.ecc.android.ui.send.SendFragment"
+        tools:layout="@layout/fragment_send" />
+
+    <fragment
+        android:id="@+id/nav_receive"
+        android:name="cash.z.ecc.android.ui.receive.ReceiveFragment"
+        tools:layout="@layout/fragment_receive" />
+
+    <fragment
+        android:id="@+id/nav_detail"
+        android:name="cash.z.ecc.android.ui.detail.WalletDetailFragment"
+        tools:layout="@layout/fragment_detail" />
+
+</navigation>

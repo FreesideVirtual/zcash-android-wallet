@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Zcash Wallet</string>
+    <string name="receive_address_title">Your Zcash shielded address</string>
+</resources>
