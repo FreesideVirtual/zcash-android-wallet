@@ -2,6 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="cash.z.ecc.android">
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <application
         android:name="cash.z.ecc.android.ZcashWalletApp"
         android:allowBackup="false"

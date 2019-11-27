@@ -6,117 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_home">
 
-    <ImageView
-        android:id="@+id/icon_scan"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:tint="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.108"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0574"
-        app:layout_constraintHeight_percent="0.052"
-        app:layout_constraintWidth_percent="0.0887"
-        app:srcCompat="@drawable/ic_qrcode_24dp" />
-
-    <ImageView
-        android:id="@+id/icon_receive"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.8883"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.06420765027"
-        app:layout_constraintHeight_percent="0.03825136612"
-        app:layout_constraintWidth_percent="0.05582524272"
-        app:srcCompat="@drawable/ic_receive_funds" />
-
-    <ImageView
-        android:id="@+id/icon_detail"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:tint="@color/colorAccent"
-        app:layout_constraintTop_toTopOf="@id/text_detail"
-        app:layout_constraintBottom_toBottomOf="@id/text_detail"
-        app:layout_constraintEnd_toStartOf="@id/text_detail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHeight_percent="0.044"
-        app:layout_constraintWidth_percent="0.0887"
-        app:srcCompat="@drawable/ic_receipt_24dp"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
-
-    <TextView
-        android:id="@+id/text_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:tint="@color/colorAccent"
-        android:text="Wallet Details"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@id/button_send"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="@dimen/ratio_golden_small"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/icon_detail"/>
-
-    <TextView
-        android:id="@+id/text_amount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:text="12.345"
-        android:textSize="72dp"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:textColor="@color/text_light"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guide_keys"/>
-
-    <TextView
-        android:id="@+id/text_balance_available"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="12.34581242 ZEC"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:textColor="@color/text_light"
-        app:layout_constraintTop_toBottomOf="@id/text_amount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/label_available"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
-
-    <TextView
-        android:id="@+id/label_available"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:text="Available"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:textColor="@color/colorPrimary"
-        app:layout_constraintBaseline_toBaselineOf="@id/text_balance_available"
-        app:layout_constraintStart_toEndOf="@id/text_balance_available"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-
-    <ImageView
-        android:id="@+id/icon_zec_symbol"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:tint="@color/colorAccent"
-        app:layout_constraintWidth_percent="0.060"
-        app:layout_constraintHeight_percent="0.052"
-        app:layout_constraintTop_toTopOf="@id/text_amount"
-        app:layout_constraintBottom_toBottomOf="@id/text_amount"
-        app:layout_constraintEnd_toStartOf="@id/text_amount"
-        app:layout_constraintVertical_bias="0.2"
-        app:srcCompat="@drawable/ic_zec_symbol" />
-
     <View
         android:id="@+id/guide_keys"
         android:layout_width="0dp"
@@ -131,159 +20,197 @@
         app:layout_constraintVertical_bias="0.58"
         app:layout_constraintWidth_percent="0.7475728155" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_hit_area_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.04" />
+
+    <TextView
+        android:id="@+id/text_balance_available"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12.34581242 ZEC"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="@color/text_light"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/label_balance"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_send_amount" />
+
+    <TextView
+        android:id="@+id/label_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:text="Available"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone"
+        app:layout_constraintBaseline_toBaselineOf="@id/text_balance_available"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_balance_available" />
+
+
+    <!--            -->
+    <!-- Calculator -->
+    <!--            -->
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="1"
         style="@style/Zcash.TextView.Calculator"
+        android:text="1"
+        app:layout_constraintBottom_toTopOf="@id/button_calculator_4"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
         app:layout_constraintTop_toTopOf="@id/guide_keys"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_4"
-        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent"
-        app:layout_constraintVertical_chainStyle="spread_inside"/>
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="2"
         style="@style/Zcash.TextView.Calculator"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toTopOf="@id/guide_keys"
+        android:text="2"
         app:layout_constraintBottom_toTopOf="@id/button_calculator_5"
-        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent"
-        app:layout_constraintVertical_chainStyle="spread_inside"/>
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintEnd_toEndOf="@id/guide_keys"
+        app:layout_constraintStart_toStartOf="@id/guide_keys"
+        app:layout_constraintTop_toTopOf="@id/guide_keys"
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_3"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="3"
         style="@style/Zcash.TextView.Calculator"
+        android:text="3"
+        app:layout_constraintBottom_toTopOf="@id/button_calculator_6"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintTop_toTopOf="@id/guide_keys"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_6"
-        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent"
-        app:layout_constraintVertical_chainStyle="spread_inside"/>
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_4"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="4"
         style="@style/Zcash.TextView.Calculator"
+        android:text="4"
+        app:layout_constraintBottom_toTopOf="@id/button_calculator_7"
         app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/button_calculator_1"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_7"
-        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_5"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="5"
         style="@style/Zcash.TextView.Calculator"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_2"
+        android:text="5"
         app:layout_constraintBottom_toTopOf="@id/button_calculator_8"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintEnd_toEndOf="@id/guide_keys"
+        app:layout_constraintStart_toStartOf="@id/guide_keys"
+        app:layout_constraintTop_toBottomOf="@id/button_calculator_2"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_6"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="6"
         style="@style/Zcash.TextView.Calculator"
+        android:text="6"
+        app:layout_constraintBottom_toTopOf="@id/button_calculator_9"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/button_calculator_3"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_9"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_7"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="7"
         style="@style/Zcash.TextView.Calculator"
+        android:text="7"
+        app:layout_constraintBottom_toTopOf="@id/button_calculator_decimal"
         app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/button_calculator_4"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_decimal"
-        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_8"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="8"
         style="@style/Zcash.TextView.Calculator"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_5"
+        android:text="8"
         app:layout_constraintBottom_toTopOf="@id/button_calculator_0"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintEnd_toEndOf="@id/guide_keys"
+        app:layout_constraintStart_toStartOf="@id/guide_keys"
+        app:layout_constraintTop_toBottomOf="@id/button_calculator_5"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_9"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="9"
         style="@style/Zcash.TextView.Calculator"
+        android:text="9"
+        app:layout_constraintBottom_toTopOf="@id/button_calculator_back"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/button_calculator_6"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_back"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_decimal"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="."
-        android:paddingBottom="2dp"
         style="@style/Zcash.TextView.Calculator"
+        android:paddingBottom="2dp"
+        android:text="."
+        app:layout_constraintBottom_toBottomOf="@id/guide_keys"
         app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/button_calculator_7"
-        app:layout_constraintBottom_toBottomOf="@id/guide_keys"
-        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_0"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="0"
         style="@style/Zcash.TextView.Calculator"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_8"
+        android:text="0"
         app:layout_constraintBottom_toBottomOf="@id/guide_keys"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintEnd_toEndOf="@id/guide_keys"
+        app:layout_constraintStart_toStartOf="@id/guide_keys"
+        app:layout_constraintTop_toBottomOf="@id/button_calculator_8"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_calculator_back"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="&lt;"
         style="@style/Zcash.TextView.Calculator"
+        android:text="&lt;"
+        app:layout_constraintBottom_toBottomOf="@id/guide_keys"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/button_calculator_9"
-        app:layout_constraintBottom_toBottomOf="@id/guide_keys"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <!-- TODO: properly style this as a button with ripples -->
@@ -295,20 +222,67 @@
         android:background="@drawable/background_button_rounded"
         android:gravity="center"
         android:text="Send Amount"
-        android:textColor="#000000"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="#000000"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
         app:layout_constraintTop_toBottomOf="@id/guide_keys" />
 
-    <!-- Hit Areas -->
+    <View
+        android:id="@+id/layer_lock"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D0000000"
+        android:elevation="5dp" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_hit_area_top"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.04" />
+    <!--             -->
+    <!-- Upper Layer -->
+    <!--             -->
+    <ImageView
+        android:id="@+id/icon_scan"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="6dp"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.052"
+        app:layout_constraintHorizontal_bias="0.108"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0574"
+        app:layout_constraintWidth_percent="0.0887"
+        app:srcCompat="@drawable/ic_qrcode_24dp" />
+
+    <ImageView
+        android:id="@+id/icon_logo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.03825136612"
+        app:layout_constraintHorizontal_bias="0.8883"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.06420765027"
+        app:layout_constraintWidth_percent="0.05582524272"
+        app:srcCompat="@drawable/ic_receive_funds" />
+
+    <ImageView
+        android:id="@+id/icon_detail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="6dp"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@id/text_detail"
+        app:layout_constraintEnd_toStartOf="@id/text_detail"
+        app:layout_constraintHeight_percent="0.044"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/text_detail"
+        app:layout_constraintWidth_percent="0.0887"
+        app:srcCompat="@drawable/ic_receipt_24dp" />
 
     <View
         android:id="@+id/hit_area_scan"
@@ -317,6 +291,7 @@
         android:layout_marginStart="24dp"
         android:alpha="0.3"
         android:background="@android:color/transparent"
+        android:elevation="6dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guideline_hit_area_top" />
 
@@ -326,7 +301,99 @@
         android:layout_height="68dp"
         android:layout_marginEnd="24dp"
         android:background="@android:color/transparent"
+        android:elevation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/guideline_hit_area_top" />
+
+    <TextView
+        android:id="@+id/text_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:elevation="6dp"
+        android:text="Wallet Details"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="@color/colorAccent"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon_detail"
+        app:layout_constraintTop_toBottomOf="@id/button_send"
+        app:layout_constraintVertical_bias="@dimen/ratio_golden_small" />
+
+    <ImageView
+        android:id="@+id/icon_zec_symbol"
+        android:elevation="6dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@id/text_send_amount"
+        app:layout_constraintEnd_toStartOf="@id/text_send_amount"
+        app:layout_constraintHeight_percent="0.052"
+        app:layout_constraintTop_toTopOf="@id/text_send_amount"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintWidth_percent="0.060"
+        app:srcCompat="@drawable/ic_zec_symbol" />
+
+    <TextView
+        android:id="@+id/text_send_amount"
+        android:elevation="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="0"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        android:textColor="@color/text_light"
+        android:textSize="72dp"
+        app:layout_constraintBottom_toTopOf="@id/guide_keys"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <!--        -->
+    <!-- Banner -->
+    <!--        -->
+
+    <TextView
+        android:id="@+id/text_banner_message"
+        android:elevation="6dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_banner"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:text="No Balance"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="@color/text_light"
+        app:layout_constraintEnd_toEndOf="@id/icon_logo"
+        app:layout_constraintStart_toStartOf="@id/icon_scan"
+        app:layout_constraintTop_toBottomOf="@id/text_send_amount" />
+
+    <TextView
+        android:id="@+id/text_banner_action"
+        android:elevation="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Learn More"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintBaseline_toBaselineOf="@id/text_banner_message"
+        app:layout_constraintEnd_toEndOf="@id/text_banner_message" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="text_balance_available,label_balance" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_banner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="text_banner_message, text_banner_action" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

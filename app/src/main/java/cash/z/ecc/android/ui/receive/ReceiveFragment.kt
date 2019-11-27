@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import cash.z.android.qrecycler.QRecycler
 import cash.z.ecc.android.databinding.FragmentReceiveBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.util.AddressPartNumberSpan
 import dagger.Module
@@ -39,6 +41,7 @@ class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
             text_address_part_7,
             text_address_part_8
         )
+        binding.backButton.onClickNavUp()
     }
 
     override fun onAttach(context: Context) {
@@ -81,5 +84,5 @@ class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
 abstract class ReceiveFragmentModule {
     @FragmentScope
     @ContributesAndroidInjector
-    abstract fun contributeReceiveFragment(): ReceiveFragment
+    abstract fun contributeFragment(): ReceiveFragment
 }

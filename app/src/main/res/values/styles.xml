@@ -1,11 +1,15 @@
 <resources>
 
-    <!-- Base application theme -->
-    <style name="ZcashBaseTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Application theme -->
+
+    <style name="ZcashBaseTheme" parent="Theme.MaterialComponents.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="shapeAppearanceSmallComponent">@style/Zcash.ShapeAppearance.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/Zcash.ShapeAppearance.MediumComponent</item>
     </style>
 
     <style name="ZcashTheme" parent="ZcashBaseTheme"/>
@@ -20,6 +24,10 @@
     <style name="Zcash.TextView.Calculator" parent="Widget.AppCompat.TextView">
         <item name="android:textAppearance">@style/Zcash.TextAppearance.Calculator</item>
         <item name="android:background">@drawable/selector_pressed_ripple_circle</item>
+    </style>
+
+    <style name="Zcash.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/zcashWhite_87</item>
     </style>
 
     <!-- Text Appearances -->
@@ -41,4 +49,14 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
+    <!-- Shape Appearances -->
+
+    <style name="Zcash.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+    <style name="Zcash.ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">12dp</item>
+    </style>
 </resources>

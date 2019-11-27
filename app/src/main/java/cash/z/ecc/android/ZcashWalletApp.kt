@@ -1,6 +1,7 @@
 package cash.z.ecc.android
 
 import android.content.Context
+import android.os.Build
 import cash.z.ecc.android.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
@@ -40,4 +41,12 @@ class ZcashWalletApp : DaggerApplication() {
             ogHandler.uncaughtException(t, e)
         }
     }
+}
+
+
+fun ZcashWalletApp.isEmulator(): Boolean {
+    val goldfish = Build.HARDWARE.contains("goldfish");
+    val emu = (System.getProperty("ro.kernel.qemu", "")?.length ?: 0) > 0;
+    val sdk = Build.MODEL.toLowerCase().contains("sdk")
+    return goldfish || emu || sdk;
 }
