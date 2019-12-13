@@ -55,16 +55,16 @@
 
 
     <!--            -->
-    <!-- Calculator -->
+    <!-- Number Pad -->
     <!--            -->
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_1"
+        android:id="@+id/button_number_pad_1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="1"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_4"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_4"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
         app:layout_constraintTop_toTopOf="@id/guide_keys"
@@ -72,12 +72,12 @@
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_2"
+        android:id="@+id/button_number_pad_2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="2"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_5"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_5"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
@@ -86,12 +86,12 @@
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_3"
+        android:id="@+id/button_number_pad_3"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="3"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_6"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_6"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintTop_toTopOf="@id/guide_keys"
@@ -99,118 +99,118 @@
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_4"
+        android:id="@+id/button_number_pad_4"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="4"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_7"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_7"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_1"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_1"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_5"
+        android:id="@+id/button_number_pad_5"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="5"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_8"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_8"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_2"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_2"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_6"
+        android:id="@+id/button_number_pad_6"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="6"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_9"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_9"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_3"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_3"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_7"
+        android:id="@+id/button_number_pad_7"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="7"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_decimal"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_decimal"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_4"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_4"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_8"
+        android:id="@+id/button_number_pad_8"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="8"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_0"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_0"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_5"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_5"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_9"
+        android:id="@+id/button_number_pad_9"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="9"
-        app:layout_constraintBottom_toTopOf="@id/button_calculator_back"
+        app:layout_constraintBottom_toTopOf="@id/button_number_pad_back"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_6"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_6"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_decimal"
+        android:id="@+id/button_number_pad_decimal"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:paddingBottom="2dp"
         android:text="."
         app:layout_constraintBottom_toBottomOf="@id/guide_keys"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_7"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_7"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_0"
+        android:id="@+id/button_number_pad_0"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="0"
         app:layout_constraintBottom_toBottomOf="@id/guide_keys"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_8"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_8"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_calculator_back"
+        android:id="@+id/button_number_pad_back"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        style="@style/Zcash.TextView.Calculator"
+        style="@style/Zcash.TextView.NumberPad"
         android:text="&lt;"
         app:layout_constraintBottom_toBottomOf="@id/guide_keys"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/button_calculator_9"
+        app:layout_constraintTop_toBottomOf="@id/button_number_pad_9"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
     <!-- TODO: properly style this as a button with ripples -->
@@ -232,6 +232,7 @@
         android:id="@+id/layer_lock"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
         android:background="#D0000000"
         android:elevation="5dp" />
 
@@ -327,6 +328,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:tint="@color/colorAccent"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/text_send_amount"
         app:layout_constraintEnd_toStartOf="@id/text_send_amount"
         app:layout_constraintHeight_percent="0.052"
@@ -342,9 +344,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:text="0"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:textColor="@color/text_light"
+        android:text="$0"
+        android:textAppearance="@style/Zcash.TextAppearance.Zec"
         android:textSize="72dp"
         app:layout_constraintBottom_toTopOf="@id/guide_keys"
         app:layout_constraintEnd_toEndOf="parent"

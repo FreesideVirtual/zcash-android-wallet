@@ -16,25 +16,41 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
+
+    private lateinit var numberPad: List<TextView>
+
     override fun inflate(inflater: LayoutInflater): FragmentHomeBinding =
         FragmentHomeBinding.inflate(inflater)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        with(binding) {
+            numberPad = arrayListOf(
+                buttonNumberPad0,
+                buttonNumberPad1,
+                buttonNumberPad2,
+                buttonNumberPad3,
+                buttonNumberPad4,
+                buttonNumberPad5,
+                buttonNumberPad6,
+                buttonNumberPad7,
+                buttonNumberPad8,
+                buttonNumberPad9,
+                buttonNumberPadDecimal,
+                buttonNumberPadBack
+            )
+            hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_receive)
+            iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
+            textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
+            hitAreaScan.onClickNavTo(R.id.action_nav_home_to_nav_send)
+
+            textBannerAction.setOnClickListener {
+                onBannerAction(BannerAction.from((it as? TextView)?.text?.toString()))
+            }
+        }
+
         // TODO: trigger this from presenter
         onNoFunds()
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        binding.hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_receive)
-        binding.iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
-        binding.textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
-        binding.hitAreaScan.onClickNavTo(R.id.action_nav_home_to_nav_send)
-
-        binding.textBannerAction.setOnClickListener {
-            onBannerAction(BannerAction.from((it as? TextView)?.text?.toString()))
-        }
     }
 
     private fun onBannerAction(action: BannerAction) {
