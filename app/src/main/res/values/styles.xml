@@ -44,6 +44,13 @@
         <item name="android:textColor">@color/text_light</item>
     </style>
 
+    <style name="Zcash.TextAppearance.Zec" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/zboto</item>
+        <item name="fontFamily">@font/zboto</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/text_light</item>
+    </style>
+
     <style name="Zcash.TextAppearance.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="fontFamily">sans-serif</item>
         <item name="android:fontFamily">sans-serif</item>
