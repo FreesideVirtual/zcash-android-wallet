@@ -36,8 +36,8 @@ object Deps {
         val STDLIB =                        "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$version"
         object Coroutines :     Version("1.3.2") {
             val ANDROID =                   "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
-
             val CORE =                      "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
+            val TEST =                      "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
         }
     }
 
