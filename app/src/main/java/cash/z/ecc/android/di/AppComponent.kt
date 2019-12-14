@@ -8,6 +8,7 @@ import cash.z.ecc.android.ui.receive.ReceiveFragmentModule
 import cash.z.ecc.android.ui.send.SendFragmentModule
 import cash.z.ecc.android.ui.setup.BackupFragmentModule
 import cash.z.ecc.android.ui.setup.LandingFragmentModule
+import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
@@ -33,6 +34,9 @@ import javax.inject.Singleton
     ]
 )
 interface AppComponent : AndroidInjector<ZcashWalletApp> {
-    @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<ZcashWalletApp>()
+
+    @Component.Factory
+    interface Factory {
+        fun create(@BindsInstance application: ZcashWalletApp): AppComponent
+    }
 }

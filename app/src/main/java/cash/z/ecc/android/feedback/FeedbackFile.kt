@@ -5,12 +5,8 @@ import okio.Okio
 import java.io.File
 import java.text.SimpleDateFormat
 
-class FeedbackFile(coordinator: FeedbackCoordinator, fileName: String = "feedback.log") :
+class FeedbackFile(fileName: String = "feedback.log") :
     FeedbackCoordinator.FeedbackObserver {
-
-    init {
-        coordinator.addObserver(this)
-    }
 
     private val file = File(ZcashWalletApp.instance.noBackupFilesDir, fileName)
     private val format = SimpleDateFormat("MM-dd HH:mm:ss.SSS")

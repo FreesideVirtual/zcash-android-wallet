@@ -22,21 +22,18 @@ class AppModule {
     // Feedback Observer Set
     //
 
-    @Provides
     @Singleton
+    @Provides
     @IntoSet
-    fun provideFeedbackFile(feedbackCoordinator: FeedbackCoordinator)
-            : FeedbackCoordinator.FeedbackObserver = FeedbackFile(feedbackCoordinator)
+    fun provideFeedbackFile(): FeedbackCoordinator.FeedbackObserver = FeedbackFile()
 
-    @Provides
     @Singleton
+    @Provides
     @IntoSet
-    fun provideFeedbackConsole(feedbackCoordinator: FeedbackCoordinator)
-            : FeedbackCoordinator.FeedbackObserver = FeedbackConsole(feedbackCoordinator)
+    fun provideFeedbackConsole(): FeedbackCoordinator.FeedbackObserver = FeedbackConsole()
 
-    @Provides
     @Singleton
+    @Provides
     @IntoSet
-    fun provideFeedbackMixpanel(feedbackCoordinator: FeedbackCoordinator)
-            : FeedbackCoordinator.FeedbackObserver = FeedbackMixpanel(feedbackCoordinator)
+    fun provideFeedbackMixpanel(): FeedbackCoordinator.FeedbackObserver = FeedbackMixpanel()
 }

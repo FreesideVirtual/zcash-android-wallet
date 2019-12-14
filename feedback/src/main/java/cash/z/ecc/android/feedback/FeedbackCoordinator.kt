@@ -30,7 +30,7 @@ class FeedbackCoordinator(val feedback: Feedback) {
     private var contextMetrics = Dispatchers.IO
     private var contextActions = Dispatchers.IO
     private val jobs = CompositeJob()
-    private val observers = mutableListOf<FeedbackObserver>()
+    private val observers = mutableSetOf<FeedbackObserver>()
 
     /**
      * Wait for any in-flight listeners to complete.

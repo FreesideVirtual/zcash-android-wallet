@@ -3,11 +3,19 @@ package cash.z.ecc.android
 import android.content.Context
 import android.os.Build
 import cash.z.ecc.android.di.DaggerAppComponent
+import cash.z.ecc.android.feedback.FeedbackCoordinator
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
+import javax.inject.Inject
 
 
 class ZcashWalletApp : DaggerApplication() {
+
+    @Inject
+    lateinit var feedbackCoordinator: FeedbackCoordinator
+
+    @Inject
+    lateinit var feedbackObservers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
 
     var creationTime: Long = 0
         private set
@@ -22,13 +30,14 @@ class ZcashWalletApp : DaggerApplication() {
 
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
 //        Twig.plant(TroubleshootingTwig())
+        feedbackObservers.forEach { feedbackCoordinator.addObserver(it) }
     }
 
     /**
      * Implement the HasActivityInjector behavior so that dagger knows which [AndroidInjector] to use.
      */
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.builder().create(this)
+        return DaggerAppComponent.factory().create(this)
     }
 
     override fun attachBaseContext(base: Context) {

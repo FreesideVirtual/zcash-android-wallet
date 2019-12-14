@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.FileObserver
 import android.os.SystemClock
 import android.os.Vibrator
 import android.util.Log
@@ -36,10 +37,8 @@ class MainActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var feedback: Feedback
 
-    @Inject
-    lateinit var observers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
-
     lateinit var navController: NavController
+
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
