@@ -6,8 +6,6 @@ import android.content.Context
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.FileObserver
-import android.os.SystemClock
 import android.os.Vibrator
 import android.util.Log
 import android.view.View
@@ -21,13 +19,12 @@ import androidx.navigation.findNavController
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.annotation.ActivityScope
-import cash.z.ecc.android.feedback.*
-import cash.z.ecc.android.feedback.NonUserAction.FEEDBACK_STARTED
+import cash.z.ecc.android.feedback.Feedback
+import cash.z.ecc.android.feedback.LaunchMetric
 import cash.z.ecc.android.feedback.NonUserAction.FEEDBACK_STOPPED
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

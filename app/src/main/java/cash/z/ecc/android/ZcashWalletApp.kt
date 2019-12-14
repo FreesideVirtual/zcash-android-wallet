@@ -37,7 +37,7 @@ class ZcashWalletApp : DaggerApplication() {
      * Implement the HasActivityInjector behavior so that dagger knows which [AndroidInjector] to use.
      */
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.builder().create(this)
+        return DaggerAppComponent.factory().create(this)
     }
 
     override fun attachBaseContext(base: Context) {
