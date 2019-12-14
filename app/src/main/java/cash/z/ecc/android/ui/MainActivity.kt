@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.SystemClock
 import android.os.Vibrator
 import android.util.Log
 import android.view.View
@@ -13,16 +14,31 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.getSystemService
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import cash.z.ecc.android.R
+import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.annotation.ActivityScope
+import cash.z.ecc.android.feedback.*
+import cash.z.ecc.android.feedback.NonUserAction.FEEDBACK_STARTED
+import cash.z.ecc.android.feedback.NonUserAction.FEEDBACK_STOPPED
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class MainActivity : DaggerAppCompatActivity() {
+
+    @Inject
+    lateinit var feedback: Feedback
+
+    @Inject
+    lateinit var observers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
+
     lateinit var navController: NavController
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
@@ -40,6 +56,28 @@ class MainActivity : DaggerAppCompatActivity() {
             WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
             false
         )// | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, false)
+
+        lifecycleScope.launch { feedback.start() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // keep track of app launch metrics
+        // (how long does it take the app to open when it is not already in the foreground)
+        ZcashWalletApp.instance.let { app ->
+            if (!app.creationMeasured) {
+                app.creationMeasured = true
+                feedback.report(LaunchMetric())
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        lifecycleScope.launch {
+            feedback.report(FEEDBACK_STOPPED)
+            feedback.stop()
+        }
+        super.onDestroy()
     }
 
     private fun setWindowFlag(bits: Int, on: Boolean) {

@@ -18,5 +18,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Mixpanel options -->
+        <meta-data android:name="com.mixpanel.android.MPConfig.AutoShowMixpanelUpdates" android:value="false" />
+        <meta-data android:name="com.mixpanel.android.MPConfig.EnableDebugLogging" android:value="false" />
+        <meta-data android:name="com.mixpanel.android.MPConfig.DisableDecideChecker" android:value="true" />
+        <meta-data android:name="com.mixpanel.android.MPConfig.DisableEmulatorBindingUI" android:value="true" />
+        <meta-data android:name="com.mixpanel.android.MPConfig.DisableGestureBindingUI" android:value="true" />
+        <meta-data android:name="com.mixpanel.android.MPConfig.DisableViewCrawler" android:value="true" />
+        <meta-data android:name="com.mixpanel.android.MPConfig.IgnoreInvisibleViewsVisualEditor" android:value="true" />
+
     </application>
 </manifest>

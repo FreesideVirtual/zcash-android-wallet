@@ -9,7 +9,13 @@ import dagger.android.DaggerApplication
 
 class ZcashWalletApp : DaggerApplication() {
 
+    var creationTime: Long = 0
+        private set
+
+    var creationMeasured: Boolean = false
+
     override fun onCreate() {
+        creationTime = System.currentTimeMillis()
         instance = this
         // Setup handler for uncaught exceptions.
         super.onCreate()

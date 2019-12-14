@@ -1,14 +1,11 @@
 package cash.z.ecc.android.feedback
 
 import cash.z.ecc.android.feedback.util.CompositeJob
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -18,41 +15,75 @@ import kotlin.coroutines.coroutineContext
  * waiting for any in-flight emissions to complete. Lastly, all monitoring will cleanly complete
  * whenever the feedback is stopped or its parent scope is cancelled.
  */
-class FeedbackProcessor(
-    val feedback: Feedback,
-    val onMetricListener: (Metric) -> Unit = {},
-    val onActionListener: (Action) -> Unit = {}
-) {
+class FeedbackCoordinator(val feedback: Feedback) {
 
     init {
-        feedback.onStart {
-            initMetrics()
-            initActions()
+        feedback.apply {
+            onStart {
+                invokeOnCompletion {
+                    flush()
+                }
+            }
         }
     }
 
     private var contextMetrics = Dispatchers.IO
     private var contextActions = Dispatchers.IO
-    private var jobs = CompositeJob()
+    private val jobs = CompositeJob()
+    private val observers = mutableListOf<FeedbackObserver>()
 
     /**
      * Wait for any in-flight listeners to complete.
      */
     suspend fun await() {
         jobs.await()
+        flush()
     }
 
-    fun metricsOn(dispatcher: CoroutineDispatcher): FeedbackProcessor {
+    /**
+     * Cancel all in-flight observer functions.
+     */
+    fun cancel() {
+        jobs.cancel()
+        flush()
+    }
+
+    /**
+     * Flush all observers so they can clear all pending buffers.
+     */
+    fun flush() {
+        observers.forEach { it.flush() }
+    }
+
+    /**
+     * Inject the context on which to observe metrics, mostly for testing purposes.
+     */
+    fun metricsOn(dispatcher: CoroutineDispatcher): FeedbackCoordinator {
         contextMetrics = dispatcher
         return this
     }
 
-    fun actionsOn(dispatcher: CoroutineDispatcher): FeedbackProcessor {
+    /**
+     * Inject the context on which to observe actions, mostly for testing purposes.
+     */
+    fun actionsOn(dispatcher: CoroutineDispatcher): FeedbackCoordinator {
         contextActions = dispatcher
         return this
     }
 
-    private fun initMetrics() {
+    /**
+     * Add a coordinated observer that will not clobber all other observers because their actions
+     * are coordinated via a global mutex.
+     */
+    fun addObserver(observer: FeedbackObserver) {
+        feedback.onStart {
+            observers += observer
+            observeMetrics(observer::onMetric)
+            observeActions(observer::onAction)
+        }
+    }
+
+    private fun observeMetrics(onMetricListener: (Feedback.Metric) -> Unit) {
         feedback.metrics.onEach {
             jobs += feedback.scope.launch {
                 withContext(contextMetrics) {
@@ -64,7 +95,7 @@ class FeedbackProcessor(
         }.launchIn(feedback.scope)
     }
 
-    private fun initActions() {
+    private fun observeActions(onActionListener: (Feedback.Action) -> Unit) {
         feedback.actions.onEach {
             val id = coroutineContext.hashCode()
             jobs += feedback.scope.launch {
@@ -75,6 +106,12 @@ class FeedbackProcessor(
                 }
             }
         }.launchIn(feedback.scope)
+    }
+
+    interface FeedbackObserver {
+        fun onMetric(metric: Feedback.Metric) {}
+        fun onAction(action: Feedback.Action) {}
+        fun flush() {}
     }
 
     companion object {
