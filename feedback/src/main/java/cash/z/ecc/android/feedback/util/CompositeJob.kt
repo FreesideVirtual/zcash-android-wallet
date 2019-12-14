@@ -1,7 +1,6 @@
 package cash.z.ecc.android.feedback.util
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 
 class CompositeJob {
 
@@ -24,15 +23,20 @@ class CompositeJob {
     }
 
     suspend fun await() {
-        var activeJobs = jobs.filter { it.isActive }
-        while (activeJobs.isNotEmpty()) {
-            // allow for concurrent modification since the list isn't coroutine or thread safe
-            repeat(jobs.size) {
-                if (it < jobs.size) jobs[it].join()
+        // allow for concurrent modification since the list isn't coroutine or thread safe
+        do {
+            val job = jobs.firstOrNull()
+            if (job?.isActive == true) {
+                job.join()
+            } else {
+                // prevents an infinite loop in the extreme edge case where the list has a null item
+                try { jobs.remove(job) } catch (t: Throwable) {}
             }
-            delay(100)
-            activeJobs = jobs.filter { it.isActive }
-        }
+        } while (size > 0)
+    }
+
+    fun cancel() {
+        jobs.filter { isActive() }.forEach { it.cancel() }
     }
 
     operator fun plusAssign(also: Job) {

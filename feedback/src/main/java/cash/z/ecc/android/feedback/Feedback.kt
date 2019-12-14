@@ -13,7 +13,7 @@ class Feedback(capacity: Int = 256) {
 
     private val _metrics = BroadcastChannel<Metric>(capacity)
     private val _actions = BroadcastChannel<Action>(capacity)
-    private var onStartListener: () -> Unit = {}
+    private var onStartListeners: MutableList<() -> Unit> = mutableListOf()
 
     private val jobs = CompositeJob()
 
@@ -36,17 +36,23 @@ class Feedback(capacity: Int = 256) {
             "Error: cannot initialize feedback because it has already been initialized."
         }
         scope = CoroutineScope(Dispatchers.IO + SupervisorJob(coroutineContext[Job]))
-        scope.coroutineContext[Job]!!.invokeOnCompletion {
+        invokeOnCompletion {
             _metrics.close()
             _actions.close()
         }
-        onStartListener()
+        onStartListeners.forEach { it() }
+        onStartListeners.clear()
         return this
+    }
+
+    fun invokeOnCompletion(block: CompletionHandler) {
+        ensureScope()
+        scope.coroutineContext[Job]!!.invokeOnCompletion(block)
     }
 
     /**
      * Invokes the given callback after the scope has been initialized or immediately, if the scope
-     * has already been initialized. This is used by [FeedbackProcessor] and things like it that
+     * has already been initialized. This is used by [FeedbackCoordinator] and things like it that
      * want to immediately begin collecting the metrics/actions flows because any emissions that
      * occur before subscription are dropped.
      */
@@ -54,7 +60,7 @@ class Feedback(capacity: Int = 256) {
         if (::scope.isInitialized) {
             onStartListener()
         } else {
-            this.onStartListener = onStartListener
+            onStartListeners.add(onStartListener)
         }
     }
 
@@ -140,4 +146,43 @@ class Feedback(capacity: Int = 256) {
         throw IllegalStateException("Feedback is still active because ${errors.joinToString(", ")}.")
     }
 
+    interface Metric : Mappable<String, Any> {
+        val key: String
+        val startTime: Long?
+        val endTime: Long?
+        val elapsedTime: Long?
+
+        override fun toMap(): Map<String, Any> {
+            return mapOf(
+                "key" to key,
+                "startTime" to (startTime ?: 0),
+                "endTime" to (endTime ?: 0),
+                "elapsedTime" to (elapsedTime ?: 0)
+            )
+        }
+    }
+
+    interface Action : Feedback.Mappable<String, Any> {
+        val key: String
+        override fun toMap(): Map<String, Any> {
+            return mapOf("key" to key)
+        }
+    }
+
+    interface Mappable<K, V> {
+        fun toMap(): Map<K, V>
+    }
+
+    data class TimeMetric(
+        override val key: String,
+        val times: MutableList<Long> = mutableListOf()
+    ) : Metric {
+        override val startTime: Long? get() = times.firstOrNull()
+        override val endTime: Long? get() = times.lastOrNull()
+        override val elapsedTime: Long? get() = endTime?.minus(startTime ?: 0)
+        fun markTime(): TimeMetric {
+            times.add(System.currentTimeMillis())
+            return this
+        }
+    }
 }

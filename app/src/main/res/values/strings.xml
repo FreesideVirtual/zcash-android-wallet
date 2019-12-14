@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Zcash Wallet</string>
     <string name="receive_address_title">Your Shielded Address</string>
+
+
+    <string name="mixpanel_project">a178e1ef062133fc121079cb12fa43c7</string>
 </resources>

@@ -36,11 +36,11 @@ class FeedbackTest {
 
     @Test
     fun testTrack() = runBlocking {
-        val simpleAction = object : Action {
-            override val name: String = "ButtonClick"
+        val simpleAction = object : Feedback.Action {
+            override val key = "ButtonClick"
         }
         val feedback = Feedback().start()
-        verifyAction(feedback, simpleAction.name)
+        verifyAction(feedback, simpleAction.key)
 
         feedback.report(simpleAction)
     }
@@ -85,7 +85,7 @@ class FeedbackTest {
 
     private fun verifyDuration(feedback: Feedback, duration: Long) {
         feedback.metrics.onEach {
-            val metric = (it as? TimeMetric)?.elapsedTime
+            val metric = (it as? Feedback.TimeMetric)?.elapsedTime
             assertTrue(
                 "Measured time did not match duration. Expected $duration but was $metric",
                 metric ?: 0 >= duration
@@ -96,7 +96,7 @@ class FeedbackTest {
 
     private fun verifyAction(feedback: Feedback, name: String) {
         feedback.actions.onEach {
-            assertTrue("Action did not match. Expected $name but was ${it.name}", name == it.name)
+            assertTrue("Action did not match. Expected $name but was ${it.key}", name == it.key)
             feedback.stop()
         }.launchIn(feedback.scope)
     }
