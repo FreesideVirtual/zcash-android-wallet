@@ -2,11 +2,7 @@ package cash.z.ecc.android.feedback
 
 import android.util.Log
 
-class FeedbackConsole(coordinator: FeedbackCoordinator) : FeedbackCoordinator.FeedbackObserver {
-
-    init {
-        coordinator.addObserver(this)
-    }
+class FeedbackConsole : FeedbackCoordinator.FeedbackObserver {
 
     override fun onMetric(metric: Feedback.Metric) {
         log(metric.toString())

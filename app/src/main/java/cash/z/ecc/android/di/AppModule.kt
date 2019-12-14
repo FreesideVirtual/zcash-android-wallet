@@ -17,26 +17,4 @@ class AppModule {
     @Singleton
     fun provideFeedbackCoordinator(feedback: Feedback) = FeedbackCoordinator(feedback)
 
-
-    //
-    // Feedback Observer Set
-    //
-
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFeedbackFile(feedbackCoordinator: FeedbackCoordinator)
-            : FeedbackCoordinator.FeedbackObserver = FeedbackFile(feedbackCoordinator)
-
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFeedbackConsole(feedbackCoordinator: FeedbackCoordinator)
-            : FeedbackCoordinator.FeedbackObserver = FeedbackConsole(feedbackCoordinator)
-
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFeedbackMixpanel(feedbackCoordinator: FeedbackCoordinator)
-            : FeedbackCoordinator.FeedbackObserver = FeedbackMixpanel(feedbackCoordinator)
 }

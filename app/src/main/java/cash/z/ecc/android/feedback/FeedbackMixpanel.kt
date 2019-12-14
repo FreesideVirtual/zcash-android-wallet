@@ -5,11 +5,7 @@ import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.ext.toAppString
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 
-class FeedbackMixpanel(coordinator: FeedbackCoordinator) : FeedbackCoordinator.FeedbackObserver {
-
-    init {
-        coordinator.addObserver(this)
-    }
+class FeedbackMixpanel : FeedbackCoordinator.FeedbackObserver {
 
     private val mixpanel =
         MixpanelAPI.getInstance(ZcashWalletApp.instance, R.string.mixpanel_project.toAppString())
