@@ -75,6 +75,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':qrecycler')
     implementation project(':feedback')
+    implementation project(':mnemonic')
+    implementation project(':lockbox')
 
     //  Kotlin
     implementation Deps.Kotlin.STDLIB

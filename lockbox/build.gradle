@@ -1,0 +1,48 @@
+import cash.z.ecc.android.Deps
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+repositories {
+    google()
+    jcenter()
+}
+
+android {
+    compileSdkVersion Deps.compileSdkVersion
+    buildToolsVersion Deps.buildToolsVersion
+
+    useLibrary 'android.test.runner'
+
+    defaultConfig {
+        minSdkVersion Deps.minSdkVersion
+        targetSdkVersion Deps.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation Deps.Kotlin.STDLIB
+    implementation Deps.AndroidX.APPCOMPAT
+    implementation Deps.AndroidX.CORE_KTX
+
+    implementation "de.adorsys.android:securestoragelibrary:1.2.2"
+
+    androidTestImplementation Deps.Test.Android.JUNIT
+    androidTestImplementation Deps.Test.Android.ESPRESSO
+}
