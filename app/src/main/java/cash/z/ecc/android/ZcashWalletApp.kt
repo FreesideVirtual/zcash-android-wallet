@@ -11,12 +11,6 @@ import javax.inject.Inject
 
 class ZcashWalletApp : DaggerApplication() {
 
-    @Inject
-    lateinit var feedbackCoordinator: FeedbackCoordinator
-
-    @Inject
-    lateinit var feedbackObservers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
-
     var creationTime: Long = 0
         private set
 
@@ -30,7 +24,6 @@ class ZcashWalletApp : DaggerApplication() {
 
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
 //        Twig.plant(TroubleshootingTwig())
-        feedbackObservers.forEach { feedbackCoordinator.addObserver(it) }
     }
 
     /**

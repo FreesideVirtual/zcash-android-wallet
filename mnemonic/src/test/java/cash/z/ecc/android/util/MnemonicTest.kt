@@ -11,6 +11,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.lang.Math.max
 import java.security.SecureRandom
 
 
@@ -43,6 +44,24 @@ class MnemonicTest {
         val words = mnemonics.nextMnemonicList()
         assertEquals(24, words.size)
         validate(words.map { String(it) })
+    }
+
+    @Test
+    fun testMnemonic_toList() {
+        val words = mnemonics.run {
+            toWordList(nextMnemonic())
+        }
+        assertEquals(24, words.size)
+        validate(words.map { String(it) })
+    }
+
+    @Test
+    fun testMnemonic_longestWord() {
+        var max = 0
+        repeat(2048) {
+            max = max(max, English.INSTANCE.getWord(it).length)
+        }
+        assertEquals(8, max)
     }
 
     private fun validate(words: List<String>) {

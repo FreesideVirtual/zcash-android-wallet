@@ -1,12 +1,15 @@
 package cash.z.ecc.android.feedback
 
+import android.util.Log
 import cash.z.ecc.android.feedback.util.CompositeJob
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.lang.IllegalStateException
 import kotlin.coroutines.coroutineContext
+
 
 /**
  * Takes care of the boilerplate involved in processing feedback emissions. Simply provide callbacks
@@ -15,7 +18,7 @@ import kotlin.coroutines.coroutineContext
  * waiting for any in-flight emissions to complete. Lastly, all monitoring will cleanly complete
  * whenever the feedback is stopped or its parent scope is cancelled.
  */
-class FeedbackCoordinator(val feedback: Feedback) {
+class FeedbackCoordinator(val feedback: Feedback, defaultObservers: Set<FeedbackObserver> = setOf()) {
 
     init {
         feedback.apply {
@@ -24,6 +27,11 @@ class FeedbackCoordinator(val feedback: Feedback) {
                     flush()
                 }
             }
+        }
+        if (defaultObservers.size != 3) throw IllegalStateException("BOOM")
+        defaultObservers.forEach {
+            Log.e("BOOM", "adding observer: $it to $feedback")
+            addObserver(it)
         }
     }
 

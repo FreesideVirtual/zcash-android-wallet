@@ -6,24 +6,32 @@ import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.StandardCharsets
 import java.util.*
+import javax.inject.Inject
 
+class LockBox @Inject constructor(private val appContext: Context) : LockBoxProvider {
 
-class LockBox(private val appContext: Context) : LockBoxProvider {
+    override fun setBoolean(key: String, value: Boolean) {
+        SecurePreferences.setValue(appContext, key, value)
+    }
+
+    override fun getBoolean(key: String): Boolean {
+        return SecurePreferences.getBooleanValue(appContext, key, false)
+    }
 
     override fun setBytes(key: String, value: ByteArray) {
         SecurePreferences.setValue(appContext, key, value.toHex())
     }
 
-    override fun getBytes(key: String): ByteArray {
-        return SecurePreferences.getStringValue(appContext, key, null)!!.fromHex()
+    override fun getBytes(key: String): ByteArray? {
+        return SecurePreferences.getStringValue(appContext, key, null)?.fromHex()
     }
 
     override fun setCharsUtf8(key: String, value: CharArray) {
         setBytes(key, value.toBytes())
     }
 
-    override fun getCharsUtf8(key: String): CharArray {
-        return getBytes(key).fromBytes()
+    override fun getCharsUtf8(key: String): CharArray? {
+        return getBytes(key)?.fromBytes()
     }
 
 

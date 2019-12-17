@@ -32,6 +32,9 @@ object Deps {
     object Google {
         const val MATERIAL =                "com.google.android.material:material:1.1.0-beta01"
     }
+    object JavaX {
+        const val INJECT =                        "javax.inject:javax.inject:1"
+    }
     object Kotlin :             Version(kotlinVersion) {
         val STDLIB =                        "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$version"
         object Coroutines :     Version("1.3.2") {
@@ -50,9 +53,7 @@ object Deps {
     }
 }
 
-open class Version(@JvmField val version: String)  {
-    @JvmField val t = version
-}
+open class Version(@JvmField val version: String)
 
 //zzz
 //zzz "androidx.constraintlayout:constraintlayout:2.0.0-alpha3"

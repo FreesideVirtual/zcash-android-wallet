@@ -4,16 +4,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.feedback.MetricType.SEED_CREATION
+import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.isEmulator
+import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.base.BaseFragment
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel.LockBoxKey
+import cash.z.ecc.kotlin.mnemonic.Mnemonics
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import javax.inject.Inject
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
     private var skipCount: Int = 0
 
     override fun inflate(inflater: LayoutInflater): FragmentLandingBinding =
@@ -62,6 +75,10 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
     }
 
     private fun onNewWallet() {
+        mainActivity?.feedback?.measure(SEED_CREATION) {
+            walletSetup.createSeed()
+        }
+
         binding.textMessage.text = "Wallet created! Congratulations!"
         binding.buttonNegative.text = "Skip"
         binding.buttonPositive.text = "Backup"
@@ -75,9 +92,8 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
     }
 
     private fun onEnterWallet() {
-
         skipCount = 0
-        mainActivity?.navController?.navigate(R.id.action_nav_landing_to_nav_home)
+        mainActivity?.navController?.popBackStack()
     }
 }
 

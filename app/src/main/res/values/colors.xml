@@ -10,6 +10,8 @@
     <color name="colorPrimary">@color/zcashYellow</color>
     <color name="colorPrimaryDark">#4D3805</color>
     <color name="colorAccent">#A1A1A1</color>
+    <color name="colorSurface">@color/text_light</color>
+    <color name="colorOnSurface">@color/background_banner</color>
 
 
     <!--                  -->
@@ -32,6 +34,7 @@
     <color name="zcashBlack_40">#66000000</color>
     <color name="zcashBlack_54">#8A000000</color>
     <color name="zcashBlack_87">#DD000000</color>
+    <color name="zcashBlack_dark">#171717</color>
     <color name="zcashBlack_0">#00000000</color>
 
     <!-- yellows -->
@@ -46,6 +49,8 @@
 
     <!-- every color here should be a reference to a palette color
     but have a more useful name for use in code -->
+
+    <color name="background_banner">@color/zcashBlack_dark</color>
 
     <!-- text -->
     <color name="text_light">#FFFFFF</color>

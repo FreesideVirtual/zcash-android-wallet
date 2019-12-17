@@ -1,9 +1,14 @@
 package cash.z.ecc.android.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
@@ -11,13 +16,24 @@ import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private lateinit var numberPad: List<TextView>
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
 
     override fun inflate(inflater: LayoutInflater): FragmentHomeBinding =
         FragmentHomeBinding.inflate(inflater)
@@ -51,6 +67,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
         // TODO: trigger this from presenter
         onNoFunds()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        walletSetup.checkSeed().onEach {
+            when(it) {
+                NO_SEED -> {
+                    mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
+                }
+            }
+        }.launchIn(lifecycleScope)
     }
 
     private fun onBannerAction(action: BannerAction) {
