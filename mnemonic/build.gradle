@@ -3,6 +3,7 @@ import cash.z.ecc.android.Deps
 apply plugin: 'kotlin'
 
 dependencies {
+    implementation Deps.JavaX.INJECT
     implementation Deps.Kotlin.STDLIB
 
     implementation 'com.madgag.spongycastle:core:1.58.0.0'

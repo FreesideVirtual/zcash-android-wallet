@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation Deps.JavaX.INJECT
     implementation Deps.Kotlin.STDLIB
     implementation Deps.AndroidX.APPCOMPAT
     implementation Deps.AndroidX.CORE_KTX
