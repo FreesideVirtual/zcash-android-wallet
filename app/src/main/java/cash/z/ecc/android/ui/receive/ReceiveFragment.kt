@@ -41,7 +41,7 @@ class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
             text_address_part_7,
             text_address_part_8
         )
-        binding.backButton.onClickNavUp()
+        binding.backButtonHitArea.onClickNavUp()
     }
 
     override fun onAttach(context: Context) {
