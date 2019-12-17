@@ -16,7 +16,7 @@ class SendFragment : BaseFragment<FragmentSendBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.backButton.onClickNavUp()
+        binding.backButtonHitArea.onClickNavUp()
     }
 }
 
