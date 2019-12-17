@@ -92,9 +92,9 @@ class Feedback(capacity: Int = 256) {
      * will run concurrently--meaning a "happens before" relationship between the measurer and the
      * measured cannot be established and thereby the concurrent action cannot be timed.
      */
-    inline fun <T> measure(description: Any = "measurement", block: () -> T) {
+    inline fun <T> measure(key: String = "measurement.generic", description: Any = "measurement", block: () -> T) {
         ensureScope()
-        val metric = TimeMetric(description.toString()).markTime()
+        val metric = TimeMetric(key, description.toString()).markTime()
         block()
         metric.markTime()
         report(metric)
@@ -151,10 +151,12 @@ class Feedback(capacity: Int = 256) {
         val startTime: Long?
         val endTime: Long?
         val elapsedTime: Long?
+        val description: String
 
         override fun toMap(): Map<String, Any> {
             return mapOf(
                 "key" to key,
+                "description" to description,
                 "startTime" to (startTime ?: 0),
                 "endTime" to (endTime ?: 0),
                 "elapsedTime" to (elapsedTime ?: 0)
@@ -175,6 +177,7 @@ class Feedback(capacity: Int = 256) {
 
     data class TimeMetric(
         override val key: String,
+        override val description: String,
         val times: MutableList<Long> = mutableListOf()
     ) : Metric {
         override val startTime: Long? get() = times.firstOrNull()
@@ -183,6 +186,10 @@ class Feedback(capacity: Int = 256) {
         fun markTime(): TimeMetric {
             times.add(System.currentTimeMillis())
             return this
+        }
+
+        override fun toString(): String {
+            return "$description in ${elapsedTime}ms"
         }
     }
 }

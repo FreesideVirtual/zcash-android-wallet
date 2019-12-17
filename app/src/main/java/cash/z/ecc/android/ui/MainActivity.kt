@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -19,12 +20,13 @@ import androidx.navigation.findNavController
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.annotation.ActivityScope
-import cash.z.ecc.android.feedback.Feedback
-import cash.z.ecc.android.feedback.LaunchMetric
-import cash.z.ecc.android.feedback.NonUserAction.FEEDBACK_STOPPED
+import cash.z.ecc.android.feedback.*
+import com.google.android.material.snackbar.Snackbar
 import dagger.Module
+import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,9 +36,14 @@ class MainActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var feedback: Feedback
 
+    @Inject
+    lateinit var feedbackCoordinator: FeedbackCoordinator
+
     lateinit var navController: NavController
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
+
+    private var snackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +60,9 @@ class MainActivity : DaggerAppCompatActivity() {
             false
         )// | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, false)
 
-        lifecycleScope.launch { feedback.start() }
+        lifecycleScope.launch {
+            feedback.start()
+        }
     }
 
     override fun onResume() {
@@ -70,7 +79,7 @@ class MainActivity : DaggerAppCompatActivity() {
 
     override fun onDestroy() {
         lifecycleScope.launch {
-            feedback.report(FEEDBACK_STOPPED)
+            feedback.report(NonUserAction.FEEDBACK_STOPPED)
             feedback.stop()
         }
         super.onDestroy()
@@ -140,11 +149,73 @@ class MainActivity : DaggerAppCompatActivity() {
     private fun showMessage(message: String, action: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+
+    fun showSnackbar(message: String, action: String = "OK"): Snackbar {
+        return if (snackbar == null) {
+            val view = findViewById<View>(R.id.main_activity_container)
+            val snacks = Snackbar
+                .make(view, "$message", Snackbar.LENGTH_INDEFINITE)
+                .setAction(action) { /*auto-close*/ }
+
+                val snackBarView = snacks.view as ViewGroup
+                val navigationBarHeight = resources.getDimensionPixelSize(resources.getIdentifier("navigation_bar_height", "dimen", "android"))
+                val params = snackBarView.getChildAt(0).layoutParams as ViewGroup.MarginLayoutParams
+                params.setMargins(
+                    params.leftMargin,
+                    params.topMargin,
+                    params.rightMargin,
+                    navigationBarHeight
+                )
+
+                snackBarView.getChildAt(0).setLayoutParams(params)
+            snacks
+        } else {
+            snackbar!!.setText(message).setAction(action) {/*auto-close*/}
+        }.also {
+            if (!it.isShownOrQueued) it.show()
+        }
+    }
 }
 
 @Module
 abstract class MainActivityModule {
     @ActivityScope
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [MainActivityProviderModule::class])
     abstract fun contributeActivity(): MainActivity
+
+}
+
+@Module
+class MainActivityProviderModule {
+
+    @Provides
+    @ActivityScope
+    fun provideFeedback(): Feedback = Feedback()
+
+    @Provides
+    @ActivityScope
+    fun provideFeedbackCoordinator(
+        feedback: Feedback,
+        defaultObservers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
+    ): FeedbackCoordinator = FeedbackCoordinator(feedback, defaultObservers)
+
+
+    //
+    // Default Feedback Observer Set
+    //
+
+    @Provides
+    @ActivityScope
+    @IntoSet
+    fun provideFeedbackFile(): FeedbackCoordinator.FeedbackObserver = FeedbackFile()
+
+    @Provides
+    @ActivityScope
+    @IntoSet
+    fun provideFeedbackConsole(): FeedbackCoordinator.FeedbackObserver = FeedbackConsole()
+
+    @Provides
+    @ActivityScope
+    @IntoSet
+    fun provideFeedbackMixpanel(): FeedbackCoordinator.FeedbackObserver = FeedbackMixpanel()
 }
