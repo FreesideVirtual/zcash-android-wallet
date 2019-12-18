@@ -1,11 +1,13 @@
 package cash.z.ecc.android.ui.setup
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
@@ -16,9 +18,13 @@ import cash.z.ecc.android.isEmulator
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.LockBoxKey
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
@@ -46,6 +52,17 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
                 else -> onSkip(++skipCount)
             }
         }
+    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        walletSetup.checkSeed().onEach {
+            when(it) {
+                SEED_WITHOUT_BACKUP, SEED_WITH_BACKUP -> {
+                    mainActivity?.navController?.navigate(R.id.nav_backup)
+                }
+            }
+        }.launchIn(lifecycleScope)
     }
 
     private fun onSkip(count: Int) {

@@ -1,5 +1,6 @@
 package cash.z.ecc.android.ui.setup
 
+import android.content.Context
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -7,19 +8,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentBackupBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.ext.onClick
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.LockBoxKey
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
+import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
 import cash.z.ecc.android.ui.util.AddressPartNumberSpan
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 class BackupFragment : BaseFragment<FragmentBackupBinding>() {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
+
+    private var hasBackUp: Boolean? = null
 
     override fun inflate(inflater: LayoutInflater): FragmentBackupBinding =
         FragmentBackupBinding.inflate(inflater)
@@ -41,10 +57,25 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
         binding.buttonPositive.setOnClickListener {
             onEnterWallet()
         }
+        if (hasBackUp == true) {
+            binding.buttonPositive.text = "Done"
+        }
+    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        walletSetup.checkSeed().onEach {
+            when(it) {
+                SEED_WITH_BACKUP -> {
+                    hasBackUp = true
+                }
+            }
+        }.launchIn(lifecycleScope)
     }
 
     private fun onEnterWallet() {
-        Toast.makeText(activity, "Backup verification coming soon! For now, enjoy your new wallet!", Toast.LENGTH_LONG).show()
+        if (hasBackUp != true) {
+            Toast.makeText(activity, "Backup verification coming soon!", Toast.LENGTH_LONG).show()
+        }
         mainActivity?.navController?.popBackStack(R.id.wallet_setup_navigation, true)
     }
 

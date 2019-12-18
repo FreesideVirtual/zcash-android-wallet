@@ -26,27 +26,27 @@ class LockBoxText {
         val testMessage = "Some Bytes To Test"
         val testBytes = testMessage.toByteArray()
         lockBox.setBytes("seed", testBytes)
-        assertEquals(testMessage, String(lockBox.getBytes("seed")))
+        assertEquals(testMessage, String(lockBox.getBytes("seed")!!))
     }
 
     @Test
     fun testSeed_storeNegatives() {
         val testBytes = byteArrayOf(0x00, 0x00, -0x0F, -0x0B)
         lockBox.setBytes("seed", testBytes)
-        assertTrue(testBytes.contentEquals(lockBox.getBytes("seed")))
+        assertTrue(testBytes.contentEquals(lockBox.getBytes("seed")!!))
     }
 
     @Test
     fun testSeed_storeLeadingZeros() {
         val testBytes = byteArrayOf(0x00, 0x00, 0x0F, 0x0B)
         lockBox.setBytes("seed", testBytes)
-        assertTrue(testBytes.contentEquals(lockBox.getBytes("seed")))
+        assertTrue(testBytes.contentEquals(lockBox.getBytes("seed")!!))
     }
 
     @Test
     fun testPrivateKey_retrieve() {
         val testMessage = "Some Bytes To Test"
         lockBox.setCharsUtf8("spendingKey", testMessage.toCharArray())
-        assertEquals(testMessage, String(lockBox.getCharsUtf8("spendingKey")))
+        assertEquals(testMessage, String(lockBox.getCharsUtf8("spendingKey")!!))
     }
 }

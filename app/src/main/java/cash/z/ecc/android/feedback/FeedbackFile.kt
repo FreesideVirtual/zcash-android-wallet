@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 class FeedbackFile(fileName: String = "feedback.log") :
     FeedbackCoordinator.FeedbackObserver {
 
-    private val file = File(ZcashWalletApp.instance.noBackupFilesDir, fileName)
+    val file = File(ZcashWalletApp.instance.noBackupFilesDir, fileName)
     private val format = SimpleDateFormat("MM-dd HH:mm:ss.SSS")
 
 
