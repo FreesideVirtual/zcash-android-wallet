@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.lifecycle.lifecycleScope
+import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentDetailBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
 import cash.z.ecc.android.ext.clicks
+import cash.z.ecc.android.ext.onClick
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.feedback.FeedbackFile
 import cash.z.ecc.android.ui.base.BaseFragment
@@ -27,9 +29,16 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.backButtonHitArea.onClickNavUp()
-        binding.buttonLogs.clicks().debounce(250L).onEach {
+        onClick(binding.buttonLogs) {
             onViewFeedback()
-        }.launchIn(lifecycleScope)
+        }
+        onClick(binding.buttonBackup, 1L) {
+            onBackupWallet()
+        }
+    }
+
+    private fun onBackupWallet() {
+        mainActivity?.navController?.navigate(R.id.action_nav_detail_to_backup_wallet)
     }
 
     private fun onViewFeedback() {

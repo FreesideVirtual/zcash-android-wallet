@@ -68,14 +68,13 @@
         app:layout_constraintVertical_bias="0.045" />
 
     <TextView
+        android:id="@+id/button_backup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WALLET DETAIL"
+        android:text="Backup\nWallet"
         android:textColor="@color/text_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/guieline_keyline_end"
+        app:layout_constraintTop_toTopOf="@id/back_button" />
 
     <View
         android:id="@+id/text_banner_message"
