@@ -28,9 +28,7 @@ class FeedbackCoordinator(val feedback: Feedback, defaultObservers: Set<Feedback
                 }
             }
         }
-        if (defaultObservers.size != 3) throw IllegalStateException("BOOM")
         defaultObservers.forEach {
-            Log.e("BOOM", "adding observer: $it to $feedback")
             addObserver(it)
         }
     }
@@ -38,7 +36,7 @@ class FeedbackCoordinator(val feedback: Feedback, defaultObservers: Set<Feedback
     private var contextMetrics = Dispatchers.IO
     private var contextActions = Dispatchers.IO
     private val jobs = CompositeJob()
-    private val observers = mutableSetOf<FeedbackObserver>()
+    val observers = mutableSetOf<FeedbackObserver>()
 
     /**
      * Wait for any in-flight listeners to complete.
@@ -89,6 +87,10 @@ class FeedbackCoordinator(val feedback: Feedback, defaultObservers: Set<Feedback
             observeMetrics(observer::onMetric)
             observeActions(observer::onAction)
         }
+    }
+
+    inline fun <reified T: FeedbackObserver> findObserver(): T? {
+        return observers.firstOrNull { it::class == T::class } as T
     }
 
     private fun observeMetrics(onMetricListener: (Feedback.Metric) -> Unit) {

@@ -50,15 +50,14 @@ class MainActivity : DaggerAppCompatActivity() {
         setContentView(R.layout.main_activity)
         initNavigation()
 
-        window.statusBarColor = Color.TRANSPARENT;
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
         window.setFlags(
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
-        setWindowFlag(
-            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-            false
-        )// | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, false)
+        setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
+        setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, false)
 
         lifecycleScope.launch {
             feedback.start()

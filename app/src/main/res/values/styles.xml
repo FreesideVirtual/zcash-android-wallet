@@ -19,15 +19,20 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- Text Styles -->
+    <!-- Widgets -->
 
     <style name="Zcash.TextView.NumberPad" parent="Widget.AppCompat.TextView">
         <item name="android:textAppearance">@style/Zcash.TextAppearance.NumberPad</item>
         <item name="android:background">@drawable/selector_pressed_ripple_circle</item>
     </style>
 
+    <style name="Zcash.Button.White" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="android:textColor">@color/text_dark</item>
+    </style>
+
     <style name="Zcash.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/zcashWhite_87</item>
+        <item name="strokeColor">@color/zcashWhite</item>
     </style>
 
     <!-- Text Appearances -->

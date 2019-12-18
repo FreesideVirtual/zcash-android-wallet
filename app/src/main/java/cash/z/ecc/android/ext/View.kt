@@ -3,6 +3,8 @@ package cash.z.ecc.android.ext
 import android.view.View
 import android.view.View.*
 import cash.z.ecc.android.ui.MainActivity
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.channelFlow
 
 fun View.goneIf(isGone: Boolean) {
     visibility = if (isGone) GONE else VISIBLE
@@ -27,5 +29,14 @@ fun View.onClickNavUp() {
                 "Cannot navigate from this activity. " +
                         "Expected MainActivity but found ${context.javaClass.simpleName}"
             )
+    }
+}
+
+fun View.clicks() = channelFlow<View> {
+    setOnClickListener {
+        offer(this@clicks)
+    }
+    awaitClose {
+        setOnClickListener(null)
     }
 }
