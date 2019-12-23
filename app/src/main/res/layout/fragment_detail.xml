@@ -13,28 +13,28 @@
     <!-- TODO: redo these keylines to match the designs, exactly -->
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guieline_bottom_buttons"
+        android:id="@+id/guideline_bottom_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.7017784" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guieline_keyline_start"
+        android:id="@+id/guideline_keyline_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.054" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guieline_keyline_end"
+        android:id="@+id/guideline_keyline_end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.946" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guieline_keyline_bottom"
+        android:id="@+id/guideline_keyline_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -73,7 +73,7 @@
         android:layout_height="wrap_content"
         android:text="Backup\nWallet"
         android:textColor="@color/text_light"
-        app:layout_constraintEnd_toEndOf="@id/guieline_keyline_end"
+        app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
         app:layout_constraintTop_toTopOf="@id/back_button" />
 
     <View
@@ -81,10 +81,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/background_banner_large"
-        app:layout_constraintEnd_toEndOf="@id/guieline_keyline_end"
-        app:layout_constraintStart_toStartOf="@id/guieline_keyline_start"
-        app:layout_constraintTop_toBottomOf="@id/guieline_bottom_buttons"
-        app:layout_constraintBottom_toBottomOf="@id/guieline_keyline_bottom"/>
+        app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_keyline_start"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottom_buttons"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_keyline_bottom"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_feedback"
@@ -97,8 +97,8 @@
         android:layout_marginStart="24dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guieline_keyline_start"
-        app:layout_constraintEnd_toEndOf="@id/guieline_keyline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_keyline_start"
+        app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
         app:layout_constraintVertical_bias="0.8"/>
 
     <com.google.android.material.button.MaterialButton
@@ -109,7 +109,7 @@
         android:text="View Logs"
         android:textColor="@color/text_light"
         app:layout_constraintTop_toBottomOf="@id/button_feedback"
-        app:layout_constraintBottom_toBottomOf="@id/guieline_keyline_bottom"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_keyline_bottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_bias="0.2"/>

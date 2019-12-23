@@ -16,10 +16,14 @@ import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.util.AddressPartNumberSpan
+import cash.z.wallet.sdk.ext.twig
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import kotlinx.android.synthetic.main.fragment_receive.*
 import kotlinx.coroutines.launch
+import kotlin.math.floor
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
     override fun inflate(inflater: LayoutInflater): FragmentReceiveBinding =
@@ -51,20 +55,36 @@ class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
 
     override fun onResume() {
         super.onResume()
-        lifecycleScope.launch {
-            onAddressLoaded("zs1qduvdyuv83pyygjvc4cfcuc2wj5flnqn730iigf0tjct8k5ccs9y30p96j2gvn9gzyxm6q0vj12c4")
+        resumedScope.launch {
+            mainActivity?.synchronizer?.getAddress()?.let { address ->
+                onAddressLoaded(address)
+            }
         }
     }
 
     private fun onAddressLoaded(address: String) {
-        Log.e("TWIG", "onAddressLoaded:  $address length: ${address.length}")
+        twig("address loaded:  $address length: ${address.length}")
         qrecycler.load(address)
             .withQuietZoneSize(3)
             .withCorrectionLevel(QRecycler.CorrectionLevel.MEDIUM)
             .into(receive_qr_code)
 
-        address.chunked(address.length/8).forEachIndexed { i, part ->
+        address.distribute(8) { i, part ->
             setAddressPart(i, part)
+        }
+    }
+
+    private fun <T> String.distribute(chunks: Int, block: (Int, String) -> T) {
+        val charsPerChunk = length / 8.0
+        val wholeCharsPerChunk = charsPerChunk.toInt()
+        val chunksWithExtra = ((charsPerChunk - wholeCharsPerChunk) * chunks).roundToInt()
+        repeat(chunks) { i ->
+            val part = if (i < chunksWithExtra) {
+                substring(i * (wholeCharsPerChunk + 1), (i + 1) * (wholeCharsPerChunk + 1))
+            } else {
+                substring(i * wholeCharsPerChunk + chunksWithExtra, (i + 1) * wholeCharsPerChunk + chunksWithExtra)
+            }
+            block(i, part)
         }
     }
 

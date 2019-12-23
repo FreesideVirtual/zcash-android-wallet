@@ -40,6 +40,8 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
         mainActivity?.showSnackbar("Feedback not yet implemented.")
     }
 
+    }
+
     private fun onViewLogs() {
         loadLogFileAsText().let { logText ->
             if (logText == null) {
