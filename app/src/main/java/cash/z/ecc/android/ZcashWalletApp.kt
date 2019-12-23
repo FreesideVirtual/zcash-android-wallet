@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Build
 import cash.z.ecc.android.di.DaggerAppComponent
 import cash.z.ecc.android.feedback.FeedbackCoordinator
+import cash.z.wallet.sdk.ext.TroubleshootingTwig
+import cash.z.wallet.sdk.ext.Twig
+import cash.z.wallet.sdk.ext.twig
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 import javax.inject.Inject
@@ -23,7 +26,7 @@ class ZcashWalletApp : DaggerApplication() {
         super.onCreate()
 
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
-//        Twig.plant(TroubleshootingTwig())
+        Twig.plant(TroubleshootingTwig())
     }
 
     /**
@@ -46,6 +49,7 @@ class ZcashWalletApp : DaggerApplication() {
         override fun uncaughtException(t: Thread?, e: Throwable?) {
 //            trackCrash(e, "Top-level exception wasn't caught by anything else!")
 //            Analytics.clear()
+            twig("Uncaught Exception: $e")
             ogHandler.uncaughtException(t, e)
         }
     }
