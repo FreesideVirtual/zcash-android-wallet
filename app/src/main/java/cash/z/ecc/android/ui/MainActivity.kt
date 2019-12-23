@@ -49,11 +49,20 @@ class MainActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var feedbackCoordinator: FeedbackCoordinator
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    val sendViewModel: SendViewModel by viewModels { viewModelFactory }
+
     lateinit var navController: NavController
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
     private var snackbar: Snackbar? = null
+
+    lateinit var synchronizer: Synchronizer
+
+    val clipboard get() = (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,18 +173,15 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     fun copyAddress(view: View) {
-        // TODO: get address from synchronizer
-        val address =
-            "zs1qduvdyuv83pyygjvc4cfcuc2wj5flnqn730iigf0tjct8k5ccs9y30p96j2gvn9gzyxm6q0vj12c4"
-        val clipboard: ClipboardManager =
-            getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(
-            ClipData.newPlainText(
-                "Z-Address",
-                address
+        lifecycleScope.launch {
+            clipboard.setPrimaryClip(
+                ClipData.newPlainText(
+                    "Z-Address",
+                    synchronizer.getAddress()
+                )
             )
-        )
-        showMessage("Address copied!", "Sweet")
+            showMessage("Address copied!", "Sweet")
+        }
     }
 
     private fun showMessage(message: String, action: String) {

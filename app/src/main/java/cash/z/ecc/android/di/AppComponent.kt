@@ -5,7 +5,7 @@ import cash.z.ecc.android.ui.MainActivityModule
 import cash.z.ecc.android.ui.detail.WalletDetailFragmentModule
 import cash.z.ecc.android.ui.home.HomeFragmentModule
 import cash.z.ecc.android.ui.receive.ReceiveFragmentModule
-import cash.z.ecc.android.ui.send.SendFragmentModule
+import cash.z.ecc.android.ui.send.*
 import cash.z.ecc.android.ui.setup.BackupFragmentModule
 import cash.z.ecc.android.ui.setup.LandingFragmentModule
 import dagger.BindsInstance
@@ -27,7 +27,10 @@ import javax.inject.Singleton
         // Fragments
         HomeFragmentModule::class,
         ReceiveFragmentModule::class,
-        SendFragmentModule::class,
+        SendAddressFragmentModule::class,
+        SendMemoFragmentModule::class,
+        SendConfirmFragmentModule::class,
+        SendFinalFragmentModule::class,
         WalletDetailFragmentModule::class,
         LandingFragmentModule::class,
         BackupFragmentModule::class

@@ -14,20 +14,15 @@
             android:id="@+id/action_nav_home_to_nav_receive"
             app:destination="@id/nav_receive" />
         <action
-            android:id="@+id/action_nav_home_to_nav_send"
-            app:destination="@id/nav_send" />
-        <action
             android:id="@+id/action_nav_home_to_nav_detail"
             app:destination="@id/nav_detail" />
         <action
             android:id="@+id/action_nav_home_to_create_wallet"
             app:destination="@id/wallet_setup_navigation" />
+        <action
+            android:id="@+id/action_nav_home_to_send"
+            app:destination="@id/send_navigation" />
     </fragment>
-
-    <fragment
-        android:id="@+id/nav_send"
-        android:name="cash.z.ecc.android.ui.send.SendFragment"
-        tools:layout="@layout/fragment_send" />
 
     <fragment
         android:id="@+id/nav_receive"
@@ -44,5 +39,6 @@
     </fragment>
 
     <include app:graph="@navigation/wallet_setup_navigation" />
+    <include app:graph="@navigation/send_navigation" />
 
 </navigation>
