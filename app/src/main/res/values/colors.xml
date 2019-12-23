@@ -24,6 +24,7 @@
 
     <color name="zcashWhite">#F5F5F5</color>
     <color name="zcashWhite_12">#1FFFFFFF</color>
+    <color name="zcashWhite_24">#3DFFFFFF</color>
     <color name="zcashWhite_40">#66FFFFFF</color>
     <color name="zcashWhite_50">#80FFFFFF</color>
     <color name="zcashWhite_60">#A3FFFFFF</color>

@@ -15,18 +15,21 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentBackupBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
-import cash.z.ecc.android.ext.onClick
+import cash.z.ecc.android.feedback.Report.MetricType.SEED_PHRASE_LOADED
+import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.LockBoxKey
-import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
 import cash.z.ecc.android.ui.util.AddressPartNumberSpan
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class BackupFragment : BaseFragment<FragmentBackupBinding>() {
@@ -79,7 +82,7 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
         mainActivity?.navController?.popBackStack(R.id.wallet_setup_navigation, true)
     }
 
-    private fun applySpan(vararg textViews: TextView) {
+    private fun applySpan(vararg textViews: TextView) = lifecycleScope.launch {
         val words = loadSeedWords()
         val thinSpace = "\u2005" // 0.25 em space
         textViews.forEachIndexed { index, textView ->
@@ -92,11 +95,14 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
         }
     }
 
-    private fun loadSeedWords(): List<CharArray> {
-        val lockBox = LockBox(ZcashWalletApp.instance)
-        val mnemonics = Mnemonics()
-        val seed = lockBox.getBytes(LockBoxKey.SEED)!!
-        return mnemonics.nextMnemonicList(seed)
+    private suspend fun loadSeedWords(): List<CharArray> = withContext(Dispatchers.IO) {
+        mainActivity!!.feedback.measure(SEED_PHRASE_LOADED) {
+            val lockBox = LockBox(ZcashWalletApp.instance)
+            val mnemonics = Mnemonics()
+            val seedPhrase =  lockBox.getCharsUtf8(LockBoxKey.SEED_PHRASE)!!
+            val result =  mnemonics.toWordList(seedPhrase)
+            result
+        }
     }
 }
 

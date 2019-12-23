@@ -4,4 +4,7 @@
 
 
     <string name="mixpanel_project">a178e1ef062133fc121079cb12fa43c7</string>
+
+    <!-- Send Flow -->
+    <string name="send_hint_input_zcash_address">Enter a shielded Zcash address</string>
 </resources>

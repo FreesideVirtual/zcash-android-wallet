@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/background_home">
 
     <View
@@ -27,14 +28,28 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.04" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_send_amount_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.13" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_send_amount_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.23" />
+
     <TextView
         android:id="@+id/text_balance_available"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12.34581242 ZEC"
+        android:text="Updating"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/text_light"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@id/label_balance"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,6 +67,17 @@
         app:layout_constraintBaseline_toBaselineOf="@id/text_balance_available"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/text_balance_available" />
+
+    <TextView
+        android:id="@+id/text_balance_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(enter an amount to send)"
+        android:visibility="gone"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_balance_available" />
 
 
     <!--            -->
@@ -213,20 +239,23 @@
         app:layout_constraintTop_toBottomOf="@id/button_number_pad_9"
         app:layout_constraintWidth_percent="@dimen/calculator_button_width_percent" />
 
-    <!-- TODO: properly style this as a button with ripples -->
-    <TextView
+
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_send"
         android:layout_width="0dp"
-        android:layout_height="46dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:background="@drawable/background_button_rounded"
-        android:gravity="center"
+        style="@style/Zcash.Button"
         android:text="Send Amount"
+        android:enabled="false"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="#000000"
+        android:gravity="center"
+        android:padding="12dp"
         app:layout_constraintEnd_toEndOf="@id/guide_keys"
         app:layout_constraintStart_toStartOf="@id/guide_keys"
-        app:layout_constraintTop_toBottomOf="@id/guide_keys" />
+        app:layout_constraintTop_toBottomOf="@id/guide_keys"/>
 
     <View
         android:id="@+id/layer_lock"
@@ -234,6 +263,7 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:background="#D0000000"
+        tools:visibility="gone"
         android:elevation="5dp" />
 
     <!--             -->
@@ -322,36 +352,25 @@
         app:layout_constraintTop_toBottomOf="@id/button_send"
         app:layout_constraintVertical_bias="@dimen/ratio_golden_small" />
 
-    <ImageView
-        android:id="@+id/icon_zec_symbol"
-        android:elevation="6dp"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:tint="@color/colorAccent"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/text_send_amount"
-        app:layout_constraintEnd_toStartOf="@id/text_send_amount"
-        app:layout_constraintHeight_percent="0.052"
-        app:layout_constraintTop_toTopOf="@id/text_send_amount"
-        app:layout_constraintVertical_bias="0.2"
-        app:layout_constraintWidth_percent="0.060"
-        app:srcCompat="@drawable/ic_zec_symbol" />
-
     <TextView
         android:id="@+id/text_send_amount"
         android:elevation="6dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:gravity="center"
         android:includeFontPadding="false"
         android:text="$0"
         android:textAppearance="@style/Zcash.TextAppearance.Zec"
         android:textSize="72dp"
-        app:layout_constraintBottom_toTopOf="@id/guide_keys"
+        android:maxLines="1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+
+        app:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toTopOf="@id/guideline_send_amount_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="@id/guideline_send_amount_top" />
 
     <!--        -->
     <!-- Banner -->
@@ -379,7 +398,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="Learn More"
+        android:text="Fund Now"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/colorPrimary"
         app:layout_constraintBaseline_toBaselineOf="@id/text_banner_message"
@@ -395,6 +414,7 @@
         android:id="@+id/group_banner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:constraint_referenced_ids="text_banner_message, text_banner_action" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

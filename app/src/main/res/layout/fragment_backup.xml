@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/background_home">
 
     <androidx.constraintlayout.widget.Guideline
@@ -39,7 +40,7 @@
             style="@style/Zcash.TextAppearance.AddressPart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="drum"
+            tools:text="drum"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -51,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_1"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_7" />
@@ -61,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_4"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_10" />
@@ -71,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_7"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_13" />
@@ -81,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_10"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_16" />
@@ -91,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_13"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_19" />
@@ -101,7 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_16"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_22" />
@@ -111,7 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_1"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_19" />
         
@@ -126,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:text="fitness"
+            tools:text="fitness"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_5"
             app:layout_constraintStart_toEndOf="@id/barrier_left_address_column_1"
             app:layout_constraintTop_toTopOf="@id/text_address_part_1" />
@@ -137,7 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_8"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_2" />
@@ -148,7 +149,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_11"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_5" />
@@ -159,7 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_14"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_8" />
@@ -170,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_17"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_11" />
@@ -181,7 +182,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_20"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_14" />
@@ -192,7 +193,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_23"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_17" />
@@ -203,7 +204,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_2"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_20" />
 
@@ -218,7 +219,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:text="goals"
+            tools:text="goals"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_6"
             app:layout_constraintStart_toEndOf="@id/barrier_left_address_column_2"
             app:layout_constraintTop_toTopOf="@id/text_address_part_1" />
@@ -229,7 +230,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_9"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_3" />
@@ -240,7 +241,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_12"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_6" />
@@ -251,7 +252,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_15"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_9" />
@@ -262,7 +263,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_18"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_12" />
@@ -273,7 +274,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_21"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_15" />
@@ -284,7 +285,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintBottom_toTopOf="@+id/text_address_part_24"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_18" />
@@ -295,7 +296,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             style="@style/Zcash.TextAppearance.AddressPart"
-            android:text="word"
+            tools:text="word"
             app:layout_constraintStart_toStartOf="@id/text_address_part_3"
             app:layout_constraintTop_toBottomOf="@id/text_address_part_21" />
 <!--

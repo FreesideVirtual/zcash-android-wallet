@@ -19,6 +19,8 @@ class LockBox @Inject constructor(private val appContext: Context) : LockBoxProv
     }
 
     override fun setBytes(key: String, value: ByteArray) {
+        // using hex here because this library doesn't really work well for byte arrays
+        // but hopefully we can code to arrays and then change the underlying library, later
         SecurePreferences.setValue(appContext, key, value.toHex())
     }
 
@@ -27,11 +29,13 @@ class LockBox @Inject constructor(private val appContext: Context) : LockBoxProv
     }
 
     override fun setCharsUtf8(key: String, value: CharArray) {
-        setBytes(key, value.toBytes())
+        // Using string here because this library doesn't work well for char arrays
+        // but hopefully we can code to arrays and then change the underlying library, later
+        SecurePreferences.setValue(appContext, key, String(value))
     }
 
     override fun getCharsUtf8(key: String): CharArray? {
-        return getBytes(key)?.fromBytes()
+        return SecurePreferences.getStringValue(appContext, key, null)?.toCharArray()
     }
 
 

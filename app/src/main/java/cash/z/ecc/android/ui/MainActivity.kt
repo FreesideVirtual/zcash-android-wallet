@@ -13,7 +13,9 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.content.getSystemService
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -21,6 +23,12 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.annotation.ActivityScope
 import cash.z.ecc.android.feedback.*
+import cash.z.ecc.android.feedback.Report.NonUserAction.FEEDBACK_STOPPED
+import cash.z.ecc.android.feedback.Report.NonUserAction.SYNC_START
+import cash.z.ecc.android.ui.send.SendViewModel
+import cash.z.wallet.sdk.Initializer
+import cash.z.wallet.sdk.Synchronizer
+import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.snackbar.Snackbar
 import dagger.Module
 import dagger.Provides
@@ -33,17 +41,28 @@ import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
 
+    private var syncInit: (() -> Unit)? = null
+
     @Inject
     lateinit var feedback: Feedback
 
     @Inject
     lateinit var feedbackCoordinator: FeedbackCoordinator
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    val sendViewModel: SendViewModel by viewModels { viewModelFactory }
+
     lateinit var navController: NavController
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
     private var snackbar: Snackbar? = null
+
+    lateinit var synchronizer: Synchronizer
+
+    val clipboard get() = (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +97,7 @@ class MainActivity : DaggerAppCompatActivity() {
 
     override fun onDestroy() {
         lifecycleScope.launch {
-            feedback.report(NonUserAction.FEEDBACK_STOPPED)
+            feedback.report(FEEDBACK_STOPPED)
             feedback.stop()
         }
         super.onDestroy()
@@ -103,6 +122,29 @@ class MainActivity : DaggerAppCompatActivity() {
                 this@MainActivity.window.decorView.rootView.windowToken,
                 InputMethodManager.HIDE_NOT_ALWAYS
             )
+        }
+    }
+
+    fun initSync() {
+        twig("Initializing synchronizer")
+        if (!::synchronizer.isInitialized) {
+            twig("Synchronizer didn't exist yet (this means we're opening an existing wallet). Creating it now.")
+            val initializer = Initializer(ZcashWalletApp.instance, "lightd-main.zecwallet.co", 443).also { it.open() }
+            synchronizer = Synchronizer(ZcashWalletApp.instance, initializer)
+        }
+        feedback.report(SYNC_START)
+        synchronizer.start(lifecycleScope)
+        if (syncInit != null) {
+            syncInit!!()
+            syncInit = null
+        }
+    }
+
+    fun initializeAccount(seed: ByteArray, birthday: Initializer.WalletBirthday? = null) {
+        twig("Initializing accounts")
+        feedback.measure(Report.MetricType.ACCOUNT_CREATED) {
+            synchronizer =
+                Synchronizer(ZcashWalletApp.instance, "lightd-main.zecwallet.co", 443, seed, birthday)
         }
     }
 
@@ -131,18 +173,15 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     fun copyAddress(view: View) {
-        // TODO: get address from synchronizer
-        val address =
-            "zs1qduvdyuv83pyygjvc4cfcuc2wj5flnqn730iigf0tjct8k5ccs9y30p96j2gvn9gzyxm6q0vj12c4"
-        val clipboard: ClipboardManager =
-            getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(
-            ClipData.newPlainText(
-                "Z-Address",
-                address
+        lifecycleScope.launch {
+            clipboard.setPrimaryClip(
+                ClipData.newPlainText(
+                    "Z-Address",
+                    synchronizer.getAddress()
+                )
             )
-        )
-        showMessage("Address copied!", "Sweet")
+            showMessage("Address copied!", "Sweet")
+        }
     }
 
     private fun showMessage(message: String, action: String) {
@@ -172,6 +211,15 @@ class MainActivity : DaggerAppCompatActivity() {
             snackbar!!.setText(message).setAction(action) {/*auto-close*/}
         }.also {
             if (!it.isShownOrQueued) it.show()
+        }
+    }
+
+    // TODO: refactor initialization and remove the need for this
+    fun onSyncInit(initBlock: () -> Unit) {
+        if (::synchronizer.isInitialized) {
+            initBlock()
+        } else {
+            syncInit = initBlock
         }
     }
 }

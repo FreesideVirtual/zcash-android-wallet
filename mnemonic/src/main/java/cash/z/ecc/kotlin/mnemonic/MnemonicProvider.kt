@@ -9,7 +9,7 @@ interface MnemonicProvider {
     /**
      * Generate a random seed.
      */
-    fun nextSeed(): ByteArray
+    fun nextEntropy(): ByteArray
 
     /**
      * Generate a random 24-word mnemonic phrase.

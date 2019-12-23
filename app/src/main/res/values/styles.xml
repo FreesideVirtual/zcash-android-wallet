@@ -26,9 +26,13 @@
         <item name="android:background">@drawable/selector_pressed_ripple_circle</item>
     </style>
 
-    <style name="Zcash.Button.White" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@android:color/white</item>
+    <style name="Zcash.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/colorPrimary</item>
         <item name="android:textColor">@color/text_dark</item>
+    </style>
+
+    <style name="Zcash.Button.White">
+        <item name="backgroundTint">@android:color/white</item>
     </style>
 
     <style name="Zcash.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
@@ -65,7 +69,7 @@
 
     <style name="Zcash.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">cut</item>
-        <item name="cornerSize">8dp</item>
+        <item name="cornerSize">10dp</item>
     </style>
     <style name="Zcash.ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">cut</item>

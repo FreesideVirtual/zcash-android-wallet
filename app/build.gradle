@@ -8,7 +8,7 @@ apply plugin: 'kotlin-kapt'
 
 archivesBaseName = 'zcash-android-wallet'
 group = 'cash.z.ecc.android'
-version = '1.0.0-alpha03'
+version = '1.0.0-alpha04'
 
 android {
     compileSdkVersion Deps.compileSdkVersion
@@ -18,10 +18,12 @@ android {
         applicationId 'cash.z.ecc.android'
         minSdkVersion Deps.minSdkVersion
         targetSdkVersion Deps.targetSdkVersion
-        versionCode = 1_00_00_003
+        versionCode = 1_00_00_004
         // last digits are alpha(0XX) beta(2XX) rc(4XX) release(8XX). Ex: 1_08_04_401 is an release candidate build of version 1.8.4 and 1_08_04_800 would be the final release.
         versionName = "$version"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+        multiDexEnabled true
     }
     flavorDimensions 'network'
     productFlavors {
@@ -40,11 +42,13 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
+            shrinkResources false
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -82,6 +86,7 @@ dependencies {
     implementation project(':feedback')
     implementation project(':mnemonic')
     implementation project(':lockbox')
+    implementation project(':sdk')
 
     //  Kotlin
     implementation Deps.Kotlin.STDLIB
@@ -101,6 +106,11 @@ dependencies {
     implementation Deps.Dagger.ANDROID_SUPPORT
     kapt Deps.Dagger.ANDROID_PROCESSOR
     kapt Deps.Dagger.COMPILER
+
+    // Testing these BIP39 dependencies
+    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+    implementation 'io.github.novacrypto:BIP39:2019.01.27'
+    implementation 'io.github.novacrypto:securestring:2019.01.27'
 
     // grpc-java
     implementation "io.grpc:grpc-okhttp:1.21.0"

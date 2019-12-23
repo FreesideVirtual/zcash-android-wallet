@@ -12,19 +12,19 @@ import javax.inject.Inject
 //  which expects a string so for that reason, we just use Strings here)
 class Mnemonics @Inject constructor(): MnemonicProvider {
 
-    override fun nextSeed(): ByteArray {
+    override fun nextEntropy(): ByteArray {
         return ByteArray(Words.TWENTY_FOUR.byteLength()).apply {
             SecureRandom().nextBytes(this)
         }
     }
 
     override fun nextMnemonic(): CharArray {
-        return nextMnemonic(nextSeed())
+        return nextMnemonic(nextEntropy())
     }
 
-    override fun nextMnemonic(seed: ByteArray): CharArray {
+    override fun nextMnemonic(entropy: ByteArray): CharArray {
         return StringBuilder().let { builder ->
-            MnemonicGenerator(English.INSTANCE).createMnemonic(seed) { c ->
+            MnemonicGenerator(English.INSTANCE).createMnemonic(entropy) { c ->
                 builder.append(c)
             }
             builder.toString().toCharArray()
@@ -32,12 +32,12 @@ class Mnemonics @Inject constructor(): MnemonicProvider {
     }
 
     override fun nextMnemonicList(): List<CharArray> {
-        return nextMnemonicList(nextSeed())
+        return nextMnemonicList(nextEntropy())
     }
 
-    override fun nextMnemonicList(seed: ByteArray): List<CharArray> {
+    override fun nextMnemonicList(entropy: ByteArray): List<CharArray> {
         return WordListBuilder().let { builder ->
-            MnemonicGenerator(English.INSTANCE).createMnemonic(seed) { c ->
+            MnemonicGenerator(English.INSTANCE).createMnemonic(entropy) { c ->
                 builder.append(c)
             }
             builder.wordList
@@ -46,7 +46,7 @@ class Mnemonics @Inject constructor(): MnemonicProvider {
 
     override fun toSeed(mnemonic: CharArray): ByteArray {
         // TODO: either find another library that allows for doing this without strings or modify this code to leverage SecureCharBuffer (which doesn't work well with SeedCalculator.calculateSeed, which expects a string so for that reason, we just use Strings here)
-        return SeedCalculator().calculateSeed(mnemonic.toString(), "")
+        return SeedCalculator().calculateSeed(String(mnemonic), "")
     }
 
     override fun toWordList(mnemonic: CharArray): List<CharArray> {

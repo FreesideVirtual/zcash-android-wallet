@@ -12,19 +12,17 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
-import cash.z.ecc.android.feedback.MetricType.SEED_CREATION
-import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.isEmulator
-import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.ecc.android.ui.setup.WalletSetupViewModel.LockBoxKey
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
-import cash.z.ecc.kotlin.mnemonic.Mnemonics
+import cash.z.wallet.sdk.Initializer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
@@ -45,6 +43,24 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
                 "new" -> onNewWallet()
                 "backup" -> onBackupWallet()
             }
+        }
+        binding.buttonNegative.setOnLongClickListener {
+            if (binding.buttonNegative.text.toString().toLowerCase() == "restore") {
+                MaterialAlertDialogBuilder(activity)
+                    .setMessage("Would you like to import the dev wallet?\n\nIf so, please only send 0.0001 ZEC at a time and return some later so that the account remains funded.")
+                    .setTitle("Import Dev Wallet?")
+                    .setCancelable(true)
+                    .setPositiveButton("Import") { dialog, _ ->
+                        dialog.dismiss()
+                        onUseDevWallet()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                true
+            }
+            false
         }
         binding.buttonNegative.setOnClickListener {
             when (binding.buttonNegative.text.toString().toLowerCase()) {
@@ -84,23 +100,50 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
     }
 
     private fun onRestoreWallet() {
-        if (ZcashWalletApp.instance.isEmulator()) {
-            onEnterWallet()
-        } else {
-            Toast.makeText(activity, "Coming soon!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "Coming soon!", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onUseDevWallet() {
+        val seedPhrase =
+            "still champion voice habit trend flight survey between bitter process artefact blind carbon truly provide dizzy crush flush breeze blouse charge solid fish spread"
+        val birthday = 663174//626599
+        mainActivity?.apply {
+            lifecycleScope.launch {
+                initializeAccount(
+                    walletSetup.importWallet(feedback, seedPhrase.toCharArray()),
+                    Initializer.loadBirthdayFromAssets(ZcashWalletApp.instance, birthday)
+                )
+                initSync()
+            }
+
+            binding.buttonPositive.isEnabled = true
+            binding.textMessage.text = "Wallet imported! Congratulations!"
+            binding.buttonNegative.text = "Skip"
+            binding.buttonPositive.text = "Backup"
+            playSound("sound_receive_small.mp3")
+            vibrateSuccess()
         }
     }
 
+    // TODO: move this to the ViewModel but doing so requires fixing dagger so do that as a separate PR
     private fun onNewWallet() {
-        mainActivity?.feedback?.measure(SEED_CREATION) {
-            walletSetup.createSeed()
-        }
+        lifecycleScope.launch {
+            val ogText = binding.buttonPositive.text
+            binding.buttonPositive.text = "creating"
+            binding.buttonPositive.isEnabled = false
 
-        binding.textMessage.text = "Wallet created! Congratulations!"
-        binding.buttonNegative.text = "Skip"
-        binding.buttonPositive.text = "Backup"
-        mainActivity?.playSound("sound_receive_small.mp3")
-        mainActivity?.vibrateSuccess()
+            mainActivity?.apply {
+                initializeAccount(walletSetup.createWallet(feedback))
+                initSync()
+            }
+
+            binding.buttonPositive.isEnabled = true
+            binding.textMessage.text = "Wallet created! Congratulations!"
+            binding.buttonNegative.text = "Skip"
+            binding.buttonPositive.text = "Backup"
+            mainActivity?.playSound("sound_receive_small.mp3")
+            mainActivity?.vibrateSuccess()
+        }
     }
 
     private fun onBackupWallet() {
