@@ -92,12 +92,13 @@ class Feedback(capacity: Int = 256) {
      * will run concurrently--meaning a "happens before" relationship between the measurer and the
      * measured cannot be established and thereby the concurrent action cannot be timed.
      */
-    inline fun <T> measure(key: String = "measurement.generic", description: Any = "measurement", block: () -> T) {
+    inline fun <T> measure(key: String = "measurement.generic", description: Any = "measurement", block: () -> T): T {
         ensureScope()
         val metric = TimeMetric(key, description.toString()).markTime()
-        block()
+        val result = block()
         metric.markTime()
         report(metric)
+        return result
     }
 
     /**

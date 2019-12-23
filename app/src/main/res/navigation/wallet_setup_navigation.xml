@@ -12,7 +12,9 @@
         tools:layout="@layout/fragment_landing" >
         <action
             android:id="@+id/action_nav_landing_to_nav_backup"
-            app:destination="@id/nav_backup" />
+            app:destination="@id/nav_backup"
+            app:popUpTo="@id/nav_landing"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment
