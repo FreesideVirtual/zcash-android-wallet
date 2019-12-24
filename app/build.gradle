@@ -98,6 +98,10 @@ dependencies {
     implementation Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME_KTX
     implementation Deps.AndroidX.Navigation.FRAGMENT_KTX
     implementation Deps.AndroidX.Navigation.UI_KTX
+    implementation "androidx.room:room-ktx:2.2.3"
+    implementation "androidx.paging:paging-runtime-ktx:2.1.1"
+    implementation 'com.google.guava:guava:27.0.1-android'
+    kapt "androidx.room:room-compiler:2.2.3"
 
     // Google
     implementation Deps.Google.MATERIAL

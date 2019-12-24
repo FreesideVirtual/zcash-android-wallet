@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/background_home">
 
     <!--            -->
@@ -75,6 +76,21 @@
         android:textColor="@color/text_light"
         app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
         app:layout_constraintTop_toTopOf="@id/back_button" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_transactions"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottom_buttons"
+        app:layout_constraintStart_toStartOf="@id/guideline_keyline_start"
+        app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
+        app:layout_constraintTop_toBottomOf="@id/button_backup"
+        tools:itemCount="15"
+        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_transaction"
+        tools:orientation="vertical" />
 
     <View
         android:id="@+id/text_banner_message"
