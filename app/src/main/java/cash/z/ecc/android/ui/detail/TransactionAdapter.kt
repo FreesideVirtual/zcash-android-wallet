@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import cash.z.ecc.android.R
-import cash.z.wallet.sdk.demoapp.demos.listtransactions.TransactionViewHolder
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
 
 class TransactionAdapter<T : ConfirmedTransaction> :

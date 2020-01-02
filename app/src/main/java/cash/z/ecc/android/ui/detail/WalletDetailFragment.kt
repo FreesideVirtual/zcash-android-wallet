@@ -54,7 +54,7 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         adapter = TransactionAdapter()
         resumedScope.launch {
-            mainActivity?.synchronizer?.receivedTransactions?.collect { onTransactionsUpdated(it) }
+            mainActivity?.synchronizer?.clearedTransactions?.collect { onTransactionsUpdated(it) }
         }
         binding.recyclerTransactions.adapter = adapter
     }
