@@ -38,6 +38,9 @@
     <color name="zcashBlack_dark">#171717</color>
     <color name="zcashBlack_0">#00000000</color>
 
+    <color name="zcashGreen">#66BB6A</color>
+    <color name="zcashRed">#BB666A</color>
+
     <!-- yellows -->
     <color name="zcashYellow_light">#FFD649</color>
     <color name="zcashYellow">#FFB727</color>
