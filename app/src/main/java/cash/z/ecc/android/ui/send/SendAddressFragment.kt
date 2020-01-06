@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendAddressBinding
 import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ui.base.BaseFragment
@@ -16,9 +17,12 @@ import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.twig
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import javax.inject.Inject
 
 class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     ClipboardManager.OnPrimaryClipChangedListener {
+
+    val sendViewModel: SendViewModel  by viewModel()
 
     override fun inflate(inflater: LayoutInflater): FragmentSendAddressBinding =
         FragmentSendAddressBinding.inflate(inflater)
@@ -35,7 +39,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
         binding.textBannerMessage.setOnClickListener {
             onPaste()
         }
-        binding.textAmount.text = "Sending ${mainActivity?.sendViewModel?.zatoshiAmount.convertZatoshiToZecString(8)} ZEC"
+        binding.textAmount.text = "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC"
         binding.inputZcashAddress.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 onAddAddress()
@@ -47,7 +51,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     }
 
     private fun onAddAddress() {
-        mainActivity?.sendViewModel?.toAddress = binding.inputZcashAddress.text.toString()
+        sendViewModel.toAddress = binding.inputZcashAddress.text.toString()
         mainActivity?.navController?.navigate(R.id.action_nav_send_address_to_send_memo)
     }
 
@@ -102,12 +106,4 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
 
     private fun ClipboardManager.text(): CharSequence =
         primaryClip!!.getItemAt(0).coerceToText(mainActivity)
-}
-
-
-@Module
-abstract class SendAddressFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): SendAddressFragment
 }

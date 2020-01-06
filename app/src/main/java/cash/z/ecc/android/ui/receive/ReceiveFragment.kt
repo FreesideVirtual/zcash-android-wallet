@@ -8,21 +8,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
-import androidx.lifecycle.lifecycleScope
 import cash.z.android.qrecycler.QRecycler
 import cash.z.ecc.android.databinding.FragmentReceiveBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
-import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.util.AddressPartNumberSpan
 import cash.z.wallet.sdk.ext.twig
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.android.synthetic.main.fragment_receive.*
 import kotlinx.coroutines.launch
-import kotlin.math.floor
-import kotlin.math.round
 import kotlin.math.roundToInt
 
 class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
@@ -97,12 +90,4 @@ class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
 
         addressParts[index].text = textSpan
     }
-}
-
-
-@Module
-abstract class ReceiveFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): ReceiveFragment
 }

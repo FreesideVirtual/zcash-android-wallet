@@ -5,17 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.NonNull
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import cash.z.ecc.android.ui.MainActivity
-import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlin.coroutines.coroutineContext
 
-abstract class BaseFragment<T : ViewBinding> : DaggerFragment() {
+abstract class BaseFragment<T : ViewBinding> : Fragment() {
     val mainActivity: MainActivity? get() = activity as MainActivity?
 
     lateinit var binding: T

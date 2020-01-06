@@ -13,8 +13,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class WalletSetupViewModel @Inject constructor(val mnemonics: Mnemonics, val lockBox: LockBox) :
-    ViewModel() {
+class WalletSetupViewModel @Inject constructor() : ViewModel() {
+
+    @Inject
+    lateinit var mnemonics: Mnemonics
+
+    @Inject
+    lateinit var lockBox: LockBox
 
     enum class WalletSetupState {
         UNKNOWN, SEED_WITH_BACKUP, SEED_WITHOUT_BACKUP, NO_SEED
@@ -88,8 +93,6 @@ class WalletSetupViewModel @Inject constructor(val mnemonics: Mnemonics, val loc
            }
        }
    }
-
-
 
     object LockBoxKey {
         const val SEED = "cash.z.ecc.android.SEED"

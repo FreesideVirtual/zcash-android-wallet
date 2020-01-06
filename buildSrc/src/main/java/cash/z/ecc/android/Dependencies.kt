@@ -22,6 +22,7 @@ object Deps {
         }
         object Lifecycle:       Version("2.2.0-rc02") {
             val LIFECYCLE_RUNTIME_KTX =     "androidx.lifecycle:lifecycle-runtime-ktx:$version"
+            val LIFECYCLE_EXTENSIONS =      "androidx.lifecycle:lifecycle-extensions:$version"
         }
     }
     object Dagger :             Version("2.25.2") {

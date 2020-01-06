@@ -7,23 +7,23 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendFinalBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.entity.*
 import cash.z.wallet.sdk.ext.abbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.twig
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlin.math.min
 import kotlin.random.Random
 
 class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
+
+    val sendViewModel: SendViewModel by viewModel()
+
     override fun inflate(inflater: LayoutInflater): FragmentSendFinalBinding =
         FragmentSendFinalBinding.inflate(inflater)
 
@@ -36,8 +36,8 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
             onExit()
         }
         binding.textConfirmation.text =
-            "Sending ${mainActivity?.sendViewModel?.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${mainActivity?.sendViewModel?.toAddress?.abbreviatedAddress()}"
-        mainActivity?.sendViewModel?.memo?.trim()?.isNotEmpty()?.let { hasMemo ->
+            "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel.toAddress.abbreviatedAddress()}"
+        sendViewModel.memo?.trim()?.isNotEmpty()?.let { hasMemo ->
             binding.radioIncludeAddress.isChecked = hasMemo
             binding.radioIncludeAddress.goneIf(!hasMemo)
         }
@@ -92,12 +92,4 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     private fun onExit() {
         mainActivity?.navController?.popBackStack(R.id.send_navigation, true)
     }
-}
-
-
-@Module
-abstract class SendFinalFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): SendFinalFragment
 }

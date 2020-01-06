@@ -1,4 +1,4 @@
-package cash.z.ecc.android.di
+package cash.z.ecc.android.di.module
 
 import dagger.Module
 

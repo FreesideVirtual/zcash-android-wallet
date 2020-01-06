@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-class SendViewModel @Inject constructor(var lockBox: LockBox) : ViewModel() {
+class SendViewModel @Inject constructor() : ViewModel() {
+
+    @Inject
+    lateinit var lockBox: LockBox
+
     fun send(synchronizer: Synchronizer): Flow<PendingTransaction> {
         val keys = (synchronizer as SdkSynchronizer).rustBackend!!.deriveSpendingKeys(
             lockBox.getBytes(WalletSetupViewModel.LockBoxKey.SEED)!!

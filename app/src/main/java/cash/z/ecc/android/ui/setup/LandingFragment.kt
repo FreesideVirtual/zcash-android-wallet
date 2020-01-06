@@ -5,32 +5,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
-import cash.z.ecc.android.isEmulator
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
 import cash.z.wallet.sdk.Initializer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    val walletSetup: WalletSetupViewModel by viewModel()
 
-    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
     private var skipCount: Int = 0
 
     override fun inflate(inflater: LayoutInflater): FragmentLandingBinding =
@@ -155,11 +147,4 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         skipCount = 0
         mainActivity?.navController?.popBackStack()
     }
-}
-
-@Module
-abstract class LandingFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): LandingFragment
 }

@@ -13,15 +13,15 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
-import cash.z.ecc.android.di.annotation.ActivityScope
+import cash.z.ecc.android.di.component.MainActivitySubcomponent
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.feedback.*
 import cash.z.ecc.android.feedback.Report.NonUserAction.FEEDBACK_STOPPED
 import cash.z.ecc.android.feedback.Report.NonUserAction.SYNC_START
@@ -30,16 +30,11 @@ import cash.z.wallet.sdk.Initializer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.snackbar.Snackbar
-import dagger.Module
-import dagger.Provides
-import dagger.android.ContributesAndroidInjector
-import dagger.android.support.DaggerAppCompatActivity
-import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class MainActivity : DaggerAppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private var syncInit: (() -> Unit)? = null
 
@@ -50,21 +45,26 @@ class MainActivity : DaggerAppCompatActivity() {
     lateinit var feedbackCoordinator: FeedbackCoordinator
 
     @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    lateinit var clipboard: ClipboardManager
 
-    val sendViewModel: SendViewModel by viewModels { viewModelFactory }
+    val sendViewModel: SendViewModel by viewModel()
 
-    lateinit var navController: NavController
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
     private var snackbar: Snackbar? = null
 
+    lateinit var navController: NavController
+
     lateinit var synchronizer: Synchronizer
 
-    val clipboard get() = (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+    lateinit var component: MainActivitySubcomponent
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        component = ZcashWalletApp.component.mainActivityComponent().create(this).also {
+            it.inject(this)
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         initNavigation()
@@ -222,47 +222,4 @@ class MainActivity : DaggerAppCompatActivity() {
             syncInit = initBlock
         }
     }
-}
-
-@Module
-abstract class MainActivityModule {
-    @ActivityScope
-    @ContributesAndroidInjector(modules = [MainActivityProviderModule::class])
-    abstract fun contributeActivity(): MainActivity
-
-}
-
-@Module
-class MainActivityProviderModule {
-
-    @Provides
-    @ActivityScope
-    fun provideFeedback(): Feedback = Feedback()
-
-    @Provides
-    @ActivityScope
-    fun provideFeedbackCoordinator(
-        feedback: Feedback,
-        defaultObservers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
-    ): FeedbackCoordinator = FeedbackCoordinator(feedback, defaultObservers)
-
-
-    //
-    // Default Feedback Observer Set
-    //
-
-    @Provides
-    @ActivityScope
-    @IntoSet
-    fun provideFeedbackFile(): FeedbackCoordinator.FeedbackObserver = FeedbackFile()
-
-    @Provides
-    @ActivityScope
-    @IntoSet
-    fun provideFeedbackConsole(): FeedbackCoordinator.FeedbackObserver = FeedbackConsole()
-
-    @Provides
-    @ActivityScope
-    @IntoSet
-    fun provideFeedbackMixpanel(): FeedbackCoordinator.FeedbackObserver = FeedbackMixpanel()
 }

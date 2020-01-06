@@ -8,15 +8,12 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentDetailBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
 import cash.z.ecc.android.ext.onClick
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.feedback.FeedbackFile
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
 import cash.z.wallet.sdk.ext.twig
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import okio.Okio
@@ -96,12 +93,4 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
             return it.readUtf8()
         }
     }
-}
-
-
-@Module
-abstract class WalletDetailFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): WalletDetailFragment
 }

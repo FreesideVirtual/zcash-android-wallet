@@ -6,17 +6,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.di.viewmodel.activityViewModel
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.disabledIf
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
+import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.SdkSynchronizer
@@ -26,24 +26,19 @@ import cash.z.wallet.sdk.ext.convertZecToZatoshi
 import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private lateinit var numberPad: List<TextView>
     private lateinit var uiModel: HomeViewModel.UiModel
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
-    private val viewModel: HomeViewModel by activityViewModels { viewModelFactory }
+    private val walletSetup: WalletSetupViewModel by activityViewModel()
+    private val sendViewModel: SendViewModel by activityViewModel()
+    private val viewModel: HomeViewModel by viewModel()
 
     private val _typedChars = ConflatedBroadcastChannel<Char>()
     private val typedChars = _typedChars.asFlow()
@@ -58,6 +53,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onAttach(context: Context) {
         twig("HomeFragment.onAttach")
+        mainActivity?.component?.inject(this)
         super.onAttach(context)
 
         // call initSync either now or later (after initializing DBs with newly created seed)
@@ -178,7 +174,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     fun setSendAmount(amount: String) {
         binding.textSendAmount.text = "\$$amount"
-        mainActivity?.sendViewModel?.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
+        sendViewModel.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
         binding.buttonSend.disabledIf(amount == "0")
     }
 
@@ -343,12 +339,4 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onDetach()
         twig("HomeFragment.onDetach")
     }
-}
-
-
-@Module
-abstract class HomeFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): HomeFragment
 }

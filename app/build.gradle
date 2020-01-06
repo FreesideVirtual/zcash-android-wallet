@@ -72,7 +72,13 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
+    kapt {
+        arguments {
+            arg 'dagger.fastInit', 'enabled'
+            arg 'dagger.fullBindingGraphValidation', 'ERROR'
+            arg 'dagger.gradle.incremental'
+        }
+    }
     applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "$archivesBaseName-v${defaultConfig.versionName}-${variant.buildType.name}.apk"
@@ -96,6 +102,7 @@ dependencies {
     implementation Deps.AndroidX.CORE_KTX
     implementation Deps.AndroidX.CONSTRAINT_LAYOUT
     implementation Deps.AndroidX.Lifecycle.LIFECYCLE_RUNTIME_KTX
+    implementation Deps.AndroidX.Lifecycle.LIFECYCLE_EXTENSIONS
     implementation Deps.AndroidX.Navigation.FRAGMENT_KTX
     implementation Deps.AndroidX.Navigation.UI_KTX
     implementation "androidx.room:room-ktx:2.2.3"
