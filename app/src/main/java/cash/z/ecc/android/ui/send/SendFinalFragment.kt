@@ -46,7 +46,7 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity?.apply {
-            sendViewModel.send(synchronizer).onEach {
+            sendViewModel.send().onEach {
                 onPendingTxUpdated(it)
             }.launchIn(mainActivity?.lifecycleScope!!)
         }

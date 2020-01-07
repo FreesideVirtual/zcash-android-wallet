@@ -8,18 +8,20 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentDetailBinding
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClick
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.feedback.FeedbackFile
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
+import cash.z.wallet.sdk.ext.collectWith
 import cash.z.wallet.sdk.ext.twig
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import okio.Okio
 
 
 class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
+
+    private val viewModel: WalletDetailViewModel by viewModel()
 
     private lateinit var adapter: TransactionAdapter<ConfirmedTransaction>
 
@@ -50,9 +52,7 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
         binding.recyclerTransactions.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         adapter = TransactionAdapter()
-        resumedScope.launch {
-            mainActivity?.synchronizer?.clearedTransactions?.collect { onTransactionsUpdated(it) }
-        }
+        viewModel.transactions.collectWith(resumedScope) { onTransactionsUpdated(it) }
         binding.recyclerTransactions.adapter = adapter
     }
 

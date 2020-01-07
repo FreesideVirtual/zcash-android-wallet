@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.TextView
 import cash.z.android.qrecycler.QRecycler
 import cash.z.ecc.android.databinding.FragmentReceiveBinding
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.util.AddressPartNumberSpan
@@ -19,12 +20,15 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
-    override fun inflate(inflater: LayoutInflater): FragmentReceiveBinding =
-        FragmentReceiveBinding.inflate(inflater)
+
+    private val viewModel: ReceiveViewModel by viewModel()
 
     lateinit var qrecycler: QRecycler
 
     lateinit var addressParts: Array<TextView>
+
+    override fun inflate(inflater: LayoutInflater): FragmentReceiveBinding =
+        FragmentReceiveBinding.inflate(inflater)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,9 +53,7 @@ class ReceiveFragment : BaseFragment<FragmentReceiveBinding>() {
     override fun onResume() {
         super.onResume()
         resumedScope.launch {
-            mainActivity?.synchronizer?.getAddress()?.let { address ->
-                onAddressLoaded(address)
-            }
+            onAddressLoaded(viewModel.getAddress())
         }
     }
 
