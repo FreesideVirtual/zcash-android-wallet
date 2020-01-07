@@ -6,31 +6,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
-import cash.z.ecc.android.isEmulator
+import cash.z.ecc.android.di.viewmodel.activityViewModel
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
 import cash.z.wallet.sdk.Initializer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
-    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
     private var skipCount: Int = 0
 
     override fun inflate(inflater: LayoutInflater): FragmentLandingBinding =
@@ -103,19 +97,14 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         Toast.makeText(activity, "Coming soon!", Toast.LENGTH_SHORT).show()
     }
 
+    // AKA import wallet
     private fun onUseDevWallet() {
-        val seedPhrase =
-            "still champion voice habit trend flight survey between bitter process artefact blind carbon truly provide dizzy crush flush breeze blouse charge solid fish spread"
+        val seedPhrase = "still champion voice habit trend flight survey between bitter process artefact blind carbon truly provide dizzy crush flush breeze blouse charge solid fish spread"
         val birthday = 663174//626599
         mainActivity?.apply {
             lifecycleScope.launch {
-                initializeAccount(
-                    walletSetup.importWallet(feedback, seedPhrase.toCharArray()),
-                    Initializer.loadBirthdayFromAssets(ZcashWalletApp.instance, birthday)
-                )
-                initSync()
+                mainActivity?.startSync(walletSetup.importWallet(seedPhrase, birthday))
             }
-
             binding.buttonPositive.isEnabled = true
             binding.textMessage.text = "Wallet imported! Congratulations!"
             binding.buttonNegative.text = "Skip"
@@ -125,17 +114,13 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         }
     }
 
-    // TODO: move this to the ViewModel but doing so requires fixing dagger so do that as a separate PR
     private fun onNewWallet() {
         lifecycleScope.launch {
             val ogText = binding.buttonPositive.text
             binding.buttonPositive.text = "creating"
             binding.buttonPositive.isEnabled = false
 
-            mainActivity?.apply {
-                initializeAccount(walletSetup.createWallet(feedback))
-                initSync()
-            }
+            mainActivity?.startSync(walletSetup.newWallet())
 
             binding.buttonPositive.isEnabled = true
             binding.textMessage.text = "Wallet created! Congratulations!"
@@ -155,11 +140,4 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         skipCount = 0
         mainActivity?.navController?.popBackStack()
     }
-}
-
-@Module
-abstract class LandingFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): LandingFragment
 }

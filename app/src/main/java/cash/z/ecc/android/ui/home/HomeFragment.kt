@@ -6,44 +6,38 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
+import cash.z.ecc.android.di.viewmodel.activityViewModel
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.disabledIf
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
+import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
-import cash.z.wallet.sdk.SdkSynchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.SYNCING
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.convertZecToZatoshi
 import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private lateinit var numberPad: List<TextView>
     private lateinit var uiModel: HomeViewModel.UiModel
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private val walletSetup: WalletSetupViewModel by activityViewModels { viewModelFactory }
-    private val viewModel: HomeViewModel by activityViewModels { viewModelFactory }
+    private val walletSetup: WalletSetupViewModel by activityViewModel(false)
+    private val sendViewModel: SendViewModel by activityViewModel()
+    private val viewModel: HomeViewModel by viewModel()
 
     private val _typedChars = ConflatedBroadcastChannel<Char>()
     private val typedChars = _typedChars.asFlow()
@@ -60,20 +54,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         twig("HomeFragment.onAttach")
         super.onAttach(context)
 
-        // call initSync either now or later (after initializing DBs with newly created seed)
+        // this will call startSync either now or later (after initializing with newly created seed)
         walletSetup.checkSeed().onEach {
             twig("Checking seed")
-            when(it) {
-                NO_SEED -> {
-                    twig("Seed not found, therefore, launching seed creation flow")
-                    // interact with user to create, backup and verify seed
-                    mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
-                    // leads to a call to initSync(), later (after accounts are created from seed)
-                }
-                else -> {
-                    twig("Found seed. Re-opening existing wallet")
-                    mainActivity?.initSync()
-                }
+            if (it == NO_SEED) {
+                // interact with user to create, backup and verify seed
+                // leads to a call to startSync(), later (after accounts are created from seed)
+                twig("Seed not found, therefore, launching seed creation flow")
+                mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
+            } else {
+                twig("Found seed. Re-opening existing wallet")
+                mainActivity?.startSync(walletSetup.openWallet())
             }
         }.launchIn(lifecycleScope)
     }
@@ -108,19 +99,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 onSend()
             }
         }
-        if (::uiModel.isInitialized) {
-            twig("uiModel exists!")
-            onModelUpdated(HomeViewModel.UiModel(), uiModel)
-        } else {
-            twig("uiModel does not exist!")
-            mainActivity?.onSyncInit {
-                viewModel.initialize(mainActivity!!.synchronizer, typedChars)
-            }
-        }
+//        if (::uiModel.isInitialized) {
+//            twig("uiModel exists!")
+//            onModelUpdated(HomeViewModel.UiModel(), uiModel)
+//        }
     }
 
     override fun onResume() {
         super.onResume()
+        viewModel.initialize(typedChars)
         twig("HomeFragment.onResume  resumeScope.isActive: ${resumedScope.isActive}  $resumedScope")
         viewModel.uiModels.scanReduce { old, new ->
             onModelUpdated(old, new)
@@ -134,7 +121,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         //       but for some reason, this doesn't always happen, which kind of defeats the purpose
         //       of having a cold stream in the view model
         resumedScope.launch {
-            (mainActivity!!.synchronizer as SdkSynchronizer).refreshBalance()
+            viewModel.refreshBalance()
         }
     }
 
@@ -178,7 +165,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     fun setSendAmount(amount: String) {
         binding.textSendAmount.text = "\$$amount"
-        mainActivity?.sendViewModel?.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
+        sendViewModel.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
         binding.buttonSend.disabledIf(amount == "0")
     }
 
@@ -343,12 +330,4 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onDetach()
         twig("HomeFragment.onDetach")
     }
-}
-
-
-@Module
-abstract class HomeFragmentModule {
-    @FragmentScope
-    @ContributesAndroidInjector
-    abstract fun contributeFragment(): HomeFragment
 }

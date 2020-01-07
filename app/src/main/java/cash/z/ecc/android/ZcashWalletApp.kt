@@ -1,18 +1,16 @@
 package cash.z.ecc.android
 
+import android.app.Application
 import android.content.Context
 import android.os.Build
-import cash.z.ecc.android.di.DaggerAppComponent
-import cash.z.ecc.android.feedback.FeedbackCoordinator
+import cash.z.ecc.android.di.component.AppComponent
+import cash.z.ecc.android.di.component.DaggerAppComponent
 import cash.z.wallet.sdk.ext.TroubleshootingTwig
 import cash.z.wallet.sdk.ext.Twig
 import cash.z.wallet.sdk.ext.twig
-import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
-import javax.inject.Inject
 
 
-class ZcashWalletApp : DaggerApplication() {
+class ZcashWalletApp : Application() {
 
     var creationTime: Long = 0
         private set
@@ -25,15 +23,9 @@ class ZcashWalletApp : DaggerApplication() {
         // Setup handler for uncaught exceptions.
         super.onCreate()
 
+        component = DaggerAppComponent.factory().create(this)
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
         Twig.plant(TroubleshootingTwig())
-    }
-
-    /**
-     * Implement the HasActivityInjector behavior so that dagger knows which [AndroidInjector] to use.
-     */
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.factory().create(this)
     }
 
     override fun attachBaseContext(base: Context) {
@@ -43,6 +35,7 @@ class ZcashWalletApp : DaggerApplication() {
 
     companion object {
         lateinit var instance: ZcashWalletApp
+        lateinit var component: AppComponent
     }
 
     class ExceptionReporter(val ogHandler: Thread.UncaughtExceptionHandler) : Thread.UncaughtExceptionHandler {

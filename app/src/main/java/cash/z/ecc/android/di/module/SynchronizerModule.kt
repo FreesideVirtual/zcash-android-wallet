@@ -1,0 +1,23 @@
+package cash.z.ecc.android.di.module
+
+import android.content.Context
+import cash.z.ecc.android.di.annotation.SynchronizerScope
+import cash.z.wallet.sdk.Initializer
+import cash.z.wallet.sdk.Synchronizer
+import dagger.Module
+import dagger.Provides
+
+/**
+ * Module that creates the synchronizer from an initializer and also everything that depends on the
+ * synchronizer (because it doesn't exist prior to this module being installed).
+ */
+@Module(includes = [ViewModelsSynchronizerModule::class])
+class SynchronizerModule {
+
+    @Provides
+    @SynchronizerScope
+    fun provideSynchronizer(appContext: Context, initializer: Initializer): Synchronizer {
+        return Synchronizer(appContext, initializer)
+    }
+
+}
