@@ -8,10 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentBackupBinding
+import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.feedback.Report.MetricType.SEED_PHRASE_LOADED
 import cash.z.ecc.android.feedback.measure
@@ -28,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class BackupFragment : BaseFragment<FragmentBackupBinding>() {
-    val walletSetup: WalletSetupViewModel by viewModel()
+    val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
     private var hasBackUp: Boolean? = null
 
@@ -56,6 +58,13 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
             binding.buttonPositive.text = "Done"
         }
     }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        mainActivity?.onBackPressedDispatcher?.addCallback(this) {
+            onEnterWallet(false)
+        }
+    }
     override fun onAttach(context: Context) {
         super.onAttach(context)
         walletSetup.checkSeed().onEach {
@@ -67,8 +76,8 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
         }.launchIn(lifecycleScope)
     }
 
-    private fun onEnterWallet() {
-        if (hasBackUp != true) {
+    private fun onEnterWallet(showMessage: Boolean = this.hasBackUp != true) {
+        if (showMessage) {
             Toast.makeText(activity, "Backup verification coming soon!", Toast.LENGTH_LONG).show()
         }
         mainActivity?.navController?.popBackStack(R.id.wallet_setup_navigation, true)
