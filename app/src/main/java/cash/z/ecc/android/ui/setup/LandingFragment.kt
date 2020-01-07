@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
+import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
@@ -21,7 +23,7 @@ import kotlinx.coroutines.launch
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
 
-    val walletSetup: WalletSetupViewModel by viewModel()
+    private val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
     private var skipCount: Int = 0
 
@@ -95,19 +97,14 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         Toast.makeText(activity, "Coming soon!", Toast.LENGTH_SHORT).show()
     }
 
+    // AKA import wallet
     private fun onUseDevWallet() {
-        val seedPhrase =
-            "still champion voice habit trend flight survey between bitter process artefact blind carbon truly provide dizzy crush flush breeze blouse charge solid fish spread"
+        val seedPhrase = "still champion voice habit trend flight survey between bitter process artefact blind carbon truly provide dizzy crush flush breeze blouse charge solid fish spread"
         val birthday = 663174//626599
         mainActivity?.apply {
             lifecycleScope.launch {
-                initializeAccount(
-                    walletSetup.importWallet(feedback, seedPhrase.toCharArray()),
-                    Initializer.loadBirthdayFromAssets(ZcashWalletApp.instance, birthday)
-                )
-                initSync()
+                mainActivity?.startSync(walletSetup.importWallet(seedPhrase, birthday))
             }
-
             binding.buttonPositive.isEnabled = true
             binding.textMessage.text = "Wallet imported! Congratulations!"
             binding.buttonNegative.text = "Skip"
@@ -117,17 +114,13 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         }
     }
 
-    // TODO: move this to the ViewModel but doing so requires fixing dagger so do that as a separate PR
     private fun onNewWallet() {
         lifecycleScope.launch {
             val ogText = binding.buttonPositive.text
             binding.buttonPositive.text = "creating"
             binding.buttonPositive.isEnabled = false
 
-            mainActivity?.apply {
-                initializeAccount(walletSetup.createWallet(feedback))
-                initSync()
-            }
+            mainActivity?.startSync(walletSetup.newWallet())
 
             binding.buttonPositive.isEnabled = true
             binding.textMessage.text = "Wallet created! Congratulations!"

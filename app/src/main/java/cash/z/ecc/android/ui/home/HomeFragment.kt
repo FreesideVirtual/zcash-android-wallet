@@ -19,7 +19,6 @@ import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
-import cash.z.wallet.sdk.SdkSynchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.SYNCING
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.convertZecToZatoshi
@@ -36,7 +35,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private lateinit var numberPad: List<TextView>
     private lateinit var uiModel: HomeViewModel.UiModel
 
-    private val walletSetup: WalletSetupViewModel by activityViewModel()
+    private val walletSetup: WalletSetupViewModel by activityViewModel(false)
     private val sendViewModel: SendViewModel by activityViewModel()
     private val viewModel: HomeViewModel by viewModel()
 
@@ -53,23 +52,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onAttach(context: Context) {
         twig("HomeFragment.onAttach")
-        mainActivity?.component?.inject(this)
         super.onAttach(context)
 
-        // call initSync either now or later (after initializing DBs with newly created seed)
+        // this will call startSync either now or later (after initializing with newly created seed)
         walletSetup.checkSeed().onEach {
             twig("Checking seed")
-            when(it) {
-                NO_SEED -> {
-                    twig("Seed not found, therefore, launching seed creation flow")
-                    // interact with user to create, backup and verify seed
-                    mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
-                    // leads to a call to initSync(), later (after accounts are created from seed)
-                }
-                else -> {
-                    twig("Found seed. Re-opening existing wallet")
-                    mainActivity?.initSync()
-                }
+            if (it == NO_SEED) {
+                // interact with user to create, backup and verify seed
+                // leads to a call to startSync(), later (after accounts are created from seed)
+                twig("Seed not found, therefore, launching seed creation flow")
+                mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
+            } else {
+                twig("Found seed. Re-opening existing wallet")
+                mainActivity?.startSync(walletSetup.openWallet())
             }
         }.launchIn(lifecycleScope)
     }
@@ -104,19 +99,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 onSend()
             }
         }
-        if (::uiModel.isInitialized) {
-            twig("uiModel exists!")
-            onModelUpdated(HomeViewModel.UiModel(), uiModel)
-        } else {
-            twig("uiModel does not exist!")
-            mainActivity?.onSyncInit {
-                viewModel.initialize(mainActivity!!.synchronizer, typedChars)
-            }
-        }
+//        if (::uiModel.isInitialized) {
+//            twig("uiModel exists!")
+//            onModelUpdated(HomeViewModel.UiModel(), uiModel)
+//        }
     }
 
     override fun onResume() {
         super.onResume()
+        viewModel.initialize(typedChars)
         twig("HomeFragment.onResume  resumeScope.isActive: ${resumedScope.isActive}  $resumedScope")
         viewModel.uiModels.scanReduce { old, new ->
             onModelUpdated(old, new)
@@ -130,7 +121,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         //       but for some reason, this doesn't always happen, which kind of defeats the purpose
         //       of having a cold stream in the view model
         resumedScope.launch {
-            (mainActivity!!.synchronizer as SdkSynchronizer).refreshBalance()
+            viewModel.refreshBalance()
         }
     }
 

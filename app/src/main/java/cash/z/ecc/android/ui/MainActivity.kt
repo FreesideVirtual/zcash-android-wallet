@@ -21,22 +21,19 @@ import androidx.navigation.findNavController
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.component.MainActivitySubcomponent
-import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.feedback.*
+import cash.z.ecc.android.di.component.SynchronizerSubcomponent
+import cash.z.ecc.android.feedback.Feedback
+import cash.z.ecc.android.feedback.FeedbackCoordinator
+import cash.z.ecc.android.feedback.LaunchMetric
 import cash.z.ecc.android.feedback.Report.NonUserAction.FEEDBACK_STOPPED
 import cash.z.ecc.android.feedback.Report.NonUserAction.SYNC_START
-import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.wallet.sdk.Initializer
-import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
-
-    private var syncInit: (() -> Unit)? = null
 
     @Inject
     lateinit var feedback: Feedback
@@ -47,8 +44,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var clipboard: ClipboardManager
 
-    val sendViewModel: SendViewModel by viewModel()
-
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
@@ -56,13 +51,12 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var navController: NavController
 
-    lateinit var synchronizer: Synchronizer
-
     lateinit var component: MainActivitySubcomponent
+    lateinit var synchronizerComponent: SynchronizerSubcomponent
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        component = ZcashWalletApp.component.mainActivityComponent().create(this).also {
+        component = ZcashWalletApp.component.mainActivitySubcomponent().create(this).also {
             it.inject(this)
         }
         super.onCreate(savedInstanceState)
@@ -125,27 +119,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun initSync() {
-        twig("Initializing synchronizer")
-        if (!::synchronizer.isInitialized) {
-            twig("Synchronizer didn't exist yet (this means we're opening an existing wallet). Creating it now.")
-            val initializer = Initializer(ZcashWalletApp.instance, "lightd-main.zecwallet.co", 443).also { it.open() }
-            synchronizer = Synchronizer(ZcashWalletApp.instance, initializer)
-        }
+    fun startSync(initializer: Initializer) {
+        synchronizerComponent = ZcashWalletApp.component.synchronizerSubcomponent().create(initializer)
         feedback.report(SYNC_START)
-        synchronizer.start(lifecycleScope)
-        if (syncInit != null) {
-            syncInit!!()
-            syncInit = null
-        }
-    }
-
-    fun initializeAccount(seed: ByteArray, birthday: Initializer.WalletBirthday? = null) {
-        twig("Initializing accounts")
-        feedback.measure(Report.MetricType.ACCOUNT_CREATED) {
-            synchronizer =
-                Synchronizer(ZcashWalletApp.instance, "lightd-main.zecwallet.co", 443, seed, birthday)
-        }
+        synchronizerComponent.synchronizer().start(lifecycleScope)
     }
 
     fun playSound(fileName: String) {
@@ -177,7 +154,7 @@ class MainActivity : AppCompatActivity() {
             clipboard.setPrimaryClip(
                 ClipData.newPlainText(
                     "Z-Address",
-                    synchronizer.getAddress()
+                    synchronizerComponent.synchronizer().getAddress()
                 )
             )
             showMessage("Address copied!", "Sweet")
@@ -211,15 +188,6 @@ class MainActivity : AppCompatActivity() {
             snackbar!!.setText(message).setAction(action) {/*auto-close*/}
         }.also {
             if (!it.isShownOrQueued) it.show()
-        }
-    }
-
-    // TODO: refactor initialization and remove the need for this
-    fun onSyncInit(initBlock: () -> Unit) {
-        if (::synchronizer.isInitialized) {
-            initBlock()
-        } else {
-            syncInit = initBlock
         }
     }
 }

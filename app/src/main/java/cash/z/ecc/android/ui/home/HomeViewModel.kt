@@ -2,26 +2,37 @@ package cash.z.ecc.android.ui.home
 
 import android.os.Parcelable
 import androidx.lifecycle.ViewModel
+import cash.z.wallet.sdk.SdkSynchronizer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.DISCONNECTED
 import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
-import cash.z.wallet.sdk.ext.ZcashSdk
 import cash.z.wallet.sdk.ext.ZcashSdk.MINERS_FEE_ZATOSHI
 import cash.z.wallet.sdk.ext.ZcashSdk.ZATOSHI_PER_ZEC
 import cash.z.wallet.sdk.ext.twig
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.scan
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor() : ViewModel() {
 
+    @Inject
+    lateinit var synchronizer: Synchronizer
+
     lateinit var uiModels: Flow<UiModel>
 
+    var initialized = false
+
     fun initialize(
-        synchronizer: Synchronizer,
         typedChars: Flow<Char>
     ) {
         twig("init called")
+        if (initialized) {
+            twig("Warning already initialized HomeViewModel. Ignoring call to initialize.")
+            return
+        }
         val zec = typedChars.scan("0") { acc, c ->
             when {
                 // no-op cases
@@ -54,6 +65,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         twig("HomeViewModel cleared!")
+    }
+
+    suspend fun refreshBalance() {
+        (synchronizer as SdkSynchronizer).refreshBalance()
     }
 
     @Parcelize

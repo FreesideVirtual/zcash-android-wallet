@@ -3,7 +3,7 @@ package cash.z.ecc.android.ui.send
 import androidx.lifecycle.ViewModel
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
-import cash.z.wallet.sdk.SdkSynchronizer
+import cash.z.wallet.sdk.Initializer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.entity.PendingTransaction
 import cash.z.wallet.sdk.ext.twig
@@ -16,8 +16,14 @@ class SendViewModel @Inject constructor() : ViewModel() {
     @Inject
     lateinit var lockBox: LockBox
 
-    fun send(synchronizer: Synchronizer): Flow<PendingTransaction> {
-        val keys = (synchronizer as SdkSynchronizer).rustBackend!!.deriveSpendingKeys(
+    @Inject
+    lateinit var synchronizer: Synchronizer
+
+    @Inject
+    lateinit var initializer: Initializer
+
+    fun send(): Flow<PendingTransaction> {
+        val keys = initializer.deriveSpendingKeys(
             lockBox.getBytes(WalletSetupViewModel.LockBoxKey.SEED)!!
         )
         return synchronizer.sendToAddress(

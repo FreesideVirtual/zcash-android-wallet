@@ -1,12 +1,16 @@
 package cash.z.ecc.android.ui.setup
 
 import androidx.lifecycle.ViewModel
+import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.feedback.Feedback
+import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.MetricType.*
 import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.*
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
+import cash.z.wallet.sdk.Initializer
+import cash.z.wallet.sdk.ext.twig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -21,6 +25,9 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
     @Inject
     lateinit var lockBox: LockBox
 
+    @Inject
+    lateinit var feedback: Feedback
+
     enum class WalletSetupState {
         UNKNOWN, SEED_WITH_BACKUP, SEED_WITHOUT_BACKUP, NO_SEED
     }
@@ -34,11 +41,41 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
     }
 
     /**
+     * Re-open an existing wallet. This is the most common use case, where a user has previously
+     * created or imported their seed and is returning to the wallet. In other words, this is the
+     * non-FTUE case.
+     */
+    fun openWallet(): Initializer {
+        twig("Opening existing wallet")
+        return ZcashWalletApp.component.initializerSubcomponent().create().run {
+            initializer().open(birthdayStore().getBirthday())
+        }
+    }
+
+    suspend fun newWallet(): Initializer {
+        twig("Initializing new wallet")
+        return ZcashWalletApp.component.initializerSubcomponent().create().run {
+            initializer().apply {
+                new(createWallet(), birthdayStore().newWalletBirthday)
+            }
+        }
+    }
+
+    suspend fun importWallet(seedPhrase: String, birthdayHeight: Int): Initializer {
+        twig("Importing wallet")
+        return ZcashWalletApp.component.initializerSubcomponent().create(Initializer.DefaultBirthdayStore(ZcashWalletApp.instance, birthdayHeight)).run {
+            initializer().apply {
+                import(importWallet(seedPhrase.toCharArray()), birthdayStore().getBirthday())
+            }
+        }
+    }
+
+    /**
      * Take all the steps necessary to create a new wallet and measure how long it takes.
      *
      * @param feedback the object used for measurement.
      */
-    suspend fun createWallet(feedback: Feedback): ByteArray = withContext(Dispatchers.IO){
+    private suspend fun createWallet(): ByteArray = withContext(Dispatchers.IO){
         check(!lockBox.getBoolean(LockBoxKey.HAS_SEED)) {
             "Error! Cannot create a seed when one already exists! This would overwrite the" +
                     " existing seed and could lead to a loss of funds if the user has no backup!"
@@ -69,8 +106,7 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
     *
     * @param feedback the object used for measurement.
     */
-   suspend fun importWallet(
-       feedback: Feedback,
+   private suspend fun importWallet(
        seedPhrase: CharArray
    ): ByteArray = withContext(Dispatchers.IO) {
        check(!lockBox.getBoolean(LockBoxKey.HAS_SEED)) {
