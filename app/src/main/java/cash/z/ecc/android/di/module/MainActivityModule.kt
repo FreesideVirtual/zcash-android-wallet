@@ -1,21 +1,15 @@
 package cash.z.ecc.android.di.module
 
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import cash.z.ecc.android.di.annotation.ActivityScope
+import cash.z.ecc.android.di.component.InitializerSubcomponent
+import cash.z.ecc.android.di.component.SynchronizerSubcomponent
 import cash.z.ecc.android.feedback.*
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 
-@Module
+@Module(includes = [ViewModelsActivityModule::class], subcomponents = [SynchronizerSubcomponent::class, InitializerSubcomponent::class])
 class MainActivityModule {
-
-    @Provides
-    @ActivityScope
-    fun provideViewModelProvider(activity: FragmentActivity, factory: ViewModelProvider.Factory): ViewModelProvider {
-        return ViewModelProvider(activity, factory)
-    }
 
     @Provides
     @ActivityScope

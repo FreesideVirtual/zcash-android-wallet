@@ -9,9 +9,10 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [AppModule::class])
 interface AppComponent {
-
     // Subcomponents
-    fun mainActivityComponent(): MainActivitySubcomponent.Factory
+    fun mainActivitySubcomponent(): MainActivitySubcomponent.Factory
+    fun synchronizerSubcomponent(): SynchronizerSubcomponent.Factory
+    fun initializerSubcomponent(): InitializerSubcomponent.Factory
 
     @Component.Factory
     interface Factory {
