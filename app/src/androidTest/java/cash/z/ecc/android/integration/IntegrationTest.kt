@@ -82,7 +82,7 @@ class IntegrationTest {
     fun testAddress() {
         val seed = mnemonics.toSeed(phrase.toCharArray())
         val initializer = Initializer(appContext).apply {
-            new(seed, overwrite = true)
+            new(seed, Initializer.DefaultBirthdayStore(appContext).newWalletBirthday, overwrite = true)
         }
         assertEquals(
             "Generated incorrect z-address!",
