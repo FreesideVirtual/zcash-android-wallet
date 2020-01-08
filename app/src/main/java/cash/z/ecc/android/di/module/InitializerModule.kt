@@ -8,8 +8,8 @@ import dagger.Reusable
 
 @Module
 class InitializerModule {
-    private val host = "lightd-main.zecwallet.co"
-    private val port = 443
+    private val host = "lightwalletd.z.cash"
+    private val port = 9067
 
     @Provides
     @Reusable
