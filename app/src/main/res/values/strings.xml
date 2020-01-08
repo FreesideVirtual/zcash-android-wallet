@@ -7,4 +7,5 @@
 
     <!-- Send Flow -->
     <string name="send_hint_input_zcash_address">Enter a shielded Zcash address</string>
+    <string name="send_hint_input_zcash_amount">Enter an amount to send</string>
 </resources>

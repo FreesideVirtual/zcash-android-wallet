@@ -5,24 +5,23 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendAddressBinding
-import cash.z.ecc.android.di.annotation.FragmentScope
-import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.goneIf
-import cash.z.ecc.android.ext.onClickNavBack
+import cash.z.ecc.android.di.viewmodel.activityViewModel
+import cash.z.ecc.android.ext.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.twig
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
-import javax.inject.Inject
+import cash.z.wallet.sdk.ext.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onErrorResumeNext
+import kotlinx.coroutines.launch
 
 class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     ClipboardManager.OnPrimaryClipChangedListener {
 
-    val sendViewModel: SendViewModel  by viewModel()
+    val sendViewModel: SendViewModel by activityViewModel()
 
     override fun inflate(inflater: LayoutInflater): FragmentSendAddressBinding =
         FragmentSendAddressBinding.inflate(inflater)
@@ -30,7 +29,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonNext.setOnClickListener {
-            onAddAddress()
+            onSubmit()
         }
         binding.backButtonHitArea.onClickNavBack()
         binding.textBannerAction.setOnClickListener {
@@ -39,20 +38,43 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
         binding.textBannerMessage.setOnClickListener {
             onPaste()
         }
-        binding.textAmount.text = "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC"
-        binding.inputZcashAddress.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                onAddAddress()
-                true
-            } else {
-                false
+
+        // Apply View Model
+        if (sendViewModel.zatoshiAmount > 0L) {
+            sendViewModel.zatoshiAmount.convertZatoshiToZecString(8).let { amount ->
+                binding.inputZcashAmount.setText(amount)
+                binding.textAmount.text = "Sending $amount ZEC"
             }
+        } else {
+            binding.inputZcashAmount.setText(null)
         }
+        if (!sendViewModel.toAddress.isNullOrEmpty()){
+            binding.textAmount.text = "Send to ${sendViewModel.toAddress.abbreviatedAddress()}"
+            binding.inputZcashAddress.setText(sendViewModel.toAddress)
+        } else {
+            binding.inputZcashAddress.setText(null)
+        }
+
+        binding.inputZcashAddress.onEditorActionDone(::onSubmit)
+
+        binding.imageScanQr.onClickNavTo(R.id.action_nav_send_address_to_nav_scan)
     }
 
-    private fun onAddAddress() {
+
+    private fun onSubmit(unused: EditText? = null) {
         sendViewModel.toAddress = binding.inputZcashAddress.text.toString()
-        mainActivity?.navController?.navigate(R.id.action_nav_send_address_to_send_memo)
+        binding.inputZcashAmount.convertZecToZatoshi()?.let { sendViewModel.zatoshiAmount = it }
+        sendViewModel.validate().onFirstWith(resumedScope) {
+            if (it == null) {
+                mainActivity?.navController?.navigate(R.id.action_nav_send_address_to_send_memo)
+            } else {
+                resumedScope.launch {
+                    binding.textAddressError.text = it
+                    delay(1500L)
+                    binding.textAddressError.text =  ""
+                }
+            }
+        }
     }
 
     override fun onAttach(context: Context) {

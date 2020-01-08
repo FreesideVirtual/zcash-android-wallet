@@ -69,20 +69,39 @@
         app:layout_constraintWidth_percent="0.84"
         app:layout_constraintVertical_bias="0.2"/>
 
+    <!-- Input: Amount -->
+    <EditText
+        android:id="@+id/input_zcash_amount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:hint="@string/send_hint_input_zcash_amount"
+        android:imeOptions="actionDone"
+        android:inputType="numberDecimal"
+        android:paddingRight="76dp"
+        android:singleLine="true"
+        android:paddingTop="0dp"
+        android:textColor="@color/text_light"
+        app:backgroundTint="@color/colorPrimary"
+        android:textColorHint="@color/text_light_dimmed"
+        app:layout_constraintTop_toBottomOf="@id/input_zcash_address"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.84"/>
+
     <TextView
         android:id="@+id/text_address_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:fontFamily="@font/inconsolata"
         android:includeFontPadding="false"
         android:textColor="@android:color/holo_red_light"
-        android:textSize="12dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/input_zcash_address"
-        app:layout_constraintTop_toBottomOf="@id/input_zcash_address"
-        tools:text="invalid address" />
+        android:textSize="14dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/button_next"
+        app:layout_constraintStart_toStartOf="@+id/input_zcash_amount"
+        app:layout_constraintTop_toTopOf="@+id/button_next"
+        tools:text="Please enter a larger amount of money" />
 
     <!-- Scan QR code -->
     <ImageView
@@ -107,7 +126,7 @@
         android:text="Next"
         android:textColor="@color/text_dark"
         app:layout_constraintEnd_toEndOf="@+id/input_zcash_address"
-        app:layout_constraintTop_toBottomOf="@+id/input_zcash_address" />
+        app:layout_constraintTop_toBottomOf="@+id/input_zcash_amount" />
 
     <!--        -->
     <!-- Banner -->
@@ -127,9 +146,10 @@
         android:textColor="@color/text_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/input_zcash_address"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/input_zcash_address"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45"/>
+        app:layout_constraintTop_toBottomOf="@id/button_next"
+        app:layout_constraintVertical_bias="0.07" />
 
     <TextView
         android:id="@+id/text_banner_action"
