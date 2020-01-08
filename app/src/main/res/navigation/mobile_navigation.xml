@@ -18,27 +18,111 @@
             app:destination="@id/nav_detail" />
         <action
             android:id="@+id/action_nav_home_to_create_wallet"
-            app:destination="@id/wallet_setup_navigation" />
+            app:destination="@id/nav_landing" />
         <action
             android:id="@+id/action_nav_home_to_send"
-            app:destination="@id/send_navigation" />
+            app:destination="@id/nav_send_address" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_scan"
+            app:destination="@id/nav_scan" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_receive"
         android:name="cash.z.ecc.android.ui.receive.ReceiveFragment"
-        tools:layout="@layout/fragment_receive" />
-
+        tools:layout="@layout/fragment_receive_new" >
+        <action
+            android:id="@+id/action_nav_receive_to_nav_scan"
+            app:destination="@id/nav_scan"
+            app:popUpTo="@id/nav_scan"
+            app:popUpToInclusive="true"
+            app:exitAnim="@anim/anim_fade_out_address"
+            app:enterAnim="@anim/anim_fade_in_scanner"/>
+    </fragment>
+    <fragment
+        android:id="@+id/nav_scan"
+        android:name="cash.z.ecc.android.ui.scan.ScanFragment"
+        tools:layout="@layout/fragment_scan">
+        <action
+            android:id="@+id/action_nav_scan_to_nav_send_address"
+            app:destination="@id/nav_send_address"
+            app:popUpTo="@id/nav_send_address"/>
+        <action
+            android:id="@+id/action_nav_scan_to_nav_receive"
+            app:popUpTo="@id/nav_receive"
+            app:popUpToInclusive="true"
+            app:destination="@id/nav_receive"
+            app:exitAnim="@anim/anim_fade_out_medium"/>
+    </fragment>
     <fragment
         android:id="@+id/nav_detail"
         android:name="cash.z.ecc.android.ui.detail.WalletDetailFragment"
         tools:layout="@layout/fragment_detail" >
         <action
             android:id="@+id/action_nav_detail_to_backup_wallet"
-            app:destination="@id/wallet_setup_navigation" />
+            app:destination="@id/nav_backup" />
     </fragment>
 
-    <include app:graph="@navigation/wallet_setup_navigation" />
-    <include app:graph="@navigation/send_navigation" />
 
+    <!--                 -->
+    <!-- Send Navigation -->
+    <!--                 -->
+
+    <fragment
+        android:id="@+id/nav_send_address"
+        android:name="cash.z.ecc.android.ui.send.SendAddressFragment"
+        tools:layout="@layout/fragment_send_address" >
+        <action
+            android:id="@+id/action_nav_send_address_to_send_memo"
+            app:destination="@id/nav_send_memo"/>
+        <action
+            android:id="@+id/action_nav_send_address_to_nav_scan"
+            app:destination="@id/nav_scan" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_send_memo"
+        android:name="cash.z.ecc.android.ui.send.SendMemoFragment"
+        tools:layout="@layout/fragment_send_memo" >
+        <action
+            android:id="@+id/action_nav_send_memo_to_send_confirm"
+            app:destination="@id/nav_send_confirm"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_send_confirm"
+        android:name="cash.z.ecc.android.ui.send.SendConfirmFragment"
+        tools:layout="@layout/fragment_send_confirm" >
+        <action
+            android:id="@+id/action_nav_send_confirm_to_send_final"
+            app:destination="@id/nav_send_final"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_send_final"
+        android:name="cash.z.ecc.android.ui.send.SendFinalFragment"
+        tools:layout="@layout/fragment_send_final" >
+    </fragment>
+
+
+    <!--                         -->
+    <!-- Wallet Setup Navigation -->
+    <!--                         -->
+
+    <fragment
+        android:id="@+id/nav_landing"
+        android:name="cash.z.ecc.android.ui.setup.LandingFragment"
+        tools:layout="@layout/fragment_landing" >
+        <action
+            android:id="@+id/action_nav_landing_to_nav_backup"
+            app:destination="@id/nav_backup"
+            app:popUpTo="@id/nav_landing"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_backup"
+        android:name="cash.z.ecc.android.ui.setup.BackupFragment"
+        tools:layout="@layout/fragment_backup" >
+    </fragment>
 </navigation>
