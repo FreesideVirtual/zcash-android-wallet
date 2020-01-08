@@ -7,6 +7,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendFinalBinding
+import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ui.base.BaseFragment
@@ -22,7 +23,7 @@ import kotlin.random.Random
 
 class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
 
-    val sendViewModel: SendViewModel by viewModel()
+    val sendViewModel: SendViewModel by activityViewModel()
 
     override fun inflate(inflater: LayoutInflater): FragmentSendFinalBinding =
         FragmentSendFinalBinding.inflate(inflater)

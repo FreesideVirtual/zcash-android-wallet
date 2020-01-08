@@ -6,13 +6,14 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendMemoBinding
+import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ui.base.BaseFragment
 
 class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
 
-    val sendViewModel: SendViewModel by viewModel()
+    val sendViewModel: SendViewModel by activityViewModel()
 
     override fun inflate(inflater: LayoutInflater): FragmentSendMemoBinding =
         FragmentSendMemoBinding.inflate(inflater)

@@ -9,6 +9,7 @@ import cash.z.ecc.android.di.viewmodel.ViewModelFactory
 import cash.z.ecc.android.ui.detail.WalletDetailViewModel
 import cash.z.ecc.android.ui.home.HomeViewModel
 import cash.z.ecc.android.ui.receive.ReceiveViewModel
+import cash.z.ecc.android.ui.scan.ScanViewModel
 import cash.z.ecc.android.ui.send.SendViewModel
 import dagger.Binds
 import dagger.Module
@@ -44,6 +45,11 @@ abstract class ViewModelsSynchronizerModule {
     @ViewModelKey(ReceiveViewModel::class)
     abstract fun bindReceiveViewModel(implementation: ReceiveViewModel): ViewModel
 
+    @SynchronizerScope
+    @Binds
+    @IntoMap
+    @ViewModelKey(ScanViewModel::class)
+    abstract fun bindScanViewModel(implementation: ScanViewModel): ViewModel
 
     /**
      * Factory for view models that are not created until the Synchronizer exists. Only VMs that
