@@ -90,7 +90,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_receive)
             iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
             textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
-//            hitAreaScan.onClickNavTo(R.id.action_nav_home_to_nav_send)
+            hitAreaScan.onClickNavTo(R.id.action_nav_home_to_nav_scan)
 
             textBannerAction.setOnClickListener {
                 onBannerAction(BannerAction.from((it as? TextView)?.text?.toString()))

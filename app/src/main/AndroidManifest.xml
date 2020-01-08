@@ -3,6 +3,7 @@
     package="cash.z.ecc.android">
 
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name="cash.z.ecc.android.ZcashWalletApp"
@@ -18,6 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Firebase options -->
+        <meta-data android:name="com.google.firebase.ml.vision.DEPENDENCIES" android:value="barcode" />
 
         <!-- Mixpanel options -->
         <meta-data android:name="com.mixpanel.android.MPConfig.AutoShowMixpanelUpdates" android:value="false" />

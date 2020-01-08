@@ -6,6 +6,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendConfirmBinding
+import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavBack
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class SendConfirmFragment : BaseFragment<FragmentSendConfirmBinding>() {
 
-    val sendViewModel: SendViewModel by viewModel()
+    val sendViewModel: SendViewModel by activityViewModel()
 
     override fun inflate(inflater: LayoutInflater): FragmentSendConfirmBinding =
         FragmentSendConfirmBinding.inflate(inflater)

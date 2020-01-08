@@ -3,6 +3,8 @@ package cash.z.ecc.android
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
 import cash.z.ecc.android.di.component.AppComponent
 import cash.z.ecc.android.di.component.DaggerAppComponent
 import cash.z.wallet.sdk.ext.TroubleshootingTwig
@@ -10,7 +12,7 @@ import cash.z.wallet.sdk.ext.Twig
 import cash.z.wallet.sdk.ext.twig
 
 
-class ZcashWalletApp : Application() {
+class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
     var creationTime: Long = 0
         private set
@@ -31,6 +33,10 @@ class ZcashWalletApp : Application() {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
 //        MultiDex.install(this)
+    }
+
+    override fun getCameraXConfig(): CameraXConfig {
+        return Camera2Config.defaultConfig()
     }
 
     companion object {

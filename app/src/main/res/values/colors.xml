@@ -55,6 +55,7 @@
     but have a more useful name for use in code -->
 
     <color name="background_banner">@color/zcashBlack_dark</color>
+    <color name="scan_overlay_background">@color/zcashBlack_87</color>
 
     <!-- text -->
     <color name="text_light">#FFFFFF</color>
