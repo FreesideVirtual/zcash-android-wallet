@@ -47,6 +47,9 @@ class SendViewModel @Inject constructor() : ViewModel() {
             zatoshiAmount < ZcashSdk.MINERS_FEE_ZATOSHI -> {
                 emit("Please enter a larger amount")
             }
+            synchronizer.getAddress() == toAddress -> {
+                emit("That appears to be your address!")
+            }
             else -> emit(null)
         }
     }

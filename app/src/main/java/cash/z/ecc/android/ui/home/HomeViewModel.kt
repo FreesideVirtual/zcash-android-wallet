@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
         uiModels = synchronizer.run {
             combine(status, progress, balances, zec) { s, p, b, z->
-                UiModel(s, p, b.available, b.total, z)
+                UiModel(s, p, b.availableZatoshi, b.totalZatoshi, z)
             }
         }.conflate()
     }
@@ -81,6 +81,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     ): Parcelable {
         // Note: the wallet is effectively empty if it cannot cover the miner's fee
         val hasFunds: Boolean get() = availableBalance > (MINERS_FEE_ZATOSHI.toDouble() / ZATOSHI_PER_ZEC) // 0.0001
+        val hasBalance: Boolean get() = totalBalance > (MINERS_FEE_ZATOSHI.toDouble() / ZATOSHI_PER_ZEC) // 0.0001
         val isSynced: Boolean get() = status == SYNCED
         val isSendEnabled: Boolean get() = isSynced && hasFunds
     }
