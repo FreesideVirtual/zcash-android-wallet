@@ -8,11 +8,10 @@ import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendFinalBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
-import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.entity.*
-import cash.z.wallet.sdk.ext.abbreviatedAddress
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.twig
 import kotlinx.coroutines.delay
@@ -37,11 +36,12 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
             onExit()
         }
         binding.textConfirmation.text =
-            "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel.toAddress.abbreviatedAddress()}"
+            "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel.toAddress.toAbbreviatedAddress()}"
         sendViewModel.memo?.trim()?.isNotEmpty()?.let { hasMemo ->
             binding.radioIncludeAddress.isChecked = hasMemo
             binding.radioIncludeAddress.goneIf(!hasMemo)
         }
+        mainActivity?.preventBackPress(this)
     }
 
     override fun onAttach(context: Context) {
@@ -91,6 +91,6 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     }
 
     private fun onExit() {
-        mainActivity?.navController?.popBackStack(R.id.send_navigation, true)
+        mainActivity?.navController?.popBackStack(R.id.nav_send_address, true)
     }
 }

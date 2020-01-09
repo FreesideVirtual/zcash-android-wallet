@@ -9,10 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import cash.z.ecc.android.ui.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
     val mainActivity: MainActivity? get() = activity as MainActivity?
@@ -33,7 +30,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     override fun onResume() {
         super.onResume()
         resumedScope = lifecycleScope.coroutineContext.let {
-            CoroutineScope(it + SupervisorJob(it[Job]))
+            CoroutineScope(Dispatchers.Main + SupervisorJob(it[Job]))
         }
     }
 
@@ -45,4 +42,10 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     // inflate is static in the ViewBinding class so we can't handle this ourselves
     // each fragment must call FragmentMyLayoutBinding.inflate(inflater)
     abstract fun inflate(@NonNull inflater: LayoutInflater): T
+
+    fun onBackPressNavTo(navResId: Int) {
+        mainActivity?.onFragmentBackPressed(this) {
+            mainActivity?.navController?.navigate(navResId)
+        }
+    }
 }

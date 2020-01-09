@@ -91,17 +91,19 @@
 
     <TextView
         android:id="@+id/text_address_error"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/inconsolata"
-        android:includeFontPadding="false"
         android:textColor="@android:color/holo_red_light"
+        android:maxLines="1"
+        android:autoSizeTextType="uniform"
         android:textSize="14dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/button_next"
         app:layout_constraintStart_toStartOf="@+id/input_zcash_amount"
         app:layout_constraintTop_toTopOf="@+id/button_next"
-        tools:text="Please enter a larger amount of money" />
+        app:layout_constraintEnd_toStartOf="@id/button_next"
+        tools:text="Please enter a larger amount of money also please enter a shorter sentence" />
 
     <!-- Scan QR code -->
     <ImageView

@@ -15,16 +15,22 @@
             app:destination="@id/nav_receive" />
         <action
             android:id="@+id/action_nav_home_to_nav_detail"
-            app:destination="@id/nav_detail" />
+            app:destination="@id/nav_detail"
+            app:enterAnim="@anim/anim_enter_from_bottom" />
         <action
             android:id="@+id/action_nav_home_to_create_wallet"
             app:destination="@id/nav_landing" />
         <action
             android:id="@+id/action_nav_home_to_send"
-            app:destination="@id/nav_send_address" />
+            app:destination="@id/nav_send_address"
+            app:exitAnim="@anim/anim_exit_to_left"
+            app:enterAnim="@anim/anim_enter_from_right"/>
         <action
             android:id="@+id/action_nav_home_to_nav_scan"
             app:destination="@id/nav_scan" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_profile"
+            app:destination="@id/nav_profile" />
     </fragment>
 
     <fragment
@@ -57,12 +63,16 @@
     <fragment
         android:id="@+id/nav_detail"
         android:name="cash.z.ecc.android.ui.detail.WalletDetailFragment"
-        tools:layout="@layout/fragment_detail" >
+        tools:layout="@layout/fragment_detail" />
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="cash.z.ecc.android.ui.profile.ProfileFragment"
+        tools:layout="@layout/fragment_profile" >
         <action
-            android:id="@+id/action_nav_detail_to_backup_wallet"
+            android:id="@+id/action_nav_profile_to_nav_backup"
             app:destination="@id/nav_backup" />
     </fragment>
-
 
     <!--                 -->
     <!-- Send Navigation -->
@@ -74,10 +84,17 @@
         tools:layout="@layout/fragment_send_address" >
         <action
             android:id="@+id/action_nav_send_address_to_send_memo"
-            app:destination="@id/nav_send_memo"/>
+            app:destination="@id/nav_send_memo"
+            app:exitAnim="@anim/anim_exit_to_left"
+            app:enterAnim="@anim/anim_enter_from_right"/>
         <action
             android:id="@+id/action_nav_send_address_to_nav_scan"
             app:destination="@id/nav_scan" />
+        <action
+            android:id="@+id/action_nav_send_address_to_nav_home"
+            app:destination="@id/nav_home"
+            app:enterAnim="@anim/anim_enter_from_left"
+            app:exitAnim="@anim/anim_exit_to_right"/>
     </fragment>
 
     <fragment
@@ -86,7 +103,14 @@
         tools:layout="@layout/fragment_send_memo" >
         <action
             android:id="@+id/action_nav_send_memo_to_send_confirm"
-            app:destination="@id/nav_send_confirm"/>
+            app:destination="@id/nav_send_confirm"
+            app:exitAnim="@anim/anim_exit_to_left"
+            app:enterAnim="@anim/anim_enter_from_right"/>
+        <action
+            android:id="@+id/action_nav_send_memo_to_nav_send_address"
+            app:destination="@id/nav_send_address"
+            app:enterAnim="@anim/anim_enter_from_left"
+            app:exitAnim="@anim/anim_exit_to_right" />
     </fragment>
 
     <fragment
@@ -95,7 +119,15 @@
         tools:layout="@layout/fragment_send_confirm" >
         <action
             android:id="@+id/action_nav_send_confirm_to_send_final"
-            app:destination="@id/nav_send_final"/>
+            app:destination="@id/nav_send_final"
+            app:popUpTo="@id/nav_send_confirm"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/anim_fade_in"/>
+        <action
+            android:id="@+id/action_nav_send_confirm_to_nav_send_memo"
+            app:destination="@id/nav_send_memo"
+            app:enterAnim="@anim/anim_enter_from_left"
+            app:exitAnim="@anim/anim_exit_to_right" />
     </fragment>
 
     <fragment

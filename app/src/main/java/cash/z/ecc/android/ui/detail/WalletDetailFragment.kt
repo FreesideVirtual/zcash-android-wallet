@@ -1,22 +1,25 @@
 package cash.z.ecc.android.ui.detail
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentDetailBinding
 import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.onClick
+import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavUp
-import cash.z.ecc.android.feedback.FeedbackFile
+import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.ui.base.BaseFragment
+import cash.z.wallet.sdk.block.CompactBlockProcessor.WalletBalance
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
 import cash.z.wallet.sdk.ext.collectWith
+import cash.z.wallet.sdk.ext.convertZatoshiToZecString
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.twig
-import okio.Okio
+import kotlinx.coroutines.launch
 
 
 class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
@@ -31,21 +34,26 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.backButtonHitArea.onClickNavUp()
-
-        onClick(binding.buttonFeedback) {
-            onSendFeedback()
-        }
-        onClick(binding.buttonLogs) {
-            onViewLogs()
-        }
-        onClick(binding.buttonBackup, 1L) {
-            onBackupWallet()
+        lifecycleScope.launch {
+            binding.textAddress.text = viewModel.getAddress().toAbbreviatedAddress()
         }
     }
 
     override fun onResume() {
         super.onResume()
         initTransactionUI()
+        viewModel.balance.collectWith(resumedScope) {
+            onBalanceUpdated(it)
+        }
+    }
+
+    private fun onBalanceUpdated(balance: WalletBalance) {
+        binding.textBalanceAvailable.text = balance.availableZatoshi.convertZatoshiToZecString()
+        val change = balance.totalZatoshi - balance.availableZatoshi
+        binding.textBalanceDescription.apply {
+            goneIf(change <= 0)
+            text = "(expecting +$change ZEC in change)".toColoredSpan(R.color.text_light, "+$change")
+        }
     }
 
     private fun initTransactionUI() {
@@ -56,41 +64,8 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
         binding.recyclerTransactions.adapter = adapter
     }
 
-    private fun onSendFeedback() {
-        mainActivity?.showSnackbar("Feedback not yet implemented.")
-    }
-
-    private fun onViewLogs() {
-        loadLogFileAsText().let { logText ->
-            if (logText == null) {
-                mainActivity?.showSnackbar("Log file not found!")
-            } else {
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, logText)
-                    type = "text/plain"
-                }
-
-                val shareIntent = Intent.createChooser(sendIntent, "Share Log File")
-                startActivity(shareIntent)
-            }
-        }
-    }
-
-    private fun onBackupWallet() {
-        mainActivity?.navController?.navigate(R.id.action_nav_detail_to_backup_wallet)
-    }
-
     private fun onTransactionsUpdated(transactions: PagedList<ConfirmedTransaction>) {
         twig("got a new paged list of transactions")
         adapter.submitList(transactions)
-    }
-
-    private fun loadLogFileAsText(): String? {
-        val feedbackFile: FeedbackFile =
-            mainActivity?.feedbackCoordinator?.findObserver() ?: return null
-        Okio.buffer(Okio.source(feedbackFile.file)).use {
-            return it.readUtf8()
-        }
     }
 }

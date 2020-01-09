@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
 import cash.z.android.qrecycler.QRecycler
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentReceiveNewBinding
@@ -12,7 +11,7 @@ import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.abbreviatedAddress
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.twig
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -63,7 +62,7 @@ class ReceiveFragment : BaseFragment<FragmentReceiveNewBinding>() {
             .withCorrectionLevel(QRecycler.CorrectionLevel.MEDIUM)
             .into(binding.receiveQrCode)
 
-        binding.receiveAddress.text = address.abbreviatedAddress(12, 12)
+        binding.receiveAddress.text = address.toAbbreviatedAddress(12, 12)
 
 //        address.distribute(8) { i, part ->
 //            setAddressPart(i, part)

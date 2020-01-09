@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 class BackupFragment : BaseFragment<FragmentBackupBinding>() {
     val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
-    private var hasBackUp: Boolean? = null
+    private var hasBackUp: Boolean = true //TODO: implement backup and then check for it here-ish
 
     override fun inflate(inflater: LayoutInflater): FragmentBackupBinding =
         FragmentBackupBinding.inflate(inflater)
@@ -80,7 +80,7 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
         if (showMessage) {
             Toast.makeText(activity, "Backup verification coming soon!", Toast.LENGTH_LONG).show()
         }
-        mainActivity?.navController?.popBackStack(R.id.wallet_setup_navigation, true)
+        mainActivity?.navController?.popBackStack()
     }
 
     private fun applySpan(vararg textViews: TextView) = lifecycleScope.launch {

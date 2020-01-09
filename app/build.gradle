@@ -9,7 +9,7 @@ apply plugin: 'com.google.gms.google-services'
 
 archivesBaseName = 'zcash-android-wallet'
 group = 'cash.z.ecc.android'
-version = '1.0.0-alpha04'
+version = '1.0.0-alpha05'
 
 android {
     compileSdkVersion Deps.compileSdkVersion
@@ -19,7 +19,7 @@ android {
         applicationId 'cash.z.ecc.android'
         minSdkVersion Deps.minSdkVersion
         targetSdkVersion Deps.targetSdkVersion
-        versionCode = 1_00_00_004
+        versionCode = 1_00_00_005
         // last digits are alpha(0XX) beta(2XX) rc(4XX) release(8XX). Ex: 1_08_04_401 is an release candidate build of version 1.8.4 and 1_08_04_800 would be the final release.
         versionName = "$version"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'

@@ -5,6 +5,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import java.io.PrintWriter
+import java.io.StringWriter
 import kotlin.coroutines.coroutineContext
 
 class Feedback(capacity: Int = 256) {
@@ -106,10 +108,11 @@ class Feedback(capacity: Int = 256) {
      *
      * @param metric the metric to add.
      */
-    fun report(metric: Metric) {
+    fun report(metric: Metric): Feedback {
         jobs += scope.launch {
             _metrics.send(metric)
         }
+        return this
     }
 
     /**
@@ -117,10 +120,21 @@ class Feedback(capacity: Int = 256) {
      *
      * @param action the action to add.
      */
-    fun report(action: Action) {
+    fun report(action: Action): Feedback {
         jobs += scope.launch {
             _actions.send(action)
         }
+        return this
+    }
+
+    /**
+     * Report the given error to everything that is tracking feedback. Converts it to a Crash object
+     * which is intended for use in property-based analytics.
+     *
+     * @param error the uncaught exception that occurred.
+     */
+    fun report(error: Throwable?): Feedback {
+        return report(Crash(error))
     }
 
     /**
@@ -146,6 +160,7 @@ class Feedback(capacity: Int = 256) {
         if (errors.isEmpty()) return true
         throw IllegalStateException("Feedback is still active because ${errors.joinToString(", ")}.")
     }
+
 
     interface Metric : Mappable<String, Any> {
         val key: String
@@ -193,4 +208,30 @@ class Feedback(capacity: Int = 256) {
             return "$description in ${elapsedTime}ms"
         }
     }
+
+    data class Crash(val error: Throwable?) : Action {
+        override val key: String = "crash"
+        override fun toMap(): Map<String, Any> {
+            return mutableMapOf<String, Any>(
+                "message" to (error?.message ?: "None"),
+                "cause" to (error?.cause?.toString() ?: "None"),
+                "cause.cause" to (error?.cause?.cause?.toString() ?: "None"),
+                "cause.cause.cause" to (error?.cause?.cause?.cause?.toString() ?: "None")
+            ).apply { putAll(super.toMap()); putAll(error.stacktraceToMap()) }
+        }
+        override fun toString() = "App crashed due to: $error"
+    }
+}
+
+private fun Throwable?.stacktraceToMap(chunkSize: Int = 250): Map<out String, String> {
+    val properties = mutableMapOf("stacktrace0" to "None")
+    if (this == null) return properties
+    val stringWriter = StringWriter()
+
+    printStackTrace(PrintWriter(stringWriter))
+
+    stringWriter.toString().chunked(chunkSize).forEachIndexed { index, chunk ->
+        properties["stacktrace$index"] = chunk
+    }
+    return properties
 }

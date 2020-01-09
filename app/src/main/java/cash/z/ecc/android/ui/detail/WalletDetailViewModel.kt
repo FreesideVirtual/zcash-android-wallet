@@ -11,6 +11,9 @@ class WalletDetailViewModel @Inject constructor() : ViewModel() {
     lateinit var synchronizer: Synchronizer
 
     val transactions get() = synchronizer.clearedTransactions
+    val balance get() = synchronizer.balances
+
+    suspend fun getAddress() = synchronizer.getAddress()
 
     override fun onCleared() {
         super.onCleared()

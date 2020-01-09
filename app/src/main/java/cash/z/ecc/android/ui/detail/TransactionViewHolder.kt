@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ext.toAppColor
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
-import cash.z.wallet.sdk.ext.abbreviatedAddress
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,7 +23,7 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         var lineTwo: String = ""
         var amount: String = ""
         var amountColor: Int = 0
-        var indicatorColor: Int = 0
+        var indicatorBackground: Int = 0
         
         transaction?.apply {
             amount = value.convertZatoshiToZecString()
@@ -32,18 +32,18 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
             val isMined = blockTimeInSeconds != 0L
             when {
                 !toAddress.isNullOrEmpty() -> {
-                    lineOne = "You paid ${toAddress?.abbreviatedAddress()}"
+                    lineOne = "You paid ${toAddress?.toAbbreviatedAddress()}"
                     lineTwo = if (isMined) "Sent $timestamp" else "Pending confirmation"
                     amount = "- $amount"
                     amountColor = R.color.zcashRed
-                    indicatorColor = R.color.colorPrimary
+                    indicatorBackground = R.drawable.background_indicator_outbound
                 }
                 raw == null || raw?.isEmpty() == true -> {
                     lineOne = "Unknown paid you"
                     lineTwo = "Received $timestamp"
                     amount = "+ $amount"
                     amountColor = R.color.zcashGreen
-                    indicatorColor = R.color.zcashGreen
+                    indicatorBackground = R.drawable.background_indicator_inbound
                 }
                 else -> {
                     lineOne = "Unknown"
@@ -56,6 +56,7 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         bottomText.text = lineTwo
         amountText.text = amount
         amountText.setTextColor(amountColor.toAppColor())
-        indicator.setBackgroundColor(indicatorColor.toAppColor())
+        val context = itemView.context
+        indicator.background = context.resources.getDrawable(indicatorBackground)
     }
 }
