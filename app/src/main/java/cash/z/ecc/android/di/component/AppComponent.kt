@@ -9,6 +9,8 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [AppModule::class])
 interface AppComponent {
+    fun inject(zcashWalletApp: ZcashWalletApp)
+
     // Subcomponents
     fun mainActivitySubcomponent(): MainActivitySubcomponent.Factory
     fun synchronizerSubcomponent(): SynchronizerSubcomponent.Factory
