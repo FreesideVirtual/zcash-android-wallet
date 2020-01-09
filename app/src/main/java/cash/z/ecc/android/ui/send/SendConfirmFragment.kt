@@ -7,11 +7,11 @@ import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendConfirmBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
-import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavBack
+import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.abbreviatedAddress
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import kotlinx.coroutines.launch
 
@@ -27,10 +27,13 @@ class SendConfirmFragment : BaseFragment<FragmentSendConfirmBinding>() {
         binding.buttonNext.setOnClickListener {
             onSend()
         }
-        binding.backButtonHitArea.onClickNavBack()
+        R.id.action_nav_send_confirm_to_nav_send_memo.let {
+            binding.backButtonHitArea.onClickNavTo(it)
+            onBackPressNavTo(it)
+        }
         mainActivity?.lifecycleScope?.launch {
             binding.textConfirmation.text =
-                "Send ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel?.toAddress.abbreviatedAddress()}?"
+                "Send ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel?.toAddress.toAbbreviatedAddress()}?"
         }
         sendViewModel.memo.trim().isNotEmpty().let { hasMemo ->
             binding.radioIncludeAddress.isChecked = hasMemo

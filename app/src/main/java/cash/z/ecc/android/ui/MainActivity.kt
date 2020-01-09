@@ -13,8 +13,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -149,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun copyAddress(view: View) {
+    fun copyAddress(view: View? = null) {
         lifecycleScope.launch {
             clipboard.setPrimaryClip(
                 ClipData.newPlainText(
@@ -159,6 +161,18 @@ class MainActivity : AppCompatActivity() {
             )
             showMessage("Address copied!", "Sweet")
         }
+    }
+
+    fun preventBackPress(fragment: Fragment) {
+        onFragmentBackPressed(fragment){}
+    }
+
+    fun onFragmentBackPressed(fragment: Fragment, block: () -> Unit) {
+        onBackPressedDispatcher.addCallback(fragment, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                block()
+            }
+        })
     }
 
     private fun showMessage(message: String, action: String) {

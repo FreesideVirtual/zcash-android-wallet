@@ -13,9 +13,6 @@ import cash.z.ecc.android.ext.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.ext.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onErrorResumeNext
 import kotlinx.coroutines.launch
 
 class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
@@ -31,7 +28,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
         binding.buttonNext.setOnClickListener {
             onSubmit()
         }
-        binding.backButtonHitArea.onClickNavBack()
+        binding.backButtonHitArea.onClickNavTo(R.id.action_nav_send_address_to_nav_home)
         binding.textBannerAction.setOnClickListener {
             onPaste()
         }
@@ -49,7 +46,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
             binding.inputZcashAmount.setText(null)
         }
         if (!sendViewModel.toAddress.isNullOrEmpty()){
-            binding.textAmount.text = "Send to ${sendViewModel.toAddress.abbreviatedAddress()}"
+            binding.textAmount.text = "Send to ${sendViewModel.toAddress.toAbbreviatedAddress()}"
             binding.inputZcashAddress.setText(sendViewModel.toAddress)
         } else {
             binding.inputZcashAddress.setText(null)

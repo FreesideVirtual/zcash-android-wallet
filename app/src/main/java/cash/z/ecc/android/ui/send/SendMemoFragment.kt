@@ -7,8 +7,7 @@ import android.view.inputmethod.EditorInfo
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendMemoBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
-import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.onClickNavBack
+import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.ui.base.BaseFragment
 
 class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
@@ -28,7 +27,10 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
             sendViewModel.memo = ""
             mainActivity?.navController?.navigate(R.id.action_nav_send_memo_to_send_confirm)
         }
-        binding.backButtonHitArea.onClickNavBack()
+        R.id.action_nav_send_memo_to_nav_send_address.let {
+            binding.backButtonHitArea.onClickNavTo(it)
+            onBackPressNavTo(it)
+        }
         binding.radioIncludeAddress.setOnClickListener {
             if (binding.radioIncludeAddress.isActivated) {
                 binding.radioIncludeAddress.isChecked = false
