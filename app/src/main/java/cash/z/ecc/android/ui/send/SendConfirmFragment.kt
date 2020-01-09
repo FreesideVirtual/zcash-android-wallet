@@ -36,8 +36,8 @@ class SendConfirmFragment : BaseFragment<FragmentSendConfirmBinding>() {
                 "Send ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel?.toAddress.toAbbreviatedAddress()}?"
         }
         sendViewModel.memo.trim().isNotEmpty().let { hasMemo ->
-            binding.radioIncludeAddress.isChecked = hasMemo
-            binding.radioIncludeAddress.goneIf(!hasMemo)
+            binding.radioIncludeAddress.isChecked = hasMemo || sendViewModel.includeFromAddress
+            binding.radioIncludeAddress.goneIf(!(hasMemo || sendViewModel.includeFromAddress))
         }
     }
 
