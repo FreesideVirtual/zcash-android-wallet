@@ -68,6 +68,14 @@ class SendViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun reset() {
+        fromAddress = ""
+        toAddress = ""
+        memo = ""
+        zatoshiAmount = -1L
+        includeFromAddress = false
+    }
+
     var fromAddress: String = ""
     var toAddress: String = ""
     var memo: String = ""
@@ -80,4 +88,5 @@ class SendViewModel @Inject constructor() : ViewModel() {
             }
             field = value
         }
+    val isShielded get() = toAddress.startsWith("z")
 }

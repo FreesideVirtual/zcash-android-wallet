@@ -162,7 +162,7 @@
     <!--                -->
     <!-- Global actions -->
     <!--                -->
-    
+
     <action
         android:id="@+id/action_global_nav_scan"
         app:destination="@id/nav_scan" />

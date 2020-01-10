@@ -88,6 +88,10 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
         binding.backButton.goneIf(!binding.textStatus.text.toString().contains("Awaiting"))
         binding.buttonNext.goneIf(isSending)
         binding.progressHorizontal.goneIf(!isSending)
+
+        if (pendingTransaction?.isSubmitSuccess() == true) {
+            sendViewModel.reset()
+        }
     }
 
     private fun onExit() {

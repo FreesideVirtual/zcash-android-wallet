@@ -2,6 +2,7 @@ package cash.z.ecc.android.ui.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import cash.z.ecc.android.R
@@ -13,12 +14,12 @@ class TransactionAdapter<T : ConfirmedTransaction> :
             override fun areItemsTheSame(
                 oldItem: T,
                 newItem: T
-            ) = oldItem.minedHeight == newItem.minedHeight
+            ) = oldItem.minedHeight == newItem.minedHeight && oldItem.noteId == newItem.noteId
 
             override fun areContentsTheSame(
                 oldItem: T,
                 newItem: T
-            ) = oldItem.equals(newItem)
+            ) = oldItem == newItem
         }
     ) {
 
@@ -33,5 +34,4 @@ class TransactionAdapter<T : ConfirmedTransaction> :
         holder: TransactionViewHolder<T>,
         position: Int
     ) = holder.bindTo(getItem(position))
-
 }
