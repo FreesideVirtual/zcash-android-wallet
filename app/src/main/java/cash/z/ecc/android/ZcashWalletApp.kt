@@ -12,7 +12,8 @@ import cash.z.ecc.android.feedback.FeedbackCoordinator
 import cash.z.wallet.sdk.ext.TroubleshootingTwig
 import cash.z.wallet.sdk.ext.Twig
 import cash.z.wallet.sdk.ext.twig
-import kotlinx.coroutines.runBlocking
+import com.squareup.okhttp.Dispatcher
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -27,6 +28,15 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
     var creationMeasured: Boolean = false
 
+    /**
+     * Intentionally private Scope for use with launching Feedback jobs. The feedback object has the
+     * longest scope in the app because it needs to be around early in order to measure launch times
+     * and stick around late in order to catch crashes. We intentionally don't expose this because
+     * application objects can have odd lifecycles, given that there is no clear onDestroy moment in
+     * many cases.
+     */
+    private var feedbackScope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
     override fun onCreate() {
         creationTime = System.currentTimeMillis()
         instance = this
@@ -35,6 +45,9 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
         component = DaggerAppComponent.factory().create(this)
         component.inject(this)
+        feedbackScope.launch {
+            feedbackCoordinator.feedback.start()
+        }
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(feedbackCoordinator, Thread.getDefaultUncaughtExceptionHandler()))
         Twig.plant(TroubleshootingTwig())
     }

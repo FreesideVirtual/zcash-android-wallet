@@ -8,6 +8,7 @@ import cash.z.wallet.sdk.Initializer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.entity.PendingTransaction
 import cash.z.wallet.sdk.ext.ZcashSdk
+import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.twig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -41,7 +42,10 @@ class SendViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun validate() = flow<String?> {
+    suspend fun validateAddress(address: String): Synchronizer.AddressType =
+        synchronizer.validateAddress(address)
+
+    fun validate(maxZatoshi: Long?) = flow<String?> {
 
         when {
             synchronizer.validateAddress(toAddress).isNotValid -> {
@@ -50,8 +54,8 @@ class SendViewModel @Inject constructor() : ViewModel() {
             zatoshiAmount < ZcashSdk.MINERS_FEE_ZATOSHI -> {
                 emit("Please enter a larger amount")
             }
-            synchronizer.getAddress() == toAddress -> {
-                emit("That appears to be your address!")
+            maxZatoshi != null && zatoshiAmount > maxZatoshi -> {
+                emit( "Please enter no more than ${maxZatoshi.convertZatoshiToZecString(8)}")
             }
             else -> emit(null)
         }

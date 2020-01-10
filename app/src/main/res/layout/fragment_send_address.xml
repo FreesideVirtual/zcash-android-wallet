@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_home"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="@drawable/background_home">
 
     <!-- Back Button -->
     <ImageView
@@ -13,13 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:tint="@color/text_light"
-        app:srcCompat="@drawable/ic_arrow_back_black_24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.065"
-        app:layout_constraintHorizontal_bias="0.05"/>
+        app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
 
     <View
         android:id="@+id/back_button_hit_area"
@@ -38,71 +38,99 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.MaterialComponents.Headline6"
-        tools:text="Sending 12.34121212 ZEC"
-        android:textColor="@color/text_light"
         android:autoSizeTextType="uniform"
         android:maxLines="1"
-        app:layout_constraintStart_toEndOf="@id/back_button_hit_area"
+        android:text="Sending"
+        android:textColor="@color/text_light"
+        app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back_button"
-        app:layout_constraintBottom_toBottomOf="@id/back_button" />
+        app:layout_constraintStart_toEndOf="@id/back_button_hit_area"
+        app:layout_constraintTop_toTopOf="@id/back_button" />
 
     <!-- Input: Address -->
-    <EditText
-        android:id="@+id/input_zcash_address"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_layout_address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:hint="@string/send_hint_input_zcash_address"
-        android:imeOptions="actionDone"
-        android:inputType="textNoSuggestions"
-        android:paddingRight="76dp"
-        android:singleLine="true"
-        android:paddingTop="0dp"
-        android:textColor="@color/text_light"
-        app:backgroundTint="@color/colorPrimary"
-        android:textColorHint="@color/text_light_dimmed"
-        app:layout_constraintTop_toTopOf="parent"
+        android:hint="To"
+        android:theme="@style/Zcash.Overlay.TextInputLayout"
+        app:endIconDrawable="@drawable/ic_qrcode_24dp"
+        app:endIconMode="custom"
+        app:helperText="Enter a valid Zcash address"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.84"
-        app:layout_constraintVertical_bias="0.2"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.08"
+        app:layout_constraintWidth_percent="0.84">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_zcash_address"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:imeOptions="actionDone"
+            android:inputType="textNoSuggestions"
+            android:singleLine="true"
+            android:maxLength="255"
+            android:textColor="@color/text_light"
+            android:textColorHint="@color/text_light_dimmed" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Input: Amount -->
-    <EditText
-        android:id="@+id/input_zcash_amount"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_layout_amount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:hint="@string/send_hint_input_zcash_amount"
-        android:imeOptions="actionDone"
-        android:inputType="numberDecimal"
-        android:paddingRight="76dp"
-        android:singleLine="true"
-        android:paddingTop="0dp"
-        android:textColor="@color/text_light"
-        app:backgroundTint="@color/colorPrimary"
-        android:textColorHint="@color/text_light_dimmed"
-        app:layout_constraintTop_toBottomOf="@id/input_zcash_address"
-        app:layout_constraintStart_toStartOf="parent"
+        android:hint="Amount"
+        android:theme="@style/Zcash.Overlay.TextInputLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.84"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_layout_address"
+        app:layout_constraintWidth_percent="0.84"
+        tools:helperText="You have 23.23 ZEC available">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_zcash_amount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:maxLength="20"
+            android:singleLine="true"
+            android:textColor="@color/text_light"
+            android:textColorHint="@color/text_light_dimmed" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/text_max"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:fontFamily="@font/inconsolata"
+        android:padding="16dp"
+        android:text="MAX"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/text_layout_amount"
+        app:layout_constraintEnd_toEndOf="@id/text_layout_amount"
+        app:layout_constraintTop_toTopOf="@id/text_layout_amount" />
 
     <TextView
         android:id="@+id/text_address_error"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/inconsolata"
-        android:textColor="@android:color/holo_red_light"
-        android:maxLines="1"
         android:autoSizeTextType="uniform"
+        android:fontFamily="@font/inconsolata"
+        android:maxLines="1"
+        android:textColor="@color/zcashRed"
         android:textSize="14dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/button_next"
-        app:layout_constraintStart_toStartOf="@+id/input_zcash_amount"
-        app:layout_constraintTop_toTopOf="@+id/button_next"
-        app:layout_constraintEnd_toStartOf="@id/button_next"
+        app:layout_constraintBottom_toTopOf="@id/text_banner_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/text_layout_amount"
+        app:layout_constraintTop_toBottomOf="@+id/button_next"
+        app:layout_constraintVertical_bias="0.1"
         tools:text="Please enter a larger amount of money also please enter a shorter sentence" />
 
     <!-- Scan QR code -->
@@ -110,14 +138,15 @@
         android:id="@+id/image_scan_qr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="24dp"
+        android:paddingEnd="1dp"
         android:paddingStart="6dp"
         android:paddingTop="10dp"
-        android:paddingEnd="1dp"
-        android:paddingBottom="24dp"
         android:tint="@color/zcashWhite"
-        app:layout_constraintBottom_toBottomOf="@id/input_zcash_address"
-        app:layout_constraintEnd_toEndOf="@id/input_zcash_address"
-        app:layout_constraintTop_toTopOf="@id/input_zcash_address"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/text_layout_address"
+        app:layout_constraintEnd_toEndOf="@id/text_layout_address"
+        app:layout_constraintTop_toTopOf="@id/text_layout_address"
         app:srcCompat="@drawable/ic_qrcode_24dp" />
 
     <com.google.android.material.button.MaterialButton
@@ -127,8 +156,8 @@
         android:layout_marginTop="16dp"
         android:text="Next"
         android:textColor="@color/text_dark"
-        app:layout_constraintEnd_toEndOf="@+id/input_zcash_address"
-        app:layout_constraintTop_toBottomOf="@+id/input_zcash_amount" />
+        app:layout_constraintEnd_toEndOf="@+id/text_layout_address"
+        app:layout_constraintTop_toBottomOf="@+id/text_layout_amount" />
 
     <!--        -->
     <!-- Banner -->
@@ -147,18 +176,18 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/text_light"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/input_zcash_address"
+        app:layout_constraintEnd_toEndOf="@+id/text_layout_address"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/input_zcash_address"
+        app:layout_constraintStart_toStartOf="@+id/text_layout_address"
         app:layout_constraintTop_toBottomOf="@id/button_next"
         app:layout_constraintVertical_bias="0.07" />
 
     <TextView
         android:id="@+id/text_banner_action"
-        android:elevation="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:elevation="6dp"
         android:text="Paste"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/colorPrimary"
@@ -169,8 +198,8 @@
         android:id="@+id/group_banner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="text_banner_message, text_banner_action"
         android:visibility="visible"
+        app:constraint_referenced_ids="text_banner_message, text_banner_action"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,7 +39,9 @@ class ReceiveFragment : BaseFragment<FragmentReceiveNewBinding>() {
 //            text_address_part_7,
 //            text_address_part_8
 //        )
-        binding.buttonScan.onClickNavTo(R.id.action_nav_receive_to_nav_scan)
+        binding.buttonScan.setOnClickListener {
+            mainActivity?.maybeOpenScan()
+        }
         binding.backButtonHitArea.onClickNavBack()
     }
 

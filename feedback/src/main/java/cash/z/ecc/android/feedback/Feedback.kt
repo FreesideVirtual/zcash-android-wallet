@@ -1,12 +1,15 @@
 package cash.z.ecc.android.feedback
 
+import android.util.Log
 import cash.z.ecc.android.feedback.util.CompositeJob
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.StringBuilder
 import kotlin.coroutines.coroutineContext
 
 class Feedback(capacity: Int = 256) {
@@ -34,8 +37,15 @@ class Feedback(capacity: Int = 256) {
      * [actions] channels will remain open unless [stop] is also called on this instance.
      */
     suspend fun start(): Feedback {
-        check(!::scope.isInitialized) {
-            "Error: cannot initialize feedback because it has already been initialized."
+        if(::scope.isInitialized) {
+            val callStack = StringBuilder().let { s ->
+                Thread.currentThread().stackTrace.forEach {element ->
+                    s.append(element.toString())
+                }
+                s.toString()
+            }
+            Log.e("@TWIG","Warning: did not initialize feedback because it has already been initialized. Call stack: $callStack")
+            return this
         }
         scope = CoroutineScope(Dispatchers.IO + SupervisorJob(coroutineContext[Job]))
         invokeOnCompletion {

@@ -75,4 +75,13 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">24dp</item>
     </style>
+    <style name="Zcash.ShapeAppearance.TextInputLayout" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+    
+    <!-- Theme Overlays -->
+    <style name="Zcash.Overlay.TextInputLayout" parent="ThemeOverlay.MaterialComponents">
+        <item name="shapeAppearanceSmallComponent">@style/Zcash.ShapeAppearance.TextInputLayout</item>
+    </style>
 </resources>

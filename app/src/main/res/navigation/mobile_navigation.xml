@@ -40,7 +40,7 @@
         <action
             android:id="@+id/action_nav_receive_to_nav_scan"
             app:destination="@id/nav_scan"
-            app:popUpTo="@id/nav_scan"
+            app:popUpTo="@id/nav_receive"
             app:popUpToInclusive="true"
             app:exitAnim="@anim/anim_fade_out_address"
             app:enterAnim="@anim/anim_fade_in_scanner"/>
@@ -157,4 +157,14 @@
         android:name="cash.z.ecc.android.ui.setup.BackupFragment"
         tools:layout="@layout/fragment_backup" >
     </fragment>
+
+
+    <!--                -->
+    <!-- Global actions -->
+    <!--                -->
+    
+    <action
+        android:id="@+id/action_global_nav_scan"
+        app:destination="@id/nav_scan" />
+
 </navigation>

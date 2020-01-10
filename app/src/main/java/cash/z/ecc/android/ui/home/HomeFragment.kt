@@ -3,19 +3,18 @@ package cash.z.ecc.android.ui.home
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
-import androidx.core.text.toSpannable
 import androidx.lifecycle.lifecycleScope
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.*
-import cash.z.ecc.android.ext.toAppColor
+import cash.z.ecc.android.ext.disabledIf
+import cash.z.ecc.android.ext.goneIf
+import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
@@ -28,6 +27,7 @@ import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -92,7 +92,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_profile)
             iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
             textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
-            hitAreaScan.onClickNavTo(R.id.action_nav_home_to_nav_scan)
+            hitAreaScan.setOnClickListener {
+                mainActivity?.maybeOpenScan()
+            }
 
             textBannerAction.setOnClickListener {
                 onBannerAction(BannerAction.from((it as? TextView)?.text?.toString()))
@@ -100,7 +102,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             buttonSend.setOnClickListener {
                 onSend()
             }
-            setSendAmount("0")
+            setSendAmount("0", false)
         }
 
         binding.buttonNumberPadBack.setOnLongClickListener {
@@ -115,9 +117,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun onClearAmount() {
-        repeat(binding.textSendAmount.text.length) {
+        if (::uiModel.isInitialized) {
             resumedScope.launch {
-                _typedChars.send('<')
+                binding.textSendAmount.text.apply {
+                    while (uiModel.pendingSend != "0") {
+                        _typedChars.send('<')
+                        delay(5)
+                    }
+                }
             }
         }
     }
@@ -184,9 +191,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     /**
      * @param amount the amount to send represented as ZEC, without the dollar sign.
      */
-    fun setSendAmount(amount: String) {
+    fun setSendAmount(amount: String, updateModel: Boolean = true) {
         binding.textSendAmount.text = "\$$amount".toColoredSpan(R.color.text_light_dimmed, "$")
-        sendViewModel.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
+        if (updateModel) {
+            sendViewModel.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
+        }
         binding.buttonSend.disabledIf(amount == "0")
     }
 
@@ -197,7 +206,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             goneIf(availableBalance < 0)
             text = if (availableBalance != -1L && (availableBalance < totalBalance)) {
                 val change = (totalBalance - availableBalance).convertZatoshiToZecString()
-                "(expecting +$change ZEC in change)".toColoredSpan(R.color.text_light, "+$change")
+                "(expecting +$change ZEC)".toColoredSpan(R.color.text_light, "+$change")
             } else {
                 "(enter an amount to send)"
             }

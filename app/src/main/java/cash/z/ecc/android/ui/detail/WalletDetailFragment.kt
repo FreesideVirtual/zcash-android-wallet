@@ -49,10 +49,10 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
 
     private fun onBalanceUpdated(balance: WalletBalance) {
         binding.textBalanceAvailable.text = balance.availableZatoshi.convertZatoshiToZecString()
-        val change = balance.totalZatoshi - balance.availableZatoshi
+        val change = (balance.totalZatoshi - balance.availableZatoshi)
         binding.textBalanceDescription.apply {
-            goneIf(change <= 0)
-            text = "(expecting +$change ZEC in change)".toColoredSpan(R.color.text_light, "+$change")
+            goneIf(change <= 0L)
+            text = "(expecting +$change ZEC)".toColoredSpan(R.color.text_light, "+${change.convertZatoshiToZecString()}")
         }
     }
 

@@ -1,11 +1,11 @@
-package cash.z.ecc.android.ui.receive
+package cash.z.ecc.android.ui.profile
 
 import androidx.lifecycle.ViewModel
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.ext.twig
 import javax.inject.Inject
 
-class ReceiveViewModel @Inject constructor() : ViewModel() {
+class ProfileViewModel @Inject constructor() : ViewModel() {
 
     @Inject
     lateinit var synchronizer: Synchronizer
@@ -14,6 +14,6 @@ class ReceiveViewModel @Inject constructor() : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        twig("ReceiveViewModel cleared!")
+        twig("ProfileViewModel cleared!")
     }
 }
