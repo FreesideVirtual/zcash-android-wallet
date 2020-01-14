@@ -10,6 +10,7 @@ import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.gone
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.ui.base.BaseFragment
 
 class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
@@ -63,8 +64,9 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
                 binding.buttonNext.text = "ADD MEMO"
                 binding.buttonSkip.text = "SEND WITHOUT MEMO"
             } else {
-                binding.buttonNext.text = "GO BACK"
+                binding.buttonNext.text = "WAIT, GO BACK"
                 binding.buttonSkip.text = "PROCEED"
+                binding.sadTitle.text = binding.sadTitle.text.toString().toColoredSpan(R.color.colorPrimary, "sad")
             }
         }
     }

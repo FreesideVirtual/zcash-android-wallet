@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.RecyclerView
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.toAppColor
+import cash.z.ecc.android.ui.MainActivity
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.isShielded
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,8 +31,11 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         var amount: String = ""
         var amountColor: Int = 0
         var indicatorBackground: Int = 0
-        
+
         transaction?.apply {
+            itemView.setOnClickListener {
+                onTransactionClicked(this)
+            }
             amount = value.convertZatoshiToZecString()
             // TODO: these might be good extension functions
             val timestamp = formatter.format(blockTimeInSeconds * 1000L)
@@ -63,6 +68,33 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         amountText.setTextColor(amountColor.toAppColor())
         val context = itemView.context
         indicator.background = context.resources.getDrawable(indicatorBackground)
-        shieldIcon.goneIf(!transaction?.toAddress.isShielded())
+        shieldIcon.goneIf((transaction?.raw != null || transaction?.expiryHeight != null) && !transaction?.toAddress.isShielded())
+    }
+
+    private fun onTransactionClicked(transaction: ConfirmedTransaction) {
+        val txId = transaction.rawTransactionId.toTxId()
+        val detailsMessage: String = "Zatoshi amount: ${transaction.value}\n\n" +
+                "Transaction: $txId"
+        MaterialAlertDialogBuilder(itemView.context)
+            .setMessage(detailsMessage)
+            .setTitle("Transaction Details")
+            .setCancelable(true)
+            .setPositiveButton("Ok") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNegativeButton("Copy TX") { dialog, _ ->
+                (itemView.context as MainActivity).copyText(txId, "Transaction Id")
+                dialog.dismiss()
+            }
+            .show()
     }
 }
+
+private fun ByteArray.toTxId(): String {
+    val sb = StringBuilder(size * 2)
+    for(i in (size - 1) downTo 0) {
+        sb.append(String.format("%02x", this[i]))
+    }
+    return sb.toString()
+}
+

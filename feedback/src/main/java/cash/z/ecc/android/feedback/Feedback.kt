@@ -37,15 +37,17 @@ class Feedback(capacity: Int = 256) {
      * [actions] channels will remain open unless [stop] is also called on this instance.
      */
     suspend fun start(): Feedback {
-        if(::scope.isInitialized) {
-            val callStack = StringBuilder().let { s ->
-                Thread.currentThread().stackTrace.forEach {element ->
-                    s.append(element.toString())
-                }
-                s.toString()
+        val callStack = StringBuilder().let { s ->
+            Thread.currentThread().stackTrace.forEach {element ->
+                s.append("$element\n")
             }
+            s.toString()
+        }
+        if(::scope.isInitialized) {
             Log.e("@TWIG","Warning: did not initialize feedback because it has already been initialized. Call stack: $callStack")
             return this
+        } else {
+            Log.e("@TWIG","Debug: Initializing feedback for the first time. Call stack: $callStack")
         }
         scope = CoroutineScope(Dispatchers.IO + SupervisorJob(coroutineContext[Job]))
         invokeOnCompletion {

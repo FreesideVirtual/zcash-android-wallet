@@ -52,7 +52,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
                 emit("Please enter a valid address")
             }
             zatoshiAmount < ZcashSdk.MINERS_FEE_ZATOSHI -> {
-                emit("Please enter a larger amount")
+                emit("Please enter at least 0.0001")
             }
             maxZatoshi != null && zatoshiAmount > maxZatoshi -> {
                 emit( "Please enter no more than ${maxZatoshi.convertZatoshiToZecString(8)}")

@@ -7,21 +7,18 @@ import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
 import cash.z.ecc.android.di.component.AppComponent
 import cash.z.ecc.android.di.component.DaggerAppComponent
-import cash.z.ecc.android.feedback.Feedback
 import cash.z.ecc.android.feedback.FeedbackCoordinator
 import cash.z.wallet.sdk.ext.TroubleshootingTwig
 import cash.z.wallet.sdk.ext.Twig
 import cash.z.wallet.sdk.ext.twig
-import com.squareup.okhttp.Dispatcher
 import kotlinx.coroutines.*
 import javax.inject.Inject
-import javax.inject.Provider
 
 
 class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
     @Inject
-    lateinit var feedbackCoordinator: FeedbackCoordinator
+    lateinit var coordinator: FeedbackCoordinator
 
     var creationTime: Long = 0
         private set
@@ -38,6 +35,8 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
     private var feedbackScope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
+        Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
+        Twig.plant(TroubleshootingTwig())
         creationTime = System.currentTimeMillis()
         instance = this
         // Setup handler for uncaught exceptions.
@@ -46,10 +45,8 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
         component = DaggerAppComponent.factory().create(this)
         component.inject(this)
         feedbackScope.launch {
-            feedbackCoordinator.feedback.start()
+            coordinator.feedback.start()
         }
-        Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(feedbackCoordinator, Thread.getDefaultUncaughtExceptionHandler()))
-        Twig.plant(TroubleshootingTwig())
     }
 
     override fun attachBaseContext(base: Context) {
@@ -71,17 +68,18 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
      * is complete, we can lazily initialize all the feedback objects at this moment so that we
      * don't have to add any time to startup.
      */
-    class ExceptionReporter(private val coordinator: FeedbackCoordinator, private val ogHandler: Thread.UncaughtExceptionHandler) : Thread.UncaughtExceptionHandler {
+    inner class ExceptionReporter(private val ogHandler: Thread.UncaughtExceptionHandler) : Thread.UncaughtExceptionHandler {
         override fun uncaughtException(t: Thread?, e: Throwable?) {
-            twig("Uncaught Exception: $e")
+            twig("Uncaught Exception: $e caused by: ${e?.cause}")
             coordinator.feedback.report(e)
             coordinator.flush()
             // can do this if necessary but first verify that we need it
             runBlocking {
-              coordinator.await()
-              coordinator.feedback.stop()
+                coordinator.await()
+                coordinator.feedback.stop()
             }
             ogHandler.uncaughtException(t, e)
+            Thread.sleep(2000L)
         }
     }
 }

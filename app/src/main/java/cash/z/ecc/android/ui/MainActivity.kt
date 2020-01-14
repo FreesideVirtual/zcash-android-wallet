@@ -169,6 +169,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun copyText(textToCopy: String, label: String = "zECC Wallet Text") {
+        clipboard.setPrimaryClip(
+            ClipData.newPlainText(label, textToCopy)
+        )
+        showMessage("$label copied!", "Sweet")
+    }
+
     fun preventBackPress(fragment: Fragment) {
         onFragmentBackPressed(fragment){}
     }
@@ -211,9 +218,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun maybeOpenScan() {
+    /**
+     * @param popUpToInclusive the destination to remove from the stack before opening the camera.
+     * This only takes effect in the common case where the permission is granted.
+     */
+    fun maybeOpenScan(popUpToInclusive: Int? = null) {
         if (hasCameraPermission) {
-            openCamera()
+            openCamera(popUpToInclusive)
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), 101)
@@ -238,8 +249,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openCamera() {
-        navController.navigate(R.id.action_global_nav_scan)
+    private fun openCamera(popUpToInclusive: Int? = null) {
+        navController.navigate(popUpToInclusive ?: R.id.action_global_nav_scan)
     }
 
     private fun onNoCamera() {

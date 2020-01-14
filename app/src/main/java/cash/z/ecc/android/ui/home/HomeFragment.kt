@@ -1,7 +1,6 @@
 package cash.z.ecc.android.ui.home
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,13 +19,13 @@ import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
+import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.SYNCING
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.convertZecToZatoshi
 import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
@@ -40,9 +39,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val walletSetup: WalletSetupViewModel by activityViewModel(false)
     private val sendViewModel: SendViewModel by activityViewModel()
     private val viewModel: HomeViewModel by viewModel()
-
-    private val _typedChars = ConflatedBroadcastChannel<Char>()
-    private val typedChars = _typedChars.asFlow()
 
     override fun inflate(inflater: LayoutInflater): FragmentHomeBinding =
         FragmentHomeBinding.inflate(inflater)
@@ -99,7 +95,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             textBannerAction.setOnClickListener {
                 onBannerAction(BannerAction.from((it as? TextView)?.text?.toString()))
             }
-            buttonSend.setOnClickListener {
+            buttonSendAmount.setOnClickListener {
                 onSend()
             }
             setSendAmount("0", false)
@@ -121,7 +117,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             resumedScope.launch {
                 binding.textSendAmount.text.apply {
                     while (uiModel.pendingSend != "0") {
-                        _typedChars.send('<')
+                        viewModel.onChar('<')
                         delay(5)
                     }
                 }
@@ -131,30 +127,39 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.initialize(typedChars)
         twig("HomeFragment.onResume  resumeScope.isActive: ${resumedScope.isActive}  $resumedScope")
+        viewModel.initializeMaybe()
+twig("onResume (A)")
         onClearAmount()
+twig("onResume (B)")
         viewModel.uiModels.scanReduce { old, new ->
             onModelUpdated(old, new)
             new
+        }.onCompletion {
+            twig("uiModel.scanReduce completed.")
         }.catch { e ->
             twig("exception while processing uiModels $e")
+            throw e
         }.launchIn(resumedScope)
+twig("onResume (C)")
 
         // TODO: see if there is a better way to trigger a refresh of the uiModel on resume
         //       the latest one should just be in the viewmodel and we should just "resubscribe"
         //       but for some reason, this doesn't always happen, which kind of defeats the purpose
         //       of having a cold stream in the view model
         resumedScope.launch {
+twig("onResume (pre-fresh)")
             viewModel.refreshBalance()
+twig("onResume (post-fresh)")
         }
+twig("onResume (D)")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         twig("HomeFragment.onSaveInstanceState")
         if (::uiModel.isInitialized) {
-            outState.putParcelable("uiModel", uiModel)
+//            outState.putParcelable("uiModel", uiModel)
         }
     }
 
@@ -162,7 +167,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onViewStateRestored(savedInstanceState)
         savedInstanceState?.let { inState ->
             twig("HomeFragment.onViewStateRestored")
-            onModelUpdated(HomeViewModel.UiModel(), inState.getParcelable("uiModel")!!)
+//            onModelUpdated(HomeViewModel.UiModel(), inState.getParcelable("uiModel")!!)
         }
     }
 
@@ -172,20 +177,34 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     //
 
     fun setSendEnabled(enabled: Boolean) {
-        binding.buttonSend.apply {
+        binding.buttonSendAmount.apply {
             isEnabled = enabled
-            backgroundTintList = ColorStateList.valueOf( resources.getColor( if(enabled) R.color.colorPrimary else R.color.zcashWhite_24) )
+//            backgroundTintList = ColorStateList.valueOf( resources.getColor( if(enabled) R.color.colorPrimary else R.color.zcashWhite_24) )
         }
     }
 
-    fun setProgress(progress: Int) {
-        progress.let {
-            if (it < 100) {
-                setBanner("Downloading . . . $it%", NONE)
-            } else {
-                setBanner("Scanning . . .", NONE)
-            }
+    fun setProgress(uiModel: HomeViewModel.UiModel) {
+        if (!uiModel.processorInfo.hasData) {
+            twig("Warning: ignoring progress update because the processor has not started.")
+            return
         }
+
+        val sendText = when {
+            uiModel.isSynced -> "SEND AMOUNT"
+            uiModel.status == Synchronizer.Status.DISCONNECTED -> "DISCONNECTED"
+            uiModel.status == Synchronizer.Status.STOPPED -> "IDLE"
+            uiModel.isDownloading -> "Downloading . . . ${uiModel.downloadProgress}%"
+            uiModel.isValidating -> "Validating . . ."
+            uiModel.isScanning -> "Scanning . . . ${uiModel.scanProgress}%"
+            else -> "Updating"
+        }
+        binding.lottieButtonLoading.progress = if (uiModel.isSynced) 1.0f else uiModel.totalProgress * 0.82f // line fully closes at 82% mark
+        binding.buttonSendAmount.text = sendText
+        twig("Lottie progress set to ${binding.lottieButtonLoading.progress}  (isSynced? ${uiModel.isSynced})")
+        twig("Send button set to: $sendText")
+
+        val resId = if (uiModel.isSynced) R.color.selector_button_text_dark else R.color.selector_button_text_light
+        binding.buttonSendAmount.setTextColor(resources.getColorStateList(resId))
     }
 
     /**
@@ -196,7 +215,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         if (updateModel) {
             sendViewModel.zatoshiAmount = amount.safelyConvertToBigDecimal().convertZecToZatoshi()
         }
-        binding.buttonSend.disabledIf(amount == "0")
+        binding.buttonSendAmount.disabledIf(amount == "0")
     }
 
     fun setAvailable(availableBalance: Long = -1L, totalBalance: Long = -1L) {
@@ -211,10 +230,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 "(enter an amount to send)"
             }
         }
-    }
-
-    fun setSendText(buttonText: String = "Send Amount") {
-        binding.buttonSend.text = buttonText
     }
 
     fun setBanner(message: String = "", action: BannerAction = CLEAR) {
@@ -235,29 +250,36 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     //
 
     private fun onModelUpdated(old: HomeViewModel.UiModel, new: HomeViewModel.UiModel) {
-        twig(new.toString())
+        twig("onModelUpdated: $new")
         uiModel = new
+twig("onModelUpdated (A)")
         if (old.pendingSend != new.pendingSend) {
+twig("onModelUpdated (B)")
             setSendAmount(new.pendingSend)
+twig("onModelUpdated (C)")
         }
+twig("onModelUpdated (D)")
         // TODO: handle stopped and disconnected flows
+        setProgress(uiModel) // TODO: we may not need to separate anymore
+twig("onModelUpdated (E)")
         if (new.status == SYNCING) onSyncing(new) else onSynced(new)
+twig("onModelUpdated (F)")
         setSendEnabled(new.isSendEnabled)
+twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
+        twig("DONE onModelUpdated")
     }
 
     private fun onSyncing(uiModel: HomeViewModel.UiModel) {
-        setProgress(uiModel.progress) // calls setBanner
         setAvailable()
-        setSendText("Syncing Blockchain…")
     }
 
     private fun onSynced(uiModel: HomeViewModel.UiModel) {
+        binding.lottieButtonLoading.progress = 1.0f
         if (!uiModel.hasBalance) {
             onNoFunds()
         } else {
             setBanner("")
             setAvailable(uiModel.availableBalance, uiModel.totalBalance)
-            setSendText()
         }
     }
 
@@ -319,7 +341,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setOnClickListener {
             lifecycleScope.launch {
                 twig("CHAR TYPED: $c")
-                _typedChars.send(c)
+                viewModel.onChar(c)
             }
         }
         return this

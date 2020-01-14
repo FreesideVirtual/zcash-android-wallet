@@ -95,6 +95,6 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     }
 
     private fun onExit() {
-        mainActivity?.navController?.popBackStack(R.id.nav_send_address, true)
+        mainActivity?.navController?.popBackStack(R.id.nav_home, false)
     }
 }

@@ -5,11 +5,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
+apply plugin: 'com.google.firebase.firebase-perf'
 //apply plugin: 'com.github.ben-manes.versions'
 
 archivesBaseName = 'zcash-android-wallet'
 group = 'cash.z.ecc.android'
-version = '1.0.0-alpha06'
+version = '1.0.0-alpha08'
 
 android {
     compileSdkVersion Deps.compileSdkVersion
@@ -19,12 +21,13 @@ android {
         applicationId 'cash.z.ecc.android'
         minSdkVersion Deps.minSdkVersion
         targetSdkVersion Deps.targetSdkVersion
-        versionCode = 1_00_00_006
+        versionCode = 1_00_00_008
         // last digits are alpha(0XX) beta(2XX) rc(4XX) release(8XX). Ex: 1_08_04_401 is an release candidate build of version 1.8.4 and 1_08_04_800 would be the final release.
         versionName = "$version"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         testInstrumentationRunnerArguments clearPackageData: 'true'
         multiDexEnabled true
+//        manifestPlaceholders = [rollbarToken: properties["rollbarToken"]]
     }
     flavorDimensions 'network'
     productFlavors {
@@ -87,6 +90,10 @@ android {
     }
 }
 
+crashlytics {
+    enableNdk true
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':qrecycler')
@@ -134,7 +141,12 @@ dependencies {
     // per this recommendation from Chris Povirk, given guava's decision to split ListenableFuture away from Guava: https://groups.google.com/d/msg/guava-discuss/GghaKwusjcY/bCIAKfzOEwAJ
     implementation 'com.google.guava:guava:27.0.1-android'
 
+    // Analytics
     implementation 'com.mixpanel.android:mixpanel-android:5.6.3'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics-ndk:2.1.1'
+    implementation 'com.google.firebase:firebase-perf:19.0.4'
 
     // QR Scanning
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
@@ -143,6 +155,10 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha05"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha05"
     implementation "androidx.camera:camera-lifecycle:1.0.0-alpha02"
+
+    // Misc.
+    implementation 'com.airbnb.android:lottie:3.1.0'
+    implementation 'com.facebook.stetho:stetho:1.5.1'
 
     // Tests
 

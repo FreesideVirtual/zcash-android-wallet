@@ -40,7 +40,7 @@ class ReceiveFragment : BaseFragment<FragmentReceiveNewBinding>() {
 //            text_address_part_8
 //        )
         binding.buttonScan.setOnClickListener {
-            mainActivity?.maybeOpenScan()
+            mainActivity?.maybeOpenScan(R.id.action_nav_receive_to_nav_scan)
         }
         binding.backButtonHitArea.onClickNavBack()
     }

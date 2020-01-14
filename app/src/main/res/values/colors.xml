@@ -24,6 +24,7 @@
      and should map directly to the design style guide -->
 
     <color name="zcashWhite">#F5F5F5</color>
+    <color name="zcashGray">#616161</color>
     <color name="zcashWhite_12">#1FFFFFFF</color>
     <color name="zcashWhite_24">#3DFFFFFF</color>
     <color name="zcashWhite_40">#66FFFFFF</color>
@@ -59,6 +60,7 @@
     <color name="background_banner">@color/zcashBlack_dark</color>
     <color name="scan_overlay_background">@color/zcashBlack_87</color>
     <color name="spacer">#1FBB666A</color>
+    <color name="text_send_amount_disabled">@color/text_light</color>
 
     <!-- text -->
     <color name="text_light">#FFFFFF</color>

@@ -2,7 +2,6 @@ package cash.z.ecc.android.ui.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import cash.z.ecc.android.R

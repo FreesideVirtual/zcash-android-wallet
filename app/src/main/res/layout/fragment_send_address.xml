@@ -52,16 +52,15 @@
         android:id="@+id/text_layout_address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="24dp"
         android:hint="To"
         android:theme="@style/Zcash.Overlay.TextInputLayout"
         app:endIconDrawable="@drawable/ic_qrcode_24dp"
         app:endIconMode="custom"
         app:helperText="Enter a valid Zcash address"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_banner_message"
         app:layout_constraintVertical_bias="0.08"
         app:layout_constraintWidth_percent="0.84">
 
@@ -126,7 +125,6 @@
         android:textColor="@color/zcashRed"
         android:textSize="14dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@id/text_banner_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/text_layout_amount"
         app:layout_constraintTop_toBottomOf="@+id/button_next"
@@ -175,12 +173,10 @@
         android:text="Address on clipboard!"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/text_light"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/text_layout_address"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/text_layout_address"
-        app:layout_constraintTop_toBottomOf="@id/button_next"
-        app:layout_constraintVertical_bias="0.07" />
+        app:layout_constraintTop_toBottomOf="@id/back_button_hit_area" />
 
     <TextView
         android:id="@+id/text_banner_action"
