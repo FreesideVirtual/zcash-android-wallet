@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     ) {
         // Note: the wallet is effectively empty if it cannot cover the miner's fee
         val hasFunds: Boolean get() = availableBalance > (MINERS_FEE_ZATOSHI.toDouble() / ZATOSHI_PER_ZEC) // 0.0001
-        val hasBalance: Boolean get() = totalBalance > (MINERS_FEE_ZATOSHI.toDouble() / ZATOSHI_PER_ZEC) // 0.0001
+        val hasBalance: Boolean get() = totalBalance > 0
         val isSynced: Boolean get() = status == SYNCED
         val isSendEnabled: Boolean get() = isSynced && hasFunds
 

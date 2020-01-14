@@ -45,9 +45,9 @@
     <color name="zcashBlue">#26DAB6</color>
 
     <!-- yellows -->
-    <color name="zcashYellow_light">#FFD649</color>
-    <color name="zcashYellow">#FFB727</color>
-    <color name="zcashYellow_dark">#FFA918</color>
+    <color name="zcashYellow_light">#FFCF4A</color>
+    <color name="zcashYellow">#FFB900</color>
+    <color name="zcashYellow_dark">#FFAA17</color>
 
 
     <!--                  -->

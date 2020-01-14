@@ -65,7 +65,12 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
 
         binding.inputZcashAddress.apply {
             doAfterTextChanged {
-                onAddressChanged(text.toString())
+                val trim = text.toString().trim()
+                if (text.toString() != trim) {
+                    binding.inputZcashAddress
+                        .findViewById<EditText>(R.id.input_zcash_address).setText(trim)
+                }
+                onAddressChanged(trim)
             }
         }
 
@@ -108,7 +113,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     private fun onMax() {
         if (maxZatoshi != null) {
             binding.inputZcashAmount.apply {
-                setText(maxZatoshi.convertZatoshiToZecString())
+                setText(maxZatoshi.convertZatoshiToZecString(8))
                 postDelayed({
                     requestFocus()
                     setSelection(text?.length ?: 0)

@@ -291,18 +291,27 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
         when (action) {
             FUND_NOW -> {
                 MaterialAlertDialogBuilder(activity)
-                    .setMessage("To make full use of this wallet, deposit funds to your address or tap the faucet to trigger a tiny automatic deposit.\n\nFaucet funds are made available for the community by the community for testing. So please be kind enough to return what you borrow!")
+                    .setMessage("To make full use of this wallet, deposit funds to your address.")
                     .setTitle("No Balance")
                     .setCancelable(true)
-                    .setPositiveButton("Tap Faucet") { dialog, _ ->
-                        dialog.dismiss()
-                        setBanner("Tapping faucet...", CANCEL)
-                    }
-                    .setNegativeButton("View Address") { dialog, _ ->
+                    .setPositiveButton("View Address") { dialog, _ ->
                         dialog.dismiss()
                         mainActivity?.navController?.navigate(R.id.action_nav_home_to_nav_receive)
                     }
                     .show()
+//                MaterialAlertDialogBuilder(activity)
+//                    .setMessage("To make full use of this wallet, deposit funds to your address or tap the faucet to trigger a tiny automatic deposit.\n\nFaucet funds are made available for the community by the community for testing. So please be kind enough to return what you borrow!")
+//                    .setTitle("No Balance")
+//                    .setCancelable(true)
+//                    .setPositiveButton("Tap Faucet") { dialog, _ ->
+//                        dialog.dismiss()
+//                        setBanner("Tapping faucet...", CANCEL)
+//                    }
+//                    .setNegativeButton("View Address") { dialog, _ ->
+//                        dialog.dismiss()
+//                        mainActivity?.navController?.navigate(R.id.action_nav_home_to_nav_receive)
+//                    }
+//                    .show()
             }
             CANCEL -> {
                 // TODO: trigger banner / balance update
