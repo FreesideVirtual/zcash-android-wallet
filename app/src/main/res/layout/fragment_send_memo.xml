@@ -42,6 +42,7 @@
         android:elevation="6dp"
         android:gravity="top"
         android:hint="Add a memo here"
+        android:maxLines="3"
         android:imeActionLabel="add memo"
         android:imeOptions="actionDone"
         android:inputType="textImeMultiLine"
@@ -208,5 +209,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="input_memo, check_include_address, text_included_address, text_info_shielded"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

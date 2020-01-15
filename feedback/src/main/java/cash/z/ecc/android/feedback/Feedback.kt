@@ -174,8 +174,8 @@ class Feedback(capacity: Int = 256) {
     }
 
 
-    interface Metric : Mappable<String, Any> {
-        val key: String
+    interface Metric : Mappable<String, Any>, Keyed<String> {
+        override val key: String
         val startTime: Long?
         val endTime: Long?
         val elapsedTime: Long?
@@ -192,11 +192,15 @@ class Feedback(capacity: Int = 256) {
         }
     }
 
-    interface Action : Feedback.Mappable<String, Any> {
-        val key: String
+    interface Action : Feedback.Mappable<String, Any>, Keyed<String> {
+        override val key: String
         override fun toMap(): Map<String, Any> {
             return mapOf("key" to key)
         }
+    }
+
+    interface Keyed<T> {
+        val key: T
     }
 
     interface Mappable<K, V> {
