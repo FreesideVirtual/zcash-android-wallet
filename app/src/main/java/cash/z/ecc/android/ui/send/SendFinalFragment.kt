@@ -9,11 +9,15 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendFinalBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.goneIf
+import cash.z.ecc.android.feedback.Feedback
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.MetricType.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.entity.*
 import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.twig
+import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
@@ -31,6 +35,9 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonNext.setOnClickListener {
             onExit()
+        }
+        binding.buttonRetry.setOnClickListener {
+            onRetry()
         }
         binding.backButtonHitArea.setOnClickListener {
             onExit()
@@ -69,28 +76,47 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     }
 
     private fun onPendingTxUpdated(pendingTransaction: PendingTransaction?) {
-        val id = pendingTransaction?.id ?: -1
-        var isSending = true
-        val message = when {
-            pendingTransaction == null -> "Transaction not found"
-            pendingTransaction.isMined() -> "Transaction Mined (id: $id)!\n\nSEND COMPLETE".also { isSending = false }
-            pendingTransaction.isSubmitSuccess() -> "Successfully submitted transaction!\nAwaiting confirmation . . ."
-            pendingTransaction.isFailedEncoding() -> "ERROR: failed to encode transaction! (id: $id)".also { isSending = false }
-            pendingTransaction.isFailedSubmit() -> "ERROR: failed to submit transaction! (id: $id)".also { isSending = false }
-            pendingTransaction.isCreated() -> "Transaction creation complete! (id: $id)"
-            pendingTransaction.isCreating() -> "Creating transaction . . ."
-            else -> "Transaction updated!".also { twig("Unhandled TX state: $pendingTransaction") }
+        try {
+            if (pendingTransaction != null) sendViewModel.updateMetrics(pendingTransaction)
+            val id = pendingTransaction?.id ?: -1
+            var isSending = true
+            var isFailure = false
+            val message = when {
+                pendingTransaction == null -> "Transaction not found"
+                pendingTransaction.isMined() -> "Transaction Mined!\n\nSEND COMPLETE".also { isSending = false }
+                pendingTransaction.isSubmitSuccess() -> "Successfully submitted transaction!\nAwaiting confirmation . . ."
+                pendingTransaction.isFailedEncoding() -> "ERROR: failed to encode transaction! (id: $id)".also { isSending = false; isFailure = true }
+                pendingTransaction.isFailedSubmit() -> "ERROR: failed to submit transaction! (id: $id)".also { isSending = false; isFailure = true }
+                pendingTransaction.isCreated() -> "Transaction creation complete!"
+                pendingTransaction.isCreating() -> "Creating transaction . . ."
+                else -> "Transaction updated!".also { twig("Unhandled TX state: $pendingTransaction") }
+            }
+            twig("Pending TX (id: ${pendingTransaction?.id} Updated with message: $message")
+            binding.textStatus.apply {
+                text = "$message"
+            }
+            binding.backButton.goneIf(!binding.textStatus.text.toString().contains("Awaiting"))
+            binding.buttonNext.goneIf((pendingTransaction?.isSubmitSuccess() != true) && (pendingTransaction?.isCreated() != true) && !isFailure)
+            binding.buttonNext.text =  if (isSending) "Done" else "Finished"
+            binding.buttonRetry.goneIf(!isFailure)
+            binding.progressHorizontal.goneIf(!isSending)
+
+
+            if (pendingTransaction?.isSubmitSuccess() == true) {
+                sendViewModel.reset()
+            }
+        } catch(t: Throwable) {
+            twig("ERROR: error while handling pending transaction update! $t")
+            Crashlytics.logException(t)
         }
-        twig("Pending TX Updated: $message")
-        binding.textStatus.apply {
-            text = "$text\n$message"
-        }
-        binding.backButton.goneIf(!binding.textStatus.text.toString().contains("Awaiting"))
-        binding.buttonNext.goneIf(isSending)
-        binding.progressHorizontal.goneIf(!isSending)
     }
 
     private fun onExit() {
-        mainActivity?.navController?.popBackStack(R.id.nav_send_address, true)
+        mainActivity?.navController?.popBackStack(R.id.nav_home, false)
     }
+
+    private fun onRetry() {
+        mainActivity?.navController?.popBackStack(R.id.nav_send_address, false)
+    }
+
 }

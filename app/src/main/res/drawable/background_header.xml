@@ -22,9 +22,6 @@
             android:bottomRightRadius="0dp"
             android:topLeftRadius="10dp"
             android:topRightRadius="10dp" />
-        <stroke
-            android:color="#282828"
-            android:width="1dp" />
         <solid android:color="@color/background_banner" />
     </shape>
 </item></layer-list>

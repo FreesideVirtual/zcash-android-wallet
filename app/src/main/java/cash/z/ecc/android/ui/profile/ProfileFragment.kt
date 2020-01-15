@@ -7,14 +7,20 @@ import android.view.View
 import cash.z.ecc.android.BuildConfig
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentProfileBinding
+import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClick
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.feedback.FeedbackFile
 import cash.z.ecc.android.ui.base.BaseFragment
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
+import kotlinx.coroutines.launch
 import okio.Okio
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
+
+    private val viewModel: ProfileViewModel by viewModel()
+
     override fun inflate(inflater: LayoutInflater): FragmentProfileBinding =
         FragmentProfileBinding.inflate(inflater)
 
@@ -28,6 +34,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
         onClick(binding.buttonFeedback) {
             onSendFeedback()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resumedScope.launch {
+            binding.textAddress.text = viewModel.getAddress().toAbbreviatedAddress(12, 12)
         }
     }
 

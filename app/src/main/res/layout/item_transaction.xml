@@ -118,6 +118,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:paddingStart="12dp"
         android:autoSizeTextType="uniform"
         android:gravity="center_vertical"
         android:maxLines="1"
@@ -127,6 +128,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/indicator"
         app:layout_constraintWidth_percent="0.25"
-        tools:text="+ 4345.2444" />
+        tools:text="+ 434.2444234" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

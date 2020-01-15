@@ -49,16 +49,18 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
 
     private fun onBalanceUpdated(balance: WalletBalance) {
         binding.textBalanceAvailable.text = balance.availableZatoshi.convertZatoshiToZecString()
-        val change = balance.totalZatoshi - balance.availableZatoshi
+        val change = (balance.totalZatoshi - balance.availableZatoshi)
         binding.textBalanceDescription.apply {
-            goneIf(change <= 0)
-            text = "(expecting +$change ZEC in change)".toColoredSpan(R.color.text_light, "+$change")
+            goneIf(change <= 0L)
+            val changeString = change.convertZatoshiToZecString()
+            text = "(expecting +$changeString ZEC)".toColoredSpan(R.color.text_light, "+${changeString}")
         }
     }
 
     private fun initTransactionUI() {
         binding.recyclerTransactions.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerTransactions.addItemDecoration(TransactionsFooter(binding.recyclerTransactions.context))
         adapter = TransactionAdapter()
         viewModel.transactions.collectWith(resumedScope) { onTransactionsUpdated(it) }
         binding.recyclerTransactions.adapter = adapter
@@ -66,6 +68,12 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
 
     private fun onTransactionsUpdated(transactions: PagedList<ConfirmedTransaction>) {
         twig("got a new paged list of transactions")
+        binding.groupEmptyViews.goneIf(transactions.size > 0)
         adapter.submitList(transactions)
+    }
+
+    // TODO: maybe implement this for better fade behavior. Or do an actual scroll behavior instead, yeah do that. Or an item decoration.
+    fun onLastItemShown(item: ConfirmedTransaction, position: Int) {
+        binding.footerFade.alpha = position.toFloat() / (binding.recyclerTransactions.adapter?.itemCount ?: 1)
     }
 }

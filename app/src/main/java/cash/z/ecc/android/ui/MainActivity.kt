@@ -1,10 +1,13 @@
 package cash.z.ecc.android.ui
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
@@ -15,6 +18,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -46,16 +50,18 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var clipboard: ClipboardManager
 
-
     private val mediaPlayer: MediaPlayer = MediaPlayer()
-
     private var snackbar: Snackbar? = null
 
     lateinit var navController: NavController
-
     lateinit var component: MainActivitySubcomponent
     lateinit var synchronizerComponent: SynchronizerSubcomponent
 
+    private val hasCameraPermission
+        get() = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         component = ZcashWalletApp.component.mainActivitySubcomponent().create(this).also {
@@ -163,6 +169,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun copyText(textToCopy: String, label: String = "zECC Wallet Text") {
+        clipboard.setPrimaryClip(
+            ClipData.newPlainText(label, textToCopy)
+        )
+        showMessage("$label copied!", "Sweet")
+    }
+
     fun preventBackPress(fragment: Fragment) {
         onFragmentBackPressed(fragment){}
     }
@@ -203,5 +216,44 @@ class MainActivity : AppCompatActivity() {
         }.also {
             if (!it.isShownOrQueued) it.show()
         }
+    }
+
+    /**
+     * @param popUpToInclusive the destination to remove from the stack before opening the camera.
+     * This only takes effect in the common case where the permission is granted.
+     */
+    fun maybeOpenScan(popUpToInclusive: Int? = null) {
+        if (hasCameraPermission) {
+            openCamera(popUpToInclusive)
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), 101)
+            } else {
+                onNoCamera()
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 101) {
+            if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+                openCamera()
+            } else {
+                onNoCamera()
+            }
+        }
+    }
+
+    private fun openCamera(popUpToInclusive: Int? = null) {
+        navController.navigate(popUpToInclusive ?: R.id.action_global_nav_scan)
+    }
+
+    private fun onNoCamera() {
+        showSnackbar("Well, this is awkward. You denied permission for the camera.")
     }
 }

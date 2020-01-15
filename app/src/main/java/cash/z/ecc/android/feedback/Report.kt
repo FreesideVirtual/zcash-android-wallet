@@ -19,10 +19,20 @@ object Report {
         SEED_PHRASE_LOADED("metric.seedphrase.loaded", "seed phrase loaded"),
         WALLET_CREATED("metric.wallet.created", "wallet created"),
         WALLET_IMPORTED("metric.wallet.imported", "wallet imported"),
-        ACCOUNT_CREATED("metric.account.created", "account created")
+        ACCOUNT_CREATED("metric.account.created", "account created"),
+
+        // Transactions
+        TRANSACTION_INITIALIZED("metric.tx.initialized", "transaction initialized"),
+        TRANSACTION_CREATED("metric.tx.created", "transaction created successfully"),
+        TRANSACTION_SUBMITTED("metric.tx.submitted", "transaction submitted successfully"),
+        TRANSACTION_MINED("metric.tx.mined", "transaction mined")
     }
 }
 
+/**
+ * Creates a metric with a start time of ZcashWalletApp.creationTime and an end time of when this
+ * instance was created. This can then be passed to [Feedback.report].
+ */
 class LaunchMetric private constructor(private val metric: Feedback.TimeMetric) :
     Feedback.Metric by metric {
     constructor() : this(

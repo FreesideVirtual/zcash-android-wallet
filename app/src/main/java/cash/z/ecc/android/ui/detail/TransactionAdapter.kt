@@ -13,12 +13,12 @@ class TransactionAdapter<T : ConfirmedTransaction> :
             override fun areItemsTheSame(
                 oldItem: T,
                 newItem: T
-            ) = oldItem.minedHeight == newItem.minedHeight
+            ) = oldItem.minedHeight == newItem.minedHeight && oldItem.noteId == newItem.noteId
 
             override fun areContentsTheSame(
                 oldItem: T,
                 newItem: T
-            ) = oldItem.equals(newItem)
+            ) = oldItem == newItem
         }
     ) {
 
@@ -33,5 +33,4 @@ class TransactionAdapter<T : ConfirmedTransaction> :
         holder: TransactionViewHolder<T>,
         position: Int
     ) = holder.bindTo(getItem(position))
-
 }

@@ -2,21 +2,28 @@ package cash.z.ecc.android.ui.send
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
+import androidx.core.widget.doAfterTextChanged
 import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendAddressBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.*
 import cash.z.ecc.android.ui.base.BaseFragment
+import cash.z.wallet.sdk.Synchronizer
+import cash.z.wallet.sdk.block.CompactBlockProcessor.WalletBalance
 import cash.z.wallet.sdk.ext.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     ClipboardManager.OnPrimaryClipChangedListener {
+
+    private var maxZatoshi: Long? = null
 
     val sendViewModel: SendViewModel by activityViewModel()
 
@@ -25,54 +32,96 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.backButtonHitArea.onClickNavTo(R.id.action_nav_send_address_to_nav_home)
         binding.buttonNext.setOnClickListener {
             onSubmit()
         }
-        binding.backButtonHitArea.onClickNavTo(R.id.action_nav_send_address_to_nav_home)
         binding.textBannerAction.setOnClickListener {
             onPaste()
         }
         binding.textBannerMessage.setOnClickListener {
             onPaste()
         }
+        binding.textMax.setOnClickListener {
+            onMax()
+        }
 
         // Apply View Model
         if (sendViewModel.zatoshiAmount > 0L) {
             sendViewModel.zatoshiAmount.convertZatoshiToZecString(8).let { amount ->
                 binding.inputZcashAmount.setText(amount)
-                binding.textAmount.text = "Sending $amount ZEC"
             }
         } else {
             binding.inputZcashAmount.setText(null)
         }
-        if (!sendViewModel.toAddress.isNullOrEmpty()){
-            binding.textAmount.text = "Send to ${sendViewModel.toAddress.toAbbreviatedAddress()}"
+        if (!sendViewModel.toAddress.isNullOrEmpty()) {
             binding.inputZcashAddress.setText(sendViewModel.toAddress)
         } else {
             binding.inputZcashAddress.setText(null)
         }
 
         binding.inputZcashAddress.onEditorActionDone(::onSubmit)
+        binding.inputZcashAmount.onEditorActionDone(::onSubmit)
 
-        binding.imageScanQr.onClickNavTo(R.id.action_nav_send_address_to_nav_scan)
+        binding.inputZcashAddress.apply {
+            doAfterTextChanged {
+                val trim = text.toString().trim()
+                if (text.toString() != trim) {
+                    binding.inputZcashAddress
+                        .findViewById<EditText>(R.id.input_zcash_address).setText(trim)
+                }
+                onAddressChanged(trim)
+            }
+        }
+
+        binding.textLayoutAddress.setEndIconOnClickListener {
+            mainActivity?.maybeOpenScan()
+        }
+    }
+
+    private fun onAddressChanged(address: String) {
+        resumedScope.launch {
+            var type = when (sendViewModel.validateAddress(address)) {
+                is Synchronizer.AddressType.Transparent -> "This is a valid transparent address" to R.color.zcashGreen
+                is Synchronizer.AddressType.Shielded -> "This is a valid shielded address" to R.color.zcashGreen
+                is Synchronizer.AddressType.Invalid -> "This address appears to be invalid" to R.color.zcashRed
+            }
+            if (address == sendViewModel.synchronizer.getAddress()) type =
+                "Warning, this appears to be your address!" to R.color.zcashRed
+            binding.textLayoutAddress.helperText = type.first
+            binding.textLayoutAddress.setHelperTextColor(ColorStateList.valueOf(type.second.toAppColor()))
+        }
     }
 
 
     private fun onSubmit(unused: EditText? = null) {
         sendViewModel.toAddress = binding.inputZcashAddress.text.toString()
         binding.inputZcashAmount.convertZecToZatoshi()?.let { sendViewModel.zatoshiAmount = it }
-        sendViewModel.validate().onFirstWith(resumedScope) {
+        sendViewModel.validate(maxZatoshi).onFirstWith(resumedScope) {
             if (it == null) {
                 mainActivity?.navController?.navigate(R.id.action_nav_send_address_to_send_memo)
             } else {
                 resumedScope.launch {
                     binding.textAddressError.text = it
                     delay(1500L)
-                    binding.textAddressError.text =  ""
+                    binding.textAddressError.text = ""
                 }
             }
         }
     }
+
+    private fun onMax() {
+        if (maxZatoshi != null) {
+            binding.inputZcashAmount.apply {
+                setText(maxZatoshi.convertZatoshiToZecString(8))
+                postDelayed({
+                    requestFocus()
+                    setSelection(text?.length ?: 0)
+                }, 10L)
+            }
+        }
+    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -87,6 +136,18 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     override fun onResume() {
         super.onResume()
         updateClipboardBanner()
+        sendViewModel.synchronizer.balances.collectWith(resumedScope) {
+            onBalanceUpdated(it)
+        }
+        binding.inputZcashAddress.text.toString().let {
+            if (!it.isNullOrEmpty()) onAddressChanged(it)
+        }
+    }
+
+    private fun onBalanceUpdated(balance: WalletBalance) {
+        binding.textLayoutAmount.helperText =
+            "You have ${balance.availableZatoshi.convertZatoshiToZecString(8)} available"
+        maxZatoshi = balance.availableZatoshi - ZcashSdk.MINERS_FEE_ZATOSHI
     }
 
     override fun onPrimaryClipChanged() {

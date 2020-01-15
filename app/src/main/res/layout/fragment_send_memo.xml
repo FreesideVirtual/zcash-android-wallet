@@ -41,13 +41,14 @@
         android:background="@drawable/background_banner"
         android:elevation="6dp"
         android:gravity="top"
-        android:imeActionLabel="add memo"
-        android:inputType="textImeMultiLine"
-        android:imeOptions="actionDone"
         android:hint="Add a memo here"
+        android:maxLines="3"
+        android:imeActionLabel="add memo"
+        android:imeOptions="actionDone"
+        android:inputType="textImeMultiLine"
         android:paddingBottom="8dp"
-        android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:paddingStart="16dp"
         android:paddingTop="8dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/text_light"
@@ -65,38 +66,39 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:elevation="6dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:paddingBottom="8dp"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
         android:textColor="@color/text_light_dimmed"
-        tools:text="sent from z23lk4jjl2k3jl43kkj542l3kl4hj2l3k1j41l2kjk423lkj423lklhk2jrhiuhrh2j4hh2hkj23hkj4"
-        app:layout_constraintStart_toStartOf="@id/input_memo"
+        app:layout_constraintBottom_toBottomOf="@id/input_memo"
         app:layout_constraintEnd_toEndOf="@id/input_memo"
-        app:layout_constraintBottom_toBottomOf="@id/input_memo" />
+        app:layout_constraintStart_toStartOf="@id/input_memo"
+        tools:text="sent from z23lk4jjl2k3jl43kkj542l3kl4hj2l3k1j41l2kjk423lkj423lklhk2jrhiuhrh2j4hh2hkj23hkj4" />
 
     <View
         android:layout_width="0dp"
         android:layout_height="1px"
-        android:elevation="6dp"
         android:layout_marginBottom="4dp"
         android:background="@color/text_light_dimmed"
-        app:layout_constraintStart_toStartOf="@id/text_included_address"
+        android:elevation="6dp"
         app:layout_constraintEnd_toEndOf="@id/text_included_address"
-        app:layout_constraintTop_toTopOf="@id/text_included_address"/>
+        app:layout_constraintStart_toStartOf="@id/text_included_address"
+        app:layout_constraintTop_toTopOf="@id/text_included_address" />
 
 
     <CheckBox
         android:id="@+id/check_include_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="0dp"
         android:layout_marginTop="16dp"
         android:padding="0dp"
-        android:layout_marginRight="0dp"
         android:text="Include your sending address in memo"
         app:layout_constraintStart_toStartOf="@+id/input_memo"
         app:layout_constraintTop_toBottomOf="@+id/input_memo" />
 
     <TextView
+        android:id="@+id/text_info_shielded"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -107,6 +109,67 @@
         app:layout_constraintEnd_toEndOf="@id/input_memo"
         app:layout_constraintStart_toStartOf="@id/input_memo"
         app:layout_constraintTop_toBottomOf="@id/check_include_address" />
+
+    <ImageView
+        android:id="@+id/sad_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.17"
+        app:layout_constraintWidth_percent="0.68"
+        app:srcCompat="@drawable/ic_sadzebra" />
+
+    <TextView
+        android:id="@+id/sad_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="16dp"
+        android:layout_marginTop="16dp"
+        android:drawableTint="@color/text_light_dimmed"
+        android:text="You are going to make the zebra sad."
+        android:textColor="@color/text_light"
+        android:textSize="18dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sad_icon"
+        app:layout_constraintBottom_toTopOf="@id/sad_description"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/sad_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawablePadding="16dp"
+        android:drawableTint="@color/text_light_dimmed"
+        android:gravity="center"
+        android:text="Heads up! You are sending to a transparent address, which reduces your privacy and does not support memos."
+        android:textColor="@color/text_light"
+        android:textSize="18dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@id/sad_title"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintStart_toStartOf="@id/sad_title"
+        app:layout_constraintTop_toBottomOf="@id/sad_title"
+        app:layout_constraintBottom_toTopOf="@id/sad_checkbox"
+        app:layout_constraintVertical_bias="0.5263" />
+
+    <CheckBox
+        android:id="@+id/sad_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don't show this again"
+        android:checked="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sad_description"
+        app:layout_constraintBottom_toTopOf="@id/button_next"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_next"
@@ -134,4 +197,17 @@
         app:layout_constraintEnd_toEndOf="@id/button_next"
         app:layout_constraintStart_toStartOf="@id/button_next"
         app:layout_constraintTop_toBottomOf="@id/button_next" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="sad_description, sad_icon, sad_title, sad_checkbox" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_shielded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="input_memo, check_include_address, text_included_address, text_info_shielded"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

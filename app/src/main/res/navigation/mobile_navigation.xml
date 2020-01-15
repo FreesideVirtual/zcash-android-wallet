@@ -40,7 +40,7 @@
         <action
             android:id="@+id/action_nav_receive_to_nav_scan"
             app:destination="@id/nav_scan"
-            app:popUpTo="@id/nav_scan"
+            app:popUpTo="@id/nav_receive"
             app:popUpToInclusive="true"
             app:exitAnim="@anim/anim_fade_out_address"
             app:enterAnim="@anim/anim_fade_in_scanner"/>
@@ -52,10 +52,11 @@
         <action
             android:id="@+id/action_nav_scan_to_nav_send_address"
             app:destination="@id/nav_send_address"
-            app:popUpTo="@id/nav_send_address"/>
+            app:popUpTo="@id/nav_scan"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_nav_scan_to_nav_receive"
-            app:popUpTo="@id/nav_receive"
+            app:popUpTo="@id/nav_scan"
             app:popUpToInclusive="true"
             app:destination="@id/nav_receive"
             app:exitAnim="@anim/anim_fade_out_medium"/>
@@ -134,6 +135,11 @@
         android:id="@+id/nav_send_final"
         android:name="cash.z.ecc.android.ui.send.SendFinalFragment"
         tools:layout="@layout/fragment_send_final" >
+        <action
+            android:id="@+id/action_nav_send_final_to_nav_home"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/nav_home"
+            app:popUpToInclusive="true"/>
     </fragment>
 
 
@@ -157,4 +163,16 @@
         android:name="cash.z.ecc.android.ui.setup.BackupFragment"
         tools:layout="@layout/fragment_backup" >
     </fragment>
+
+
+    <!--                -->
+    <!-- Global actions -->
+    <!--                -->
+
+    <action
+        android:id="@+id/action_global_nav_scan"
+        app:destination="@id/nav_scan"
+        app:popUpTo="@id/nav_scan"
+        app:popUpToInclusive="true" />
+
 </navigation>

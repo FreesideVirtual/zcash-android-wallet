@@ -101,6 +101,7 @@
         android:layout_height="wrap_content"
         android:text="(enter an amount to send)"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        android:textColor="@color/text_light_dimmed"
         app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,10 +111,10 @@
         android:id="@+id/header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/background_header"
+        android:onClick="copyAddress"
         android:paddingBottom="24dp"
         android:paddingTop="24dp"
-        android:onClick="copyAddress"
-        android:background="@drawable/background_header"
         app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
         app:layout_constraintStart_toStartOf="@id/guideline_keyline_start"
         app:layout_constraintTop_toBottomOf="@id/back_button_hit_area">
@@ -144,28 +145,51 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            tools:text="zs1g7cqw...9qmvyzgm"
             android:textColor="@color/colorPrimaryMedium"
             app:layout_constraintStart_toEndOf="@id/label_address"
-            app:layout_constraintTop_toBottomOf="@+id/text_header_title" />
+            app:layout_constraintTop_toBottomOf="@+id/text_header_title"
+            tools:text="zs1g7cqw...9qmvyzgm" />
 
         <ImageView
             android:id="@+id/image_copy"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:src="@drawable/ic_content_copy"
-            app:layout_constraintTop_toTopOf="@id/label_address"
             app:layout_constraintBottom_toBottomOf="@id/label_address"
-            app:layout_constraintStart_toEndOf="@id/text_address"
+            app:layout_constraintDimensionRatio="W,1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.15"
-            app:layout_constraintDimensionRatio="W,1:1"/>
+            app:layout_constraintStart_toEndOf="@id/text_address"
+            app:layout_constraintTop_toTopOf="@id/label_address" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/empty_footer"
+        android:layout_width="0dp"
+        android:layout_height="16dp"
+        android:background="@drawable/background_footer"
+        app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_keyline_start"
+        app:layout_constraintTop_toBottomOf="@id/header" />
+
+    <TextView
+        android:id="@+id/empty_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No history yet."
+        android:textColor="@color/text_light"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_transactions"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
         app:layout_constraintStart_toStartOf="@id/guideline_keyline_start"
@@ -173,6 +197,24 @@
         tools:itemCount="15"
         tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_transaction"
-        tools:orientation="vertical" />
+        tools:orientation="vertical"
+        tools:visibility="gone" />
 
+    <View
+        android:id="@+id/footer_fade"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        android:alpha="0.8"
+        android:background="@drawable/background_gradient_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_keyline_end"
+        app:layout_constraintStart_toStartOf="@id/guideline_keyline_start" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_empty_views"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="empty_footer,empty_message" />
 </androidx.constraintlayout.widget.ConstraintLayout>

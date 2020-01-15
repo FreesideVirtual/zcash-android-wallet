@@ -10,6 +10,7 @@ import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.gone
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.ui.base.BaseFragment
 
 class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
@@ -22,10 +23,10 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonNext.setOnClickListener {
-            onAddMemo()
+            onTopButton()
         }
         binding.buttonSkip.setOnClickListener {
-            onSkip()
+            onBottomButton()
         }
         R.id.action_nav_send_memo_to_nav_send_address.let {
             binding.backButtonHitArea.onClickNavTo(it)
@@ -38,7 +39,7 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
 
         binding.inputMemo.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                onAddMemo()
+                onTopButton()
                 true
             } else {
                 false
@@ -54,8 +55,20 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
     }
 
     private fun applyModel() {
-        binding.inputMemo.setText(sendViewModel.memo)
-        binding.checkIncludeAddress.isChecked = sendViewModel.includeFromAddress
+        sendViewModel.isShielded.let { isShielded ->
+            binding.groupShielded.goneIf(!isShielded)
+            binding.groupTransparent.goneIf(isShielded)
+            if (isShielded) {
+                binding.inputMemo.setText(sendViewModel.memo)
+                binding.checkIncludeAddress.isChecked = sendViewModel.includeFromAddress
+                binding.buttonNext.text = "ADD MEMO"
+                binding.buttonSkip.text = "SEND WITHOUT MEMO"
+            } else {
+                binding.buttonNext.text = "WAIT, GO BACK"
+                binding.buttonSkip.text = "PROCEED"
+                binding.sadTitle.text = binding.sadTitle.text.toString().toColoredSpan(R.color.colorPrimary, "sad")
+            }
+        }
     }
 
     private fun onIncludeMemo(checked: Boolean) {
@@ -64,15 +77,19 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
         if (checked) binding.inputMemo.setHint("") else binding.inputMemo.setHint("Add a memo here")
     }
 
-    private fun onSkip() {
+    private fun onTopButton() {
+        if (sendViewModel.isShielded) {
+            sendViewModel.memo = binding.inputMemo.text.toString()
+            onNext()
+        } else {
+            mainActivity?.navController?.navigate(R.id.action_nav_send_memo_to_nav_send_address)
+        }
+    }
+
+    private fun onBottomButton() {
         binding.inputMemo.setText("")
         sendViewModel.memo = ""
         sendViewModel.includeFromAddress = false
-        onNext()
-    }
-
-    private fun onAddMemo() {
-        sendViewModel.memo = binding.inputMemo.text.toString()
         onNext()
     }
 
