@@ -1,6 +1,8 @@
 package cash.z.ecc.android.ui.home
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,17 +12,14 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.disabledIf
-import cash.z.ecc.android.ext.goneIf
-import cash.z.ecc.android.ext.onClickNavTo
-import cash.z.ecc.android.ext.toColoredSpan
+import cash.z.ecc.android.ext.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.Synchronizer.Status.SYNCING
+import cash.z.wallet.sdk.Synchronizer.Status.*
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.convertZecToZatoshi
 import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
@@ -40,6 +39,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val sendViewModel: SendViewModel by activityViewModel()
     private val viewModel: HomeViewModel by viewModel()
 
+    lateinit var snake: MagicSnakeLoader
+
     override fun inflate(inflater: LayoutInflater): FragmentHomeBinding =
         FragmentHomeBinding.inflate(inflater)
 
@@ -50,6 +51,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onAttach(context: Context) {
         twig("HomeFragment.onAttach")
+        twig("ZZZ")
+        twig("ZZZ")
+        twig("ZZZ")
+        twig("ZZZ   ===================== HOME FRAGMENT CREATED ==================================")
         super.onAttach(context)
 
         // this will call startSync either now or later (after initializing with newly created seed)
@@ -99,6 +104,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 onSend()
             }
             setSendAmount("0", false)
+
+            snake = MagicSnakeLoader(binding.lottieButtonLoading)
         }
 
         binding.buttonNumberPadBack.setOnLongClickListener {
@@ -106,10 +113,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             true
         }
 
-//        if (::uiModel.isInitialized) {
-//            twig("uiModel exists!")
-//            onModelUpdated(HomeViewModel.UiModel(), uiModel)
-//        }
+        if (::uiModel.isInitialized) {
+            twig("uiModel exists!")
+            onModelUpdated(null, uiModel)
+        }
     }
 
     private fun onClearAmount() {
@@ -179,7 +186,13 @@ twig("onResume (D)")
     fun setSendEnabled(enabled: Boolean) {
         binding.buttonSendAmount.apply {
             isEnabled = enabled
-//            backgroundTintList = ColorStateList.valueOf( resources.getColor( if(enabled) R.color.colorPrimary else R.color.zcashWhite_24) )
+            if (enabled) {
+//                setTextColor(resources.getColorStateList(R.color.selector_button_text_dark))
+                binding.lottieButtonLoading.alpha = 1.0f
+            } else {
+//                setTextColor(R.color.zcashGray.toAppColor())
+                binding.lottieButtonLoading.alpha = 0.32f
+            }
         }
     }
 
@@ -189,22 +202,35 @@ twig("onResume (D)")
             return
         }
 
+        snake.isSynced = uiModel.isSynced
+        if (!uiModel.isSynced) {
+            snake.downloadProgress = uiModel.downloadProgress
+            snake.scanProgress = uiModel.scanProgress
+        }
+
         val sendText = when {
-            uiModel.isSynced -> "SEND AMOUNT"
+            uiModel.isSynced -> if (uiModel.hasFunds) "SEND AMOUNT" else "NO FUNDS AVAILABLE"
             uiModel.status == Synchronizer.Status.DISCONNECTED -> "DISCONNECTED"
             uiModel.status == Synchronizer.Status.STOPPED -> "IDLE"
-            uiModel.isDownloading -> "Downloading . . . ${uiModel.downloadProgress}%"
+            uiModel.isDownloading -> "Downloading . . . ${snake.downloadProgress}%"
             uiModel.isValidating -> "Validating . . ."
-            uiModel.isScanning -> "Scanning . . . ${uiModel.scanProgress}%"
+            uiModel.isScanning -> "Scanning . . . ${snake.scanProgress}%"
             else -> "Updating"
         }
-        binding.lottieButtonLoading.progress = if (uiModel.isSynced) 1.0f else uiModel.totalProgress * 0.82f // line fully closes at 82% mark
+
+//        binding.lottieButtonLoading.progress = if (uiModel.isSynced) 1.0f else uiModel.totalProgress * 0.82f // line fully closes at 82% mark
         binding.buttonSendAmount.text = sendText
-        twig("Lottie progress set to ${binding.lottieButtonLoading.progress}  (isSynced? ${uiModel.isSynced})")
+//        twig("Lottie progress set to ${binding.lottieButtonLoading.progress}  (isSynced? ${uiModel.isSynced})")
         twig("Send button set to: $sendText")
 
         val resId = if (uiModel.isSynced) R.color.selector_button_text_dark else R.color.selector_button_text_light
         binding.buttonSendAmount.setTextColor(resources.getColorStateList(resId))
+
+//        if (uiModel.status == DISCONNECTED || uiModel.status == STOPPED) {
+//            binding.buttonSendAmount.backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.zcashGray))
+//        } else {
+//            binding.buttonSendAmount.backgroundTintList = null
+//        }
     }
 
     /**
@@ -249,11 +275,11 @@ twig("onResume (D)")
     // Private UI Events
     //
 
-    private fun onModelUpdated(old: HomeViewModel.UiModel, new: HomeViewModel.UiModel) {
+    private fun onModelUpdated(old: HomeViewModel.UiModel?, new: HomeViewModel.UiModel) {
         twig("onModelUpdated: $new")
         uiModel = new
 twig("onModelUpdated (A)")
-        if (old.pendingSend != new.pendingSend) {
+        if (old?.pendingSend != new.pendingSend) {
 twig("onModelUpdated (B)")
             setSendAmount(new.pendingSend)
 twig("onModelUpdated (C)")
@@ -262,7 +288,8 @@ twig("onModelUpdated (D)")
         // TODO: handle stopped and disconnected flows
         setProgress(uiModel) // TODO: we may not need to separate anymore
 twig("onModelUpdated (E)")
-        if (new.status == SYNCING) onSyncing(new) else onSynced(new)
+//        if (new.status = SYNCING) onSyncing(new) else onSynced(new)
+        if (new.status == SYNCED) onSynced(new) else onSyncing(new)
 twig("onModelUpdated (F)")
         setSendEnabled(new.isSendEnabled)
 twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
@@ -274,7 +301,7 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
     }
 
     private fun onSynced(uiModel: HomeViewModel.UiModel) {
-        binding.lottieButtonLoading.progress = 1.0f
+        snake.isSynced = true
         if (!uiModel.hasBalance) {
             onNoFunds()
         } else {

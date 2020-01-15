@@ -3,8 +3,7 @@ package cash.z.ecc.android.ui.home
 import androidx.lifecycle.ViewModel
 import cash.z.wallet.sdk.SdkSynchronizer
 import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.Synchronizer.Status.DISCONNECTED
-import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
+import cash.z.wallet.sdk.Synchronizer.Status.*
 import cash.z.wallet.sdk.block.CompactBlockProcessor
 import cash.z.wallet.sdk.ext.ZcashSdk.MINERS_FEE_ZATOSHI
 import cash.z.wallet.sdk.ext.ZcashSdk.ZATOSHI_PER_ZEC
@@ -54,6 +53,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 }
             }
         }
+        twig("initializing view models stream")
         uiModels = synchronizer.run {
             combine(status, processorInfo, balances, zec) { s, p, b, z->
                 UiModel(s, p, b.availableZatoshi, b.totalZatoshi, z)
@@ -88,16 +88,9 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         val isSendEnabled: Boolean get() = isSynced && hasFunds
 
         // Processor Info
-        val isDownloading: Boolean
-            get() = status != SYNCED
-                    && processorInfo.lastDownloadedHeight < processorInfo.lastDownloadRange.last
-        val isScanning: Boolean
-            get() = status != SYNCED
-                    && processorInfo.lastScannedHeight < processorInfo.lastScanRange.last
-                    && processorInfo.lastScannedHeight > processorInfo.lastScanRange.first
-        val isValidating: Boolean
-            get() = (status != SYNCED)
-                    && (!isScanning && !isDownloading)
+        val isDownloading = status == DOWNLOADING
+        val isScanning = status == SCANNING
+        val isValidating = status == VALIDATING
         val downloadProgress: Int get() {
             return processorInfo.run {
                 if (lastDownloadRange.isEmpty()) {
