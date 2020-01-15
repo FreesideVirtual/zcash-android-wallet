@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         uiModels = synchronizer.run {
             combine(status, processorInfo, balances, zec) { s, p, b, z->
                 UiModel(s, p, b.availableZatoshi, b.totalZatoshi, z)
-            }
+            }.onStart{ emit(UiModel()) }
         }.conflate()
     }
 

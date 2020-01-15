@@ -1,8 +1,6 @@
 package cash.z.ecc.android.ui.home
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,14 +10,17 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.*
+import cash.z.ecc.android.ext.disabledIf
+import cash.z.ecc.android.ext.goneIf
+import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.Synchronizer.Status.*
+import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.convertZecToZatoshi
 import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
@@ -277,6 +278,7 @@ twig("onResume (D)")
 
     private fun onModelUpdated(old: HomeViewModel.UiModel?, new: HomeViewModel.UiModel) {
         twig("onModelUpdated: $new")
+        if (binding.lottieButtonLoading.visibility != View.VISIBLE) binding.lottieButtonLoading.visibility = View.VISIBLE
         uiModel = new
 twig("onModelUpdated (A)")
         if (old?.pendingSend != new.pendingSend) {
