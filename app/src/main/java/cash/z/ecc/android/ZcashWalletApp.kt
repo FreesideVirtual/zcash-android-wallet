@@ -37,7 +37,7 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
     override fun onCreate() {
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
-        Twig.plant(SilentTwig())
+        Twig.plant(TroubleshootingTwig())
         creationTime = System.currentTimeMillis()
         instance = this
         // Setup handler for uncaught exceptions.

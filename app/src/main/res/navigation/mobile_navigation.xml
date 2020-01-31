@@ -156,12 +156,26 @@
             app:destination="@id/nav_backup"
             app:popUpTo="@id/nav_landing"
             app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_nav_landing_to_nav_restore"
+            app:destination="@id/nav_restore" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_backup"
         android:name="cash.z.ecc.android.ui.setup.BackupFragment"
         tools:layout="@layout/fragment_backup" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_restore"
+        android:name="cash.z.ecc.android.ui.setup.RestoreFragment"
+        tools:layout="@layout/fragment_restore" >
+        <action
+            android:id="@+id/action_nav_restore_to_nav_home"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/nav_landing"
+            app:popUpToInclusive="true" />
     </fragment>
 
 

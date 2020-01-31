@@ -94,7 +94,7 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
     }
 
     private fun onRestoreWallet() {
-        Toast.makeText(activity, "Coming soon!", Toast.LENGTH_SHORT).show()
+        mainActivity?.navController?.navigate(R.id.action_nav_landing_to_nav_restore)
     }
 
     // AKA import wallet

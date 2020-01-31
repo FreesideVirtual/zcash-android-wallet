@@ -159,6 +159,10 @@ dependencies {
     // Misc.
     implementation 'com.airbnb.android:lottie:3.1.0'
     implementation 'com.facebook.stetho:stetho:1.5.1'
+    implementation 'com.github.gmale:chips-input-layout:4cd87089930fc16176f9fad1362b48a392449e23'
+
+    implementation "com.github.gmale:nachos:8a71c6a"
+
 
     // Tests
 

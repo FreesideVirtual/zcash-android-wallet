@@ -13,6 +13,13 @@ inline fun <reified VM : ViewModel> BaseFragment<*>.viewModel() = object : Lazy<
             ?: ViewModelProvider(this@viewModel, scopedFactory<VM>())[VM::class.java]
 }
 
+/**
+ * Create a view model that is scoped to the lifecycle of the activity.
+ *
+ * @param isSynchronizerScope true when this view model depends on the Synchronizer. False when this
+ * viewModel needs to be created before the synchronizer or otherwise has no dependency on it being
+ * available for use.
+ */
 inline fun <reified VM : ViewModel> BaseFragment<*>.activityViewModel(isSynchronizerScope: Boolean = true) = object : Lazy<VM> {
     val cached: VM? = null
     override fun isInitialized(): Boolean = cached != null
