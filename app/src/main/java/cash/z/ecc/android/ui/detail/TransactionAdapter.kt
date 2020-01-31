@@ -14,6 +14,8 @@ class TransactionAdapter<T : ConfirmedTransaction> :
                 oldItem: T,
                 newItem: T
             ) = oldItem.minedHeight == newItem.minedHeight && oldItem.noteId == newItem.noteId
+                    // bugfix: distinguish between self-transactions so they don't overwrite each other in the UI // TODO confirm that this is working, as intended
+                    && ((oldItem.raw == null && newItem.raw == null) || (oldItem.raw != null && newItem.raw != null && oldItem.raw!!.contentEquals(newItem.raw!!)))
 
             override fun areContentsTheSame(
                 oldItem: T,

@@ -137,9 +137,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onResume()
         twig("HomeFragment.onResume  resumeScope.isActive: ${resumedScope.isActive}  $resumedScope")
         viewModel.initializeMaybe()
-twig("onResume (A)")
         onClearAmount()
-twig("onResume (B)")
         viewModel.uiModels.scanReduce { old, new ->
             onModelUpdated(old, new)
             new
@@ -149,18 +147,14 @@ twig("onResume (B)")
             twig("exception while processing uiModels $e")
             throw e
         }.launchIn(resumedScope)
-twig("onResume (C)")
 
         // TODO: see if there is a better way to trigger a refresh of the uiModel on resume
         //       the latest one should just be in the viewmodel and we should just "resubscribe"
         //       but for some reason, this doesn't always happen, which kind of defeats the purpose
         //       of having a cold stream in the view model
         resumedScope.launch {
-twig("onResume (pre-fresh)")
             viewModel.refreshBalance()
-twig("onResume (post-fresh)")
         }
-twig("onResume (D)")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -280,22 +274,14 @@ twig("onResume (D)")
         twig("onModelUpdated: $new")
         if (binding.lottieButtonLoading.visibility != View.VISIBLE) binding.lottieButtonLoading.visibility = View.VISIBLE
         uiModel = new
-twig("onModelUpdated (A)")
         if (old?.pendingSend != new.pendingSend) {
-twig("onModelUpdated (B)")
             setSendAmount(new.pendingSend)
-twig("onModelUpdated (C)")
         }
-twig("onModelUpdated (D)")
         // TODO: handle stopped and disconnected flows
         setProgress(uiModel) // TODO: we may not need to separate anymore
-twig("onModelUpdated (E)")
 //        if (new.status = SYNCING) onSyncing(new) else onSynced(new)
         if (new.status == SYNCED) onSynced(new) else onSyncing(new)
-twig("onModelUpdated (F)")
         setSendEnabled(new.isSendEnabled)
-twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
-        twig("DONE onModelUpdated")
     }
 
     private fun onSyncing(uiModel: HomeViewModel.UiModel) {
@@ -359,7 +345,7 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
     //
 
     enum class BannerAction(val action: String) {
-        FUND_NOW("Fund Now"),
+        FUND_NOW(""),
         CANCEL("Cancel"),
         NONE(""),
         CLEAR("clear");

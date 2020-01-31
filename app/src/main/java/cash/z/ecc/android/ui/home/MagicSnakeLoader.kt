@@ -15,9 +15,7 @@ class MagicSnakeLoader(
 
     var isSynced: Boolean = false
         set(value) {
-            twig("ZZZ isSynced=$value  isStarted=$isStarted")
             if (value && !isStarted) {
-                twig("ZZZ isSynced=$value    TURBO sync")
                 lottie.progress = 1.0f
                 field = value
                 return
@@ -25,19 +23,16 @@ class MagicSnakeLoader(
 
             // it is started but it hadn't reached the synced state yet
             if (value && !field) {
-                twig("ZZZ synced was $field but now is $value so playing to completion since we are now synced")
                 field = value
                 playToCompletion()
             } else {
                 field = value
-                twig("ZZZ isSynced=$value and lottie.progress=${lottie.progress}")
             }
         }
 
     var scanProgress: Int = 0
         set(value) {
             field = value
-            twig("ZZZ scanProgress=$value")
             if (value > 0) {
                 startMaybe()
                 onScanUpdated()
@@ -47,7 +42,6 @@ class MagicSnakeLoader(
     var downloadProgress: Int = 0
         set(value) {
             field = value
-            twig("ZZZ downloadProgress=$value")
             if (value > 0) startMaybe()
         }
 
@@ -56,25 +50,12 @@ class MagicSnakeLoader(
         if (!isSynced && !isStarted) lottie.postDelayed({
             // after some delay, if we're still not synced then we better start animating (unless we already are)!
             if (!isSynced && isPaused) {
-                twig("ZZZ yes start!")
                 lottie.resumeAnimation()
                 isPaused = false
                 isStarted = true
-            } else {
-                twig("ZZZ I would have started but we're already synced!")
             }
-        }, 200L).also {  twig("ZZZ startMaybe???") }
+        }, 200L)
     }
-//        set(value) {
-//            field = value
-//            if (value in 1..99 && isStopped) {
-//                lottie.playAnimation()
-//                isStopped = false
-//            } else if (value >= 100) {
-//                isStopped = true
-//            }
-//        }
-
 
     private val isDownloading get() = downloadProgress in 1..99
     private val isScanning get() = scanProgress in 1..99
@@ -83,25 +64,11 @@ class MagicSnakeLoader(
         lottie.addAnimatorUpdateListener(this)
     }
 
-    //        downloading = true
-//    lottieAnimationView.playAnimation()
-//    lottieAnimationView.addAnimatorUpdateListener { valueAnimator ->
-//        // Set animation progress
-//        val progress = (valueAnimator.animatedValue as Float * 100).toInt()
-//        progressTv.text = "Progress: $progress%"
-//
-//        if (downloading && progress >= 40) {
-//            lottieAnimationView.progress = 0f
-//        }
-//    }
-
     override fun onAnimationUpdate(animation: ValueAnimator) {
         if (isSynced || isPaused) {
 //            playToCompletion()
             return
         }
-        twig("ZZZ")
-        twig("ZZZ\t\tonAnimationUpdate(${animation.animatedValue})")
 
         // if we are scanning, then set the animation progress, based on the scan progress
         // if we're not scanning, then we're looping
@@ -112,7 +79,6 @@ class MagicSnakeLoader(
 
     private val acceptablePauseFrames = arrayOf(33,34,67,68,99)
     private fun applyScanProgress(frame: Int) {
-        twig("ZZZ applyScanProgress($frame) : isPaused=$isPaused  isStarted=$isStarted  min=${lottie.minFrame}   max=${lottie.maxFrame}")
         // don't hardcode the progress until the loop animation has completed, cleanly
         if (isPaused) {
             onScanUpdated()
@@ -126,7 +92,6 @@ class MagicSnakeLoader(
     }
 
     private fun onScanUpdated() {
-        twig("ZZZ onScanUpdated : isPaused=$isPaused")
         if (isSynced) {
 //            playToCompletion()
             return
@@ -137,7 +102,6 @@ class MagicSnakeLoader(
             val scanRange = scanningEndFrame - scanningStartFrame
             val scanRangeProgress = scanProgress.toFloat() / 100.0f * scanRange.toFloat()
             lottie.progress = (scanningStartFrame.toFloat() + scanRangeProgress) / totalFrames
-            twig("ZZZ onScanUpdated : scanRange=$scanRange  scanRangeProgress=$scanRangeProgress  lottie.progress=${(scanningStartFrame.toFloat() + scanRangeProgress)}/$totalFrames=${lottie.progress}")
         }
     }
 
@@ -160,17 +124,14 @@ class MagicSnakeLoader(
     }
 
     private fun allowLoop(frame: Int) {
-        twig("ZZZ allowLoop($frame) : isPaused=$isPaused")
         unpause()
         if (frame >= scanningStartFrame) {
-            twig("ZZZ resetting to 0f (LOOPING)")
             lottie.progress = 0f
         }
     }
 
     fun unpause() {
         if (isPaused) {
-            twig("ZZZ unpausing")
             lottie.resumeAnimation()
             isPaused = false
         }
@@ -178,7 +139,6 @@ class MagicSnakeLoader(
 
     fun pause() {
         if (!isPaused) {
-            twig("ZZZ pausing")
             lottie.pauseAnimation()
             isPaused = true
         }

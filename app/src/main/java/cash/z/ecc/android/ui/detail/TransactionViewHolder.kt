@@ -8,6 +8,7 @@ import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.toAppColor
 import cash.z.ecc.android.ui.MainActivity
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
+import cash.z.wallet.sdk.ext.ZcashSdk
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.isShielded
 import cash.z.wallet.sdk.ext.toAbbreviatedAddress
@@ -60,7 +61,12 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
                     lineTwo = "Unknown"
                 }
             }
+
+            // sanitize amount
+            if (value < ZcashSdk.MINERS_FEE_ZATOSHI) amount = "< 0.001"
+            else if (amount.length > 8) amount = "tap to view"
         }
+
 
         topText.text = lineOne
         bottomText.text = lineTwo
@@ -74,7 +80,10 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
     private fun onTransactionClicked(transaction: ConfirmedTransaction) {
         val txId = transaction.rawTransactionId.toTxId()
         val detailsMessage: String = "Zatoshi amount: ${transaction.value}\n\n" +
-                "Transaction: $txId"
+                "Transaction: $txId" +
+                "${if (transaction.toAddress != null) "\nto: ${transaction.toAddress}" else ""}" +
+                "${if (transaction.memo != null) "\nmemo: ${transaction.toAddress}" else ""}"
+
         MaterialAlertDialogBuilder(itemView.context)
             .setMessage(detailsMessage)
             .setTitle("Transaction Details")

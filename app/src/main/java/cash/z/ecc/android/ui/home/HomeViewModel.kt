@@ -96,13 +96,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 if (lastDownloadRange.isEmpty()) {
                     100
                 } else {
-                    twig("NUMERATOR: $lastDownloadedHeight - ${lastDownloadRange.first} + 1 = ${lastDownloadedHeight - lastDownloadRange.first + 1} block(s) downloaded")
-                    twig("DENOMINATOR: ${lastDownloadRange.last} - ${lastDownloadRange.first} + 1 = ${lastDownloadRange.last - lastDownloadRange.first + 1} block(s) to download")
                     val progress =
                         (((lastDownloadedHeight - lastDownloadRange.first + 1).coerceAtLeast(0).toFloat() / (lastDownloadRange.last - lastDownloadRange.first + 1)) * 100.0f).coerceAtMost(
                             100.0f
                         ).roundToInt()
-                    twig("RESULT: $progress")
                     progress
                 }
             }
@@ -112,10 +109,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 if (lastScanRange.isEmpty()) {
                     100
                 } else {
-                    twig("NUMERATOR: ${lastScannedHeight - lastScanRange.first + 1} block(s) scanned")
-                    twig("DENOMINATOR: ${lastScanRange.last - lastScanRange.first + 1} block(s) to scan")
                     val progress = (((lastScannedHeight - lastScanRange.first + 1).coerceAtLeast(0).toFloat() / (lastScanRange.last - lastScanRange.first + 1)) * 100.0f).coerceAtMost(100.0f).roundToInt()
-                    twig("RESULT: $progress")
                     progress
                 }
             }

@@ -81,8 +81,8 @@ class SendViewModel @Inject constructor() : ViewModel() {
             synchronizer.validateAddress(toAddress).isNotValid -> {
                 emit("Please enter a valid address")
             }
-            zatoshiAmount < ZcashSdk.MINERS_FEE_ZATOSHI -> {
-                emit("Too little! Please enter at least 0.0001")
+            zatoshiAmount <= 1 -> {
+                emit("Too little! Please enter at least 1 Zatoshi.")
             }
             maxZatoshi != null && zatoshiAmount > maxZatoshi -> {
                 emit( "Too much! Please enter no more than ${maxZatoshi.convertZatoshiToZecString(8)}")

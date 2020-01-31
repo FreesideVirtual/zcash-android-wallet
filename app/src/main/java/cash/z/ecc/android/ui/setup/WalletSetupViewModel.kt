@@ -62,7 +62,7 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun importWallet(seedPhrase: String, birthdayHeight: Int): Initializer {
-        twig("Importing wallet")
+        twig("Importing wallet. Requested birthday: $birthdayHeight")
         return ZcashWalletApp.component.initializerSubcomponent().create(Initializer.DefaultBirthdayStore(ZcashWalletApp.instance, birthdayHeight)).run {
             initializer().apply {
                 import(importWallet(seedPhrase.toCharArray()), birthdayStore().getBirthday())
