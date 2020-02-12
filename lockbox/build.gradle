@@ -42,6 +42,9 @@ dependencies {
     implementation Deps.AndroidX.APPCOMPAT
     implementation Deps.AndroidX.CORE_KTX
 
+    // Zcash
+    implementation 'com.github.zcash:zcash-android-wallet-plugins:1.0.0'
+
     implementation "de.adorsys.android:securestoragelibrary:1.2.2"
 
     androidTestImplementation Deps.Test.Android.JUNIT

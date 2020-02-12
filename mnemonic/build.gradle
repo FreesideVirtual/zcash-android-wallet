@@ -6,6 +6,9 @@ dependencies {
     implementation Deps.JavaX.INJECT
     implementation Deps.Kotlin.STDLIB
 
+    // Zcash
+    implementation 'com.github.zcash:zcash-android-wallet-plugins:1.0.0'
+
     implementation 'com.madgag.spongycastle:core:1.58.0.0'
     implementation 'io.github.novacrypto:BIP39:2019.01.27'
     implementation 'io.github.novacrypto:securestring:2019.01.27'

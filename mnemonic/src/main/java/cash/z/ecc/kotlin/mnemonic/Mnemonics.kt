@@ -1,5 +1,6 @@
 package cash.z.ecc.kotlin.mnemonic
 
+import cash.z.android.plugin.MnemonicPlugin
 import io.github.novacrypto.bip39.MnemonicGenerator
 import io.github.novacrypto.bip39.SeedCalculator
 import io.github.novacrypto.bip39.Words
@@ -10,7 +11,7 @@ import javax.inject.Inject
 // TODO: either find another library that allows for doing this without strings or modify this code
 //  to leverage SecureCharBuffer (which doesn't work well with SeedCalculator.calculateSeed,
 //  which expects a string so for that reason, we just use Strings here)
-class Mnemonics @Inject constructor(): MnemonicProvider {
+class Mnemonics @Inject constructor(): MnemonicPlugin {
 
     override fun nextEntropy(): ByteArray {
         return ByteArray(Words.TWENTY_FOUR.byteLength()).apply {
