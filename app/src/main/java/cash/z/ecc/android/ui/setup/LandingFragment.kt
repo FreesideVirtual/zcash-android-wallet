@@ -69,10 +69,15 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         walletSetup.checkSeed().onEach {
             when(it) {
                 SEED_WITHOUT_BACKUP, SEED_WITH_BACKUP -> {
-                    mainActivity?.navController?.navigate(R.id.nav_backup)
+                    mainActivity?.safeNavigate(R.id.nav_backup)
                 }
             }
         }.launchIn(lifecycleScope)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mainActivity?.hideKeyboard()
     }
 
     private fun onSkip(count: Int) {
@@ -94,7 +99,7 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
     }
 
     private fun onRestoreWallet() {
-        Toast.makeText(activity, "Coming soon!", Toast.LENGTH_SHORT).show()
+        mainActivity?.safeNavigate(R.id.action_nav_landing_to_nav_restore)
     }
 
     // AKA import wallet
@@ -133,7 +138,7 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
 
     private fun onBackupWallet() {
         skipCount = 0
-        mainActivity?.navController?.navigate(R.id.action_nav_landing_to_nav_backup)
+        mainActivity?.safeNavigate(R.id.action_nav_landing_to_nav_backup)
     }
 
     private fun onEnterWallet() {

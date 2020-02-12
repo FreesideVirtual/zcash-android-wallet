@@ -99,7 +99,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
         binding.inputZcashAmount.convertZecToZatoshi()?.let { sendViewModel.zatoshiAmount = it }
         sendViewModel.validate(maxZatoshi).onFirstWith(resumedScope) {
             if (it == null) {
-                mainActivity?.navController?.navigate(R.id.action_nav_send_address_to_send_memo)
+                mainActivity?.safeNavigate(R.id.action_nav_send_address_to_send_memo)
             } else {
                 resumedScope.launch {
                     binding.textAddressError.text = it

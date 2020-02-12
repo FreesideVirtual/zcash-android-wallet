@@ -5,6 +5,7 @@ import cash.z.wallet.sdk.SdkSynchronizer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.*
 import cash.z.wallet.sdk.block.CompactBlockProcessor
+import cash.z.wallet.sdk.exception.RustLayerException
 import cash.z.wallet.sdk.ext.ZcashSdk.MINERS_FEE_ZATOSHI
 import cash.z.wallet.sdk.ext.ZcashSdk.ZATOSHI_PER_ZEC
 import cash.z.wallet.sdk.ext.twig
@@ -57,7 +58,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         uiModels = synchronizer.run {
             combine(status, processorInfo, balances, zec) { s, p, b, z->
                 UiModel(s, p, b.availableZatoshi, b.totalZatoshi, z)
-            }
+            }.onStart{ emit(UiModel()) }
         }.conflate()
     }
 
@@ -71,7 +72,11 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun refreshBalance() {
-        (synchronizer as SdkSynchronizer).refreshBalance()
+        try {
+            (synchronizer as SdkSynchronizer).refreshBalance()
+        } catch (e: RustLayerException.BalanceException) {
+            twig("Balance refresh failed. This is probably caused by a critical error but we'll give the app a chance to try to recover.")
+        }
     }
 
     data class UiModel( // <- THIS ERROR IS AN IDE BUG WITH PARCELIZE
@@ -96,13 +101,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 if (lastDownloadRange.isEmpty()) {
                     100
                 } else {
-                    twig("NUMERATOR: $lastDownloadedHeight - ${lastDownloadRange.first} + 1 = ${lastDownloadedHeight - lastDownloadRange.first + 1} block(s) downloaded")
-                    twig("DENOMINATOR: ${lastDownloadRange.last} - ${lastDownloadRange.first} + 1 = ${lastDownloadRange.last - lastDownloadRange.first + 1} block(s) to download")
                     val progress =
                         (((lastDownloadedHeight - lastDownloadRange.first + 1).coerceAtLeast(0).toFloat() / (lastDownloadRange.last - lastDownloadRange.first + 1)) * 100.0f).coerceAtMost(
                             100.0f
                         ).roundToInt()
-                    twig("RESULT: $progress")
                     progress
                 }
             }
@@ -112,10 +114,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
                 if (lastScanRange.isEmpty()) {
                     100
                 } else {
-                    twig("NUMERATOR: ${lastScannedHeight - lastScanRange.first + 1} block(s) scanned")
-                    twig("DENOMINATOR: ${lastScanRange.last - lastScanRange.first + 1} block(s) to scan")
                     val progress = (((lastScannedHeight - lastScanRange.first + 1).coerceAtLeast(0).toFloat() / (lastScanRange.last - lastScanRange.first + 1)) * 100.0f).coerceAtMost(100.0f).roundToInt()
-                    twig("RESULT: $progress")
                     progress
                 }
             }

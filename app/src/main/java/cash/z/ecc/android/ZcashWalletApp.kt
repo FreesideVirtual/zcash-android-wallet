@@ -37,7 +37,7 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
     override fun onCreate() {
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
-        Twig.plant(SilentTwig())
+        Twig.plant(TroubleshootingTwig())
         creationTime = System.currentTimeMillis()
         instance = this
         // Setup handler for uncaught exceptions.
@@ -72,7 +72,8 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
     inner class ExceptionReporter(private val ogHandler: Thread.UncaughtExceptionHandler) : Thread.UncaughtExceptionHandler {
         override fun uncaughtException(t: Thread?, e: Throwable?) {
             twig("Uncaught Exception: $e caused by: ${e?.cause}")
-            coordinator.feedback.report(e)
+            // these are the only reported crashes that are considered fatal
+            coordinator.feedback.report(e, true)
             coordinator.flush()
             // can do this if necessary but first verify that we need it
             runBlocking {

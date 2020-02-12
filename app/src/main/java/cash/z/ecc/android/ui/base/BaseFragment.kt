@@ -45,7 +45,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     fun onBackPressNavTo(navResId: Int) {
         mainActivity?.onFragmentBackPressed(this) {
-            mainActivity?.navController?.navigate(navResId)
+            mainActivity?.safeNavigate(navResId)
         }
     }
 }

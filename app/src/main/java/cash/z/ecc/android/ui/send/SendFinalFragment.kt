@@ -44,7 +44,7 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
         }
         binding.textConfirmation.text =
             "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel.toAddress.toAbbreviatedAddress()}"
-        sendViewModel.memo?.trim()?.isNotEmpty()?.let { hasMemo ->
+        sendViewModel.memo.trim().isNotEmpty().let { hasMemo ->
             binding.radioIncludeAddress.isChecked = hasMemo
             binding.radioIncludeAddress.goneIf(!hasMemo)
         }
@@ -91,6 +91,15 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
                 pendingTransaction.isCreating() -> "Creating transaction . . ."
                 else -> "Transaction updated!".also { twig("Unhandled TX state: $pendingTransaction") }
             }
+
+            // TODO: make this error tracking easier to use and more spiffy
+            if (pendingTransaction?.isFailedSubmit() == true) {
+                sendViewModel.feedback.report(Report.Send.SubmitFailure(pendingTransaction?.errorCode, pendingTransaction?.errorMessage))
+            }
+            if (pendingTransaction?.isFailedEncoding() == true) {
+                sendViewModel.feedback.report(Report.Send.EncodingFailure(pendingTransaction?.errorCode, pendingTransaction?.errorMessage))
+            }
+
             twig("Pending TX (id: ${pendingTransaction?.id} Updated with message: $message")
             binding.textStatus.apply {
                 text = "$message"
@@ -106,7 +115,9 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
                 sendViewModel.reset()
             }
         } catch(t: Throwable) {
-            twig("ERROR: error while handling pending transaction update! $t")
+            val message = "ERROR: error while handling pending transaction update! $t"
+            twig(message)
+            Crashlytics.log(message)
             Crashlytics.logException(t)
         }
     }

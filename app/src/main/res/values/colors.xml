@@ -58,6 +58,7 @@
     but have a more useful name for use in code -->
 
     <color name="background_banner">@color/zcashBlack_dark</color>
+    <color name="background_banner_stroke">#282828</color>
     <color name="scan_overlay_background">@color/zcashBlack_87</color>
     <color name="spacer">#1FBB666A</color>
     <color name="text_send_amount_disabled">@color/text_light</color>

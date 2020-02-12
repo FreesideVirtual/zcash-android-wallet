@@ -1,8 +1,6 @@
 package cash.z.ecc.android.ui.home
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,18 +10,18 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.*
+import cash.z.ecc.android.ext.disabledIf
+import cash.z.ecc.android.ext.goneIf
+import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.Synchronizer.Status.*
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.convertZecToZatoshi
-import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
-import cash.z.wallet.sdk.ext.twig
+import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
+import cash.z.wallet.sdk.ext.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -64,7 +62,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 // interact with user to create, backup and verify seed
                 // leads to a call to startSync(), later (after accounts are created from seed)
                 twig("Seed not found, therefore, launching seed creation flow")
-                mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
+                mainActivity?.safeNavigate(R.id.action_nav_home_to_create_wallet)
             } else {
                 twig("Found seed. Re-opening existing wallet")
                 mainActivity?.startSync(walletSetup.openWallet())
@@ -136,9 +134,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onResume()
         twig("HomeFragment.onResume  resumeScope.isActive: ${resumedScope.isActive}  $resumedScope")
         viewModel.initializeMaybe()
-twig("onResume (A)")
         onClearAmount()
-twig("onResume (B)")
         viewModel.uiModels.scanReduce { old, new ->
             onModelUpdated(old, new)
             new
@@ -148,18 +144,14 @@ twig("onResume (B)")
             twig("exception while processing uiModels $e")
             throw e
         }.launchIn(resumedScope)
-twig("onResume (C)")
 
         // TODO: see if there is a better way to trigger a refresh of the uiModel on resume
         //       the latest one should just be in the viewmodel and we should just "resubscribe"
         //       but for some reason, this doesn't always happen, which kind of defeats the purpose
         //       of having a cold stream in the view model
         resumedScope.launch {
-twig("onResume (pre-fresh)")
             viewModel.refreshBalance()
-twig("onResume (post-fresh)")
         }
-twig("onResume (D)")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -277,23 +269,16 @@ twig("onResume (D)")
 
     private fun onModelUpdated(old: HomeViewModel.UiModel?, new: HomeViewModel.UiModel) {
         twig("onModelUpdated: $new")
+        if (binding.lottieButtonLoading.visibility != View.VISIBLE) binding.lottieButtonLoading.visibility = View.VISIBLE
         uiModel = new
-twig("onModelUpdated (A)")
         if (old?.pendingSend != new.pendingSend) {
-twig("onModelUpdated (B)")
             setSendAmount(new.pendingSend)
-twig("onModelUpdated (C)")
         }
-twig("onModelUpdated (D)")
         // TODO: handle stopped and disconnected flows
         setProgress(uiModel) // TODO: we may not need to separate anymore
-twig("onModelUpdated (E)")
 //        if (new.status = SYNCING) onSyncing(new) else onSynced(new)
         if (new.status == SYNCED) onSynced(new) else onSyncing(new)
-twig("onModelUpdated (F)")
         setSendEnabled(new.isSendEnabled)
-twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
-        twig("DONE onModelUpdated")
     }
 
     private fun onSyncing(uiModel: HomeViewModel.UiModel) {
@@ -311,7 +296,7 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
     }
 
     private fun onSend() {
-        mainActivity?.navController?.navigate(R.id.action_nav_home_to_send)
+        mainActivity?.safeNavigate(R.id.action_nav_home_to_send)
     }
 
     private fun onBannerAction(action: BannerAction) {
@@ -323,7 +308,7 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
                     .setCancelable(true)
                     .setPositiveButton("View Address") { dialog, _ ->
                         dialog.dismiss()
-                        mainActivity?.navController?.navigate(R.id.action_nav_home_to_nav_receive)
+                        mainActivity?.safeNavigate(R.id.action_nav_home_to_nav_receive)
                     }
                     .show()
 //                MaterialAlertDialogBuilder(activity)
@@ -336,7 +321,7 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
 //                    }
 //                    .setNegativeButton("View Address") { dialog, _ ->
 //                        dialog.dismiss()
-//                        mainActivity?.navController?.navigate(R.id.action_nav_home_to_nav_receive)
+//                        mainActivity?.safeNavigate(R.id.action_nav_home_to_nav_receive)
 //                    }
 //                    .show()
             }
@@ -357,7 +342,7 @@ twig("onModelUpdated (G) sendEnabled? ${new.isSendEnabled}")
     //
 
     enum class BannerAction(val action: String) {
-        FUND_NOW("Fund Now"),
+        FUND_NOW(""),
         CANCEL("Cancel"),
         NONE(""),
         CLEAR("clear");

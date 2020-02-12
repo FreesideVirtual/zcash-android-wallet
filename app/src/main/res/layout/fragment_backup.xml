@@ -318,6 +318,19 @@ text_address_part_3, text_address_part_6, text_address_part_9, text_address_part
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
+        android:id="@+id/text_birtdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Birthday Height: 510,123"
+        android:textSize="20dp"
+        android:fontFamily="@font/inconsolata"
+        app:layout_constraintTop_toBottomOf="@id/receive_address_parts"
+        app:layout_constraintBottom_toTopOf="@id/text_message"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.MaterialComponents.Body1"

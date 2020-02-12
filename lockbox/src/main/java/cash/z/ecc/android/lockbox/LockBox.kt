@@ -1,6 +1,7 @@
 package cash.z.ecc.android.lockbox
 
 import android.content.Context
+import cash.z.android.plugin.LockBoxPlugin
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
@@ -8,7 +9,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.inject.Inject
 
-class LockBox @Inject constructor(private val appContext: Context) : LockBoxProvider {
+class LockBox @Inject constructor(private val appContext: Context) : LockBoxPlugin {
 
     override fun setBoolean(key: String, value: Boolean) {
         SecurePreferences.setValue(appContext, key, value)

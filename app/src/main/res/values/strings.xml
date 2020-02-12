@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Zcash Wallet</string>
+    <string name="app_name">zECC Wallet</string>
     <string name="receive_address_title">Your Shielded Address</string>
 
 
@@ -8,4 +8,7 @@
     <!-- Send Flow -->
     <string name="send_hint_input_zcash_address">Enter a shielded Zcash address</string>
     <string name="send_hint_input_zcash_amount">Enter an amount to send</string>
+
+    <string name="send_memo_excluded_message">Your transaction is shielded and your address is not available to the recipient</string>
+    <string name="send_memo_included_message">Your transaction is shielded but your address will be sent to the recipient via the memo</string>
 </resources>

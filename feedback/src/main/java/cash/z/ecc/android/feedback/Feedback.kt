@@ -6,10 +6,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.lang.StringBuilder
 import kotlin.coroutines.coroutineContext
 
 class Feedback(capacity: Int = 256) {
@@ -145,8 +143,8 @@ class Feedback(capacity: Int = 256) {
      *
      * @param error the uncaught exception that occurred.
      */
-    fun report(error: Throwable?): Feedback {
-        return report(Crash(error))
+    fun report(error: Throwable?, fatal: Boolean = false): Feedback {
+        return report(Crash(error, fatal))
     }
 
     /**
@@ -199,6 +197,14 @@ class Feedback(capacity: Int = 256) {
         }
     }
 
+    abstract class Funnel(override val key: String) : Action {
+        override fun toMap(): MutableMap<String, Any> {
+            return mutableMapOf(
+                "key" to key
+            )
+        }
+    }
+
     interface Keyed<T> {
         val key: T
     }
@@ -225,17 +231,19 @@ class Feedback(capacity: Int = 256) {
         }
     }
 
-    data class Crash(val error: Throwable?) : Action {
+    data class Crash(val error: Throwable? = null, val fatal: Boolean = true) : Action {
         override val key: String = "crash"
         override fun toMap(): Map<String, Any> {
             return mutableMapOf<String, Any>(
+                "fatal" to fatal,
                 "message" to (error?.message ?: "None"),
                 "cause" to (error?.cause?.toString() ?: "None"),
                 "cause.cause" to (error?.cause?.cause?.toString() ?: "None"),
                 "cause.cause.cause" to (error?.cause?.cause?.cause?.toString() ?: "None")
             ).apply { putAll(super.toMap()); putAll(error.stacktraceToMap()) }
         }
-        override fun toString() = "App crashed due to: $error"
+
+        override fun toString() = "App ${if (fatal) "crashed due to" else "caught error"}: $error"
     }
 }
 

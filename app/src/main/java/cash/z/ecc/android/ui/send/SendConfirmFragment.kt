@@ -42,6 +42,6 @@ class SendConfirmFragment : BaseFragment<FragmentSendConfirmBinding>() {
     }
 
     private fun onSend() {
-        mainActivity?.navController?.navigate(R.id.action_nav_send_confirm_to_send_final)
+        mainActivity?.safeNavigate(R.id.action_nav_send_confirm_to_send_final)
     }
 }

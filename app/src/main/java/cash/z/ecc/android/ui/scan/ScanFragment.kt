@@ -79,7 +79,7 @@ class ScanFragment : BaseFragment<FragmentScanBinding>() {
             if (viewModel.isNotValid(qrContent)) image.close() // continue scanning
             else {
                 sendViewModel.toAddress = qrContent
-                mainActivity?.navController?.navigate(R.id.action_nav_scan_to_nav_send_address)
+                mainActivity?.safeNavigate(R.id.action_nav_scan_to_nav_send_address)
             }
         }
     }

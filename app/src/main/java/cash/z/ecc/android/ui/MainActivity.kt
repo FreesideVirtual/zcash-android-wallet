@@ -1,6 +1,7 @@
 package cash.z.ecc.android.ui
 
 import android.Manifest
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -17,6 +18,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -34,12 +36,16 @@ import cash.z.ecc.android.feedback.LaunchMetric
 import cash.z.ecc.android.feedback.Report.NonUserAction.FEEDBACK_STOPPED
 import cash.z.ecc.android.feedback.Report.NonUserAction.SYNC_START
 import cash.z.wallet.sdk.Initializer
+import cash.z.wallet.sdk.exception.CompactBlockProcessorException
+import cash.z.wallet.sdk.ext.twig
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
+
 
     @Inject
     lateinit var feedback: Feedback
@@ -52,10 +58,13 @@ class MainActivity : AppCompatActivity() {
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
     private var snackbar: Snackbar? = null
+    private var dialog: Dialog? = null
 
-    lateinit var navController: NavController
     lateinit var component: MainActivitySubcomponent
     lateinit var synchronizerComponent: SynchronizerSubcomponent
+
+    var navController: NavController? = null
+    private val navInitListeners: MutableList<() -> Unit> = mutableListOf()
 
     private val hasCameraPermission
         get() = ContextCompat.checkSelfPermission(
@@ -118,19 +127,49 @@ class MainActivity : AppCompatActivity() {
 
     private fun initNavigation() {
         navController = findNavController(R.id.nav_host_fragment)
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        navController!!.addOnDestinationChangedListener { _, _, _ ->
             // hide the keyboard anytime we change destinations
             getSystemService<InputMethodManager>()?.hideSoftInputFromWindow(
                 this@MainActivity.window.decorView.rootView.windowToken,
                 InputMethodManager.HIDE_NOT_ALWAYS
             )
         }
+
+        for (listener in navInitListeners) {
+            listener()
+        }
+        navInitListeners.clear()
+    }
+
+    fun safeNavigate(@IdRes destination: Int) {
+        if (navController == null) {
+            navInitListeners.add {
+                try {
+                    navController?.navigate(destination)
+                } catch (t: Throwable) {
+                    twig("WARNING: during callback, did not navigate to destination: R.id.${resources.getResourceEntryName(destination)} due to: $t")
+                }
+            }
+        } else {
+            try {
+                navController?.navigate(destination)
+            } catch (t: Throwable) {
+                twig("WARNING: did not immediately navigate to destination: R.id.${resources.getResourceEntryName(destination)} due to: $t")
+            }
+        }
     }
 
     fun startSync(initializer: Initializer) {
-        synchronizerComponent = ZcashWalletApp.component.synchronizerSubcomponent().create(initializer)
-        feedback.report(SYNC_START)
-        synchronizerComponent.synchronizer().start(lifecycleScope)
+        if (!::synchronizerComponent.isInitialized) {
+            synchronizerComponent = ZcashWalletApp.component.synchronizerSubcomponent().create(initializer)
+            feedback.report(SYNC_START)
+            synchronizerComponent.synchronizer().let { synchronizer ->
+                synchronizer.onProcessorErrorHandler = ::onProcessorError
+                synchronizer.start(lifecycleScope)
+            }
+        } else {
+            twig("Ignoring request to start sync because sync has already been started!")
+        }
     }
 
     fun playSound(fileName: String) {
@@ -218,6 +257,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun showKeyboard(focusedView: View) {
+        twig("SHOWING KEYBOARD")
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(focusedView, InputMethodManager.SHOW_FORCED)
+    }
+
+    fun hideKeyboard() {
+        twig("HIDING KEYBOARD")
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(findViewById<View>(android.R.id.content).windowToken, 0)
+    }
+
     /**
      * @param popUpToInclusive the destination to remove from the stack before opening the camera.
      * This only takes effect in the common case where the permission is granted.
@@ -250,10 +302,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openCamera(popUpToInclusive: Int? = null) {
-        navController.navigate(popUpToInclusive ?: R.id.action_global_nav_scan)
+        navController?.navigate(popUpToInclusive ?: R.id.action_global_nav_scan)
     }
 
     private fun onNoCamera() {
         showSnackbar("Well, this is awkward. You denied permission for the camera.")
+    }
+
+    private fun onProcessorError(error: Throwable?): Boolean {
+        when (error) {
+            is CompactBlockProcessorException.Uninitialized -> {
+                if (dialog == null)
+                    runOnUiThread {
+                        dialog = MaterialAlertDialogBuilder(this)
+                            .setTitle("Wallet Improperly Initialized")
+                            .setMessage("This wallet has not been initialized correctly! Perhaps an error occurred during install.\n\nThis can be fixed with a reset. Please reimport using your backup seed phrase.")
+                            .setCancelable(false)
+                            .setPositiveButton("Exit") { dialog, _ ->
+                                dialog.dismiss()
+                                throw error
+                            }
+                            .show()
+                    }
+            }
+        }
+        feedback.report(error)
+        return true
     }
 }
