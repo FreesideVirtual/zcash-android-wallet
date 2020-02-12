@@ -127,42 +127,39 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="Your transaction is shielded and your address is not available to recipient"
+        android:text="Your transaction is shielded and your address is not available to recipient."
         app:layout_constraintEnd_toEndOf="@id/background_memo"
         app:layout_constraintStart_toStartOf="@id/background_memo"
         app:layout_constraintTop_toBottomOf="@id/check_include_address" />
 
     <ImageView
         android:id="@+id/sad_icon"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:elevation="6dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintBottom_toTopOf="@id/sad_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.17"
-        app:layout_constraintWidth_percent="0.68"
-        app:srcCompat="@drawable/ic_sadzebra" />
+        app:srcCompat="@drawable/ic_info_24dp"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/sad_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:drawablePadding="16dp"
         android:drawableTint="@color/text_light_dimmed"
         android:gravity="center"
-        android:text="You are going to make the zebra sad."
+        android:paddingEnd="32dp"
+        android:paddingStart="32dp"
+        android:text="Sending to a transparent address will let everyone see the amount and the recipient."
         android:textColor="@color/text_light"
         android:textSize="18dp"
         app:layout_constraintBottom_toTopOf="@id/sad_description"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sad_icon"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toBottomOf="@id/sad_icon" />
 
     <TextView
         android:id="@+id/sad_description"
@@ -172,7 +169,9 @@
         android:drawablePadding="16dp"
         android:drawableTint="@color/text_light_dimmed"
         android:gravity="center"
-        android:text="Heads up! You are sending to a transparent address, which reduces your privacy and does not support memos."
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:text="Your privacy is protected, if you use your wallet to store your funds. Using the zECC wallet to pass funds through a z-address could compromise your privacy."
         android:textColor="@color/text_light"
         android:textSize="18dp"
         app:layout_constraintBottom_toTopOf="@id/sad_checkbox"
@@ -224,12 +223,13 @@
         android:id="@+id/group_transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        tools:visibility="visible"
         app:constraint_referenced_ids="sad_description, sad_icon, sad_title, sad_checkbox" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/group_shielded"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="background_memo, input_memo, check_include_address, text_info_shielded"
-        tools:visibility="visible" />
+        app:constraint_referenced_ids="clear_memo, background_memo, input_memo, check_include_address, text_info_shielded"
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>
