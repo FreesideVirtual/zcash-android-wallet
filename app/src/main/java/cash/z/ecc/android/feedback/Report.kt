@@ -3,6 +3,27 @@ package cash.z.ecc.android.feedback
 import cash.z.ecc.android.ZcashWalletApp
 
 object Report {
+    object Send {
+        class SubmitFailure(private val errorCode: Int?, private val errorMessage: String?) : Feedback.Funnel("send.failure.submit") {
+            override fun toMap(): MutableMap<String, Any> {
+                return super.toMap().apply {
+                    put("error.code", errorCode ?: -1)
+                    put("error.message", errorMessage ?: "None")
+                }
+            }
+        }
+
+        class EncodingFailure(private val errorCode: Int?, private val errorMessage: String?) : Feedback.Funnel("send.failure.submit") {
+            override fun toMap(): MutableMap<String, Any> {
+                return super.toMap().apply {
+                    put("error.code", errorCode ?: -1)
+                    put("error.message", errorMessage ?: "None")
+                }
+            }
+        }
+
+    }
+
     enum class NonUserAction(override val key: String, val description: String) : Feedback.Action {
         FEEDBACK_STARTED("action.feedback.start", "feedback started"),
         FEEDBACK_STOPPED("action.feedback.stop", "feedback stopped"),
