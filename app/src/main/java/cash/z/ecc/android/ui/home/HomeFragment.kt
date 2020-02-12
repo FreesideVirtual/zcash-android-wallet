@@ -21,10 +21,7 @@ import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.convertZecToZatoshi
-import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
-import cash.z.wallet.sdk.ext.twig
+import cash.z.wallet.sdk.ext.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -65,7 +62,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 // interact with user to create, backup and verify seed
                 // leads to a call to startSync(), later (after accounts are created from seed)
                 twig("Seed not found, therefore, launching seed creation flow")
-                mainActivity?.navController?.navigate(R.id.action_nav_home_to_create_wallet)
+                mainActivity?.safeNavigate(R.id.action_nav_home_to_create_wallet)
             } else {
                 twig("Found seed. Re-opening existing wallet")
                 mainActivity?.startSync(walletSetup.openWallet())
@@ -299,7 +296,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun onSend() {
-        mainActivity?.navController?.navigate(R.id.action_nav_home_to_send)
+        mainActivity?.safeNavigate(R.id.action_nav_home_to_send)
     }
 
     private fun onBannerAction(action: BannerAction) {
@@ -311,7 +308,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     .setCancelable(true)
                     .setPositiveButton("View Address") { dialog, _ ->
                         dialog.dismiss()
-                        mainActivity?.navController?.navigate(R.id.action_nav_home_to_nav_receive)
+                        mainActivity?.safeNavigate(R.id.action_nav_home_to_nav_receive)
                     }
                     .show()
 //                MaterialAlertDialogBuilder(activity)
@@ -324,7 +321,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 //                    }
 //                    .setNegativeButton("View Address") { dialog, _ ->
 //                        dialog.dismiss()
-//                        mainActivity?.navController?.navigate(R.id.action_nav_home_to_nav_receive)
+//                        mainActivity?.safeNavigate(R.id.action_nav_home_to_nav_receive)
 //                    }
 //                    .show()
             }

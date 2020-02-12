@@ -24,7 +24,7 @@ fun View.disabledIf(isDisabled: Boolean) {
 
 fun View.onClickNavTo(navResId: Int) {
     setOnClickListener {
-        (context as? MainActivity)?.navController?.navigate(navResId)
+        (context as? MainActivity)?.safeNavigate(navResId)
             ?: throw IllegalStateException("Cannot navigate from this activity. " +
                     "Expected MainActivity but found ${context.javaClass.simpleName}")
     }

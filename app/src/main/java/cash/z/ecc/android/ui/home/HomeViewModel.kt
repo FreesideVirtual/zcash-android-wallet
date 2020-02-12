@@ -5,6 +5,7 @@ import cash.z.wallet.sdk.SdkSynchronizer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.*
 import cash.z.wallet.sdk.block.CompactBlockProcessor
+import cash.z.wallet.sdk.exception.RustLayerException
 import cash.z.wallet.sdk.ext.ZcashSdk.MINERS_FEE_ZATOSHI
 import cash.z.wallet.sdk.ext.ZcashSdk.ZATOSHI_PER_ZEC
 import cash.z.wallet.sdk.ext.twig
@@ -71,7 +72,11 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun refreshBalance() {
-        (synchronizer as SdkSynchronizer).refreshBalance()
+        try {
+            (synchronizer as SdkSynchronizer).refreshBalance()
+        } catch (e: RustLayerException.BalanceException) {
+            twig("Balance refresh failed. This is probably caused by a critical error but we'll give the app a chance to try to recover.")
+        }
     }
 
     data class UiModel( // <- THIS ERROR IS AN IDE BUG WITH PARCELIZE

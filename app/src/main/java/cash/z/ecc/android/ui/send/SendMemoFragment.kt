@@ -72,9 +72,8 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
                 binding.buttonNext.text = "ADD MEMO"
                 binding.buttonSkip.text = "OMIT MEMO"
             } else {
-                binding.buttonNext.text = "WAIT, GO BACK"
+                binding.buttonNext.text = "GO BACK"
                 binding.buttonSkip.text = "PROCEED"
-                binding.sadTitle.text = binding.sadTitle.text.toString().toColoredSpan(R.color.colorPrimary, "sad")
             }
         }
     }
@@ -94,7 +93,7 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
             sendViewModel.memo = binding.inputMemo.text.toString()
             onNext()
         } else {
-            mainActivity?.navController?.navigate(R.id.action_nav_send_memo_to_nav_send_address)
+            mainActivity?.safeNavigate(R.id.action_nav_send_memo_to_nav_send_address)
         }
     }
 
@@ -106,6 +105,6 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
     }
 
     private fun onNext() {
-        mainActivity?.navController?.navigate(R.id.action_nav_send_memo_to_send_confirm)
+        mainActivity?.safeNavigate(R.id.action_nav_send_memo_to_send_confirm)
     }
 }

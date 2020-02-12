@@ -13,6 +13,7 @@ import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.isShielded
 import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -81,8 +82,8 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         val txId = transaction.rawTransactionId.toTxId()
         val detailsMessage: String = "Zatoshi amount: ${transaction.value}\n\n" +
                 "Transaction: $txId" +
-                "${if (transaction.toAddress != null) "\nto: ${transaction.toAddress}" else ""}" +
-                "${if (transaction.memo != null) "\nmemo: ${transaction.toAddress}" else ""}"
+                "${if (transaction.toAddress != null) "\n\nto: ${transaction.toAddress}" else ""}" +
+                "${if (transaction.memo != null) "\n\nmemo: \n${String(transaction.memo!!, Charset.forName("UTF-8"))}" else ""}"
 
         MaterialAlertDialogBuilder(itemView.context)
             .setMessage(detailsMessage)
