@@ -76,7 +76,14 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
         }.launchIn(lifecycleScope)
     }
 
-    private fun onEnterWallet(showMessage: Boolean = this.hasBackUp != true) {
+    override fun onResume() {
+        super.onResume()
+        resumedScope.launch {
+            binding.textBirtdate.text = "Birthday Height: %,d".format(walletSetup.loadBirthdayHeight())
+        }
+    }
+
+    private fun onEnterWallet(showMessage: Boolean = !this.hasBackUp) {
         if (showMessage) {
             Toast.makeText(activity, "Backup verification coming soon!", Toast.LENGTH_LONG).show()
         }

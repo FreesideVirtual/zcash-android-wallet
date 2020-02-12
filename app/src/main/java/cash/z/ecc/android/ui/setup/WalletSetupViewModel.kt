@@ -3,13 +3,15 @@ package cash.z.ecc.android.ui.setup
 import androidx.lifecycle.ViewModel
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.feedback.Feedback
-import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.MetricType.*
 import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.*
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
 import cash.z.wallet.sdk.Initializer
+import cash.z.wallet.sdk.Initializer.DefaultBirthdayStore
+import cash.z.wallet.sdk.Initializer.DefaultBirthdayStore.Companion.ImportedWalletBirthdayStore
+import cash.z.wallet.sdk.Initializer.DefaultBirthdayStore.Companion.NewWalletBirthdayStore
 import cash.z.wallet.sdk.ext.twig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -47,26 +49,29 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
      */
     fun openWallet(): Initializer {
         twig("Opening existing wallet")
-        return ZcashWalletApp.component.initializerSubcomponent().create().run {
-            initializer().open(birthdayStore().getBirthday())
-        }
+        return ZcashWalletApp.component.initializerSubcomponent()
+            .create(DefaultBirthdayStore(ZcashWalletApp.instance)).run {
+                initializer().open(birthdayStore().getBirthday())
+            }
     }
 
     suspend fun newWallet(): Initializer {
         twig("Initializing new wallet")
-        return ZcashWalletApp.component.initializerSubcomponent().create().run {
-            initializer().apply {
-                new(createWallet(), birthdayStore().newWalletBirthday)
+        return ZcashWalletApp.component.initializerSubcomponent()
+            .create(NewWalletBirthdayStore(ZcashWalletApp.instance)).run {
+                initializer().apply {
+                    new(createWallet(), birthdayStore().getBirthday())
+                }
             }
-        }
     }
 
     suspend fun importWallet(seedPhrase: String, birthdayHeight: Int): Initializer {
         twig("Importing wallet. Requested birthday: $birthdayHeight")
-        return ZcashWalletApp.component.initializerSubcomponent().create(Initializer.DefaultBirthdayStore(ZcashWalletApp.instance, birthdayHeight)).run {
-            initializer().apply {
-                import(importWallet(seedPhrase.toCharArray()), birthdayStore().getBirthday())
-            }
+        return ZcashWalletApp.component.initializerSubcomponent()
+            .create(ImportedWalletBirthdayStore(ZcashWalletApp.instance, birthdayHeight)).run {
+                initializer().apply {
+                    import(importWallet(seedPhrase.toCharArray()), birthdayStore().getBirthday())
+                }
         }
     }
 
@@ -75,7 +80,7 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
      *
      * @param feedback the object used for measurement.
      */
-    private suspend fun createWallet(): ByteArray = withContext(Dispatchers.IO){
+    private suspend fun createWallet(): ByteArray = withContext(Dispatchers.IO) {
         check(!lockBox.getBoolean(LockBoxKey.HAS_SEED)) {
             "Error! Cannot create a seed when one already exists! This would overwrite the" +
                     " existing seed and could lead to a loss of funds if the user has no backup!"
@@ -84,7 +89,8 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
         feedback.measure(WALLET_CREATED) {
             mnemonics.run {
                 feedback.measure(ENTROPY_CREATED) { nextEntropy() }.let { entropy ->
-                    feedback.measure(SEED_PHRASE_CREATED) { nextMnemonic(entropy) }.let { seedPhrase ->
+                    feedback.measure(SEED_PHRASE_CREATED) { nextMnemonic(entropy) }
+                        .let { seedPhrase ->
                             feedback.measure(SEED_CREATED) { toSeed(seedPhrase) }.let { bip39Seed ->
 
                                 lockBox.setCharsUtf8(LockBoxKey.SEED_PHRASE, seedPhrase)
@@ -100,6 +106,12 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
+    suspend fun loadBirthdayHeight(): Int = withContext(Dispatchers.IO) {
+        DefaultBirthdayStore(ZcashWalletApp.instance).getBirthday().height
+    }
+
+
 
    /**
     * Take all the steps necessary to import a wallet and measure how long it takes.
