@@ -10,6 +10,8 @@ import cash.z.ecc.android.databinding.FragmentReceiveNewBinding
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.twig
@@ -17,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 class ReceiveFragment : BaseFragment<FragmentReceiveNewBinding>() {
+    override val screen = Report.Screen.RECEIVE
 
     private val viewModel: ReceiveViewModel by viewModel()
 
@@ -40,9 +43,9 @@ class ReceiveFragment : BaseFragment<FragmentReceiveNewBinding>() {
 //            text_address_part_8
 //        )
         binding.buttonScan.setOnClickListener {
-            mainActivity?.maybeOpenScan(R.id.action_nav_receive_to_nav_scan)
+            mainActivity?.maybeOpenScan(R.id.action_nav_receive_to_nav_scan).also { tapped(RECEIVE_SCAN) }
         }
-        binding.backButtonHitArea.onClickNavBack()
+        binding.backButtonHitArea.onClickNavBack() { tapped(RECEIVE_BACK) }
     }
 
     override fun onAttach(context: Context) {

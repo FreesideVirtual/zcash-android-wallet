@@ -1,19 +1,20 @@
 package cash.z.ecc.android.ui.send
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.feedback.Feedback
 import cash.z.ecc.android.feedback.Feedback.Keyed
 import cash.z.ecc.android.feedback.Feedback.TimeMetric
 import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Funnel.Send.SendSelected
+import cash.z.ecc.android.feedback.Report.Funnel.Send.SpendingKeyFound
+import cash.z.ecc.android.feedback.Report.Issue
 import cash.z.ecc.android.feedback.Report.MetricType
 import cash.z.ecc.android.feedback.Report.MetricType.*
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.wallet.sdk.Initializer
 import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.annotation.OpenForTesting
 import cash.z.wallet.sdk.entity.*
 import cash.z.wallet.sdk.ext.ZcashSdk
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
@@ -58,17 +59,35 @@ class SendViewModel @Inject constructor() : ViewModel() {
     val isShielded get() = toAddress.startsWith("z")
     
     fun send(): Flow<PendingTransaction> {
+        funnel(SendSelected)
         val memoToSend = if (includeFromAddress) "$memo\nsent from\n$fromAddress" else memo
         val keys = initializer.deriveSpendingKeys(
             lockBox.getBytes(WalletSetupViewModel.LockBoxKey.SEED)!!
         )
+        funnel(SpendingKeyFound)
+        reportIssues(memoToSend)
         return synchronizer.sendToAddress(
             keys[0],
             zatoshiAmount,
             toAddress,
-            memoToSend
+            memoToSend.chunked(ZcashSdk.MAX_MEMO_SIZE).firstOrNull() ?: ""
         ).onEach {
             twig(it.toString())
+        }
+    }
+
+    private fun reportIssues(memoToSend: String) {
+        if (toAddress == fromAddress) feedback.report(Issue.SelfSend)
+        when {
+            zatoshiAmount < ZcashSdk.MINERS_FEE_ZATOSHI -> feedback.report(Issue.TinyAmount)
+            zatoshiAmount < 100 -> feedback.report(Issue.MicroAmount)
+            zatoshiAmount == 1L -> feedback.report(Issue.MinimumAmount)
+        }
+        memoToSend.length.also {
+            when {
+                it > ZcashSdk.MAX_MEMO_SIZE -> feedback.report(Issue.TruncatedMemo(it))
+                it > (ZcashSdk.MAX_MEMO_SIZE * 0.96) -> feedback.report(Issue.LargeMemo(it))
+            }
         }
     }
 
@@ -81,7 +100,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
             synchronizer.validateAddress(toAddress).isNotValid -> {
                 emit("Please enter a valid address")
             }
-            zatoshiAmount <= 1 -> {
+            zatoshiAmount < 1 -> {
                 emit("Too little! Please enter at least 1 Zatoshi.")
             }
             maxZatoshi != null && zatoshiAmount > maxZatoshi -> {
@@ -146,6 +165,11 @@ class SendViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun funnel(step: Report.Funnel.Send?) {
+        step ?: return
+        feedback.report(step)
+    }
+
     private operator fun MetricType.unaryPlus(): TimeMetric = TimeMetric(key, description).markTime()
     private infix fun TimeMetric.by(txId: Long) = this.toMetricIdFor(txId).also { metrics[it] = this }
     private infix fun Pair<MetricType, MetricType>.by(txId: Long): String? {
@@ -167,6 +191,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
     private fun Keyed<String>.toMetricIdFor(id: Long): String = "$id.$key"
     private fun String.toRelatedMetricId(): String = "$this.related"
     private fun String.toTxId(): Long = split('.').first().toLong()
+
 }
 
 

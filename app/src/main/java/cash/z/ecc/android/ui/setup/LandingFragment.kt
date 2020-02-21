@@ -12,6 +12,9 @@ import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentLandingBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Funnel.Restore
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITHOUT_BACKUP
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.SEED_WITH_BACKUP
@@ -22,6 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class LandingFragment : BaseFragment<FragmentLandingBinding>() {
+    override val screen = Report.Screen.LANDING
 
     private val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
@@ -34,21 +38,24 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonPositive.setOnClickListener {
             when (binding.buttonPositive.text.toString().toLowerCase()) {
-                "new" -> onNewWallet()
-                "backup" -> onBackupWallet()
+                "new" -> onNewWallet().also { tapped(LANDING_NEW) }
+                "backup" -> onBackupWallet().also { tapped(LANDING_BACKUP) }
             }
         }
         binding.buttonNegative.setOnLongClickListener {
+            tapped(DEVELOPER_WALLET_PROMPT)
             if (binding.buttonNegative.text.toString().toLowerCase() == "restore") {
                 MaterialAlertDialogBuilder(activity)
                     .setMessage("Would you like to import the dev wallet?\n\nIf so, please only send 0.0001 ZEC at a time and return some later so that the account remains funded.")
                     .setTitle("Import Dev Wallet?")
                     .setCancelable(true)
                     .setPositiveButton("Import") { dialog, _ ->
+                        tapped(DEVELOPER_WALLET_IMPORT)
                         dialog.dismiss()
                         onUseDevWallet()
                     }
                     .setNegativeButton("Cancel") { dialog, _ ->
+                        tapped(DEVELOPER_WALLET_CANCEL)
                         dialog.dismiss()
                     }
                     .show()
@@ -58,7 +65,10 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
         }
         binding.buttonNegative.setOnClickListener {
             when (binding.buttonNegative.text.toString().toLowerCase()) {
-                "restore" -> onRestoreWallet()
+                "restore" -> onRestoreWallet().also {
+                    mainActivity?.reportFunnel(Restore.Initiated)
+                    tapped(LANDING_RESTORE)
+                }
                 else -> onSkip(++skipCount)
             }
         }
@@ -83,16 +93,19 @@ class LandingFragment : BaseFragment<FragmentLandingBinding>() {
     private fun onSkip(count: Int) {
         when (count) {
             1 -> {
+                tapped(LANDING_BACKUP_SKIPPED_1)
                 binding.textMessage.text =
                     "Are you sure? Without a backup, funds can be lost FOREVER!"
                 binding.buttonNegative.text = "Later"
             }
             2 -> {
+                tapped(LANDING_BACKUP_SKIPPED_2)
                 binding.textMessage.text =
                     "You can't backup later. You're probably going to lose your funds!"
                 binding.buttonNegative.text = "I've been warned"
             }
             else -> {
+                tapped(LANDING_BACKUP_SKIPPED_3)
                 onEnterWallet()
             }
         }

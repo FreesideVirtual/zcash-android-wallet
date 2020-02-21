@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
+import java.lang.RuntimeException
 
 class FeedbackTest {
 
@@ -43,6 +43,7 @@ class FeedbackTest {
         verifyAction(feedback, simpleAction.key)
 
         feedback.report(simpleAction)
+        Unit
     }
 
     @Test
@@ -62,6 +63,50 @@ class FeedbackTest {
     @Test(expected = IllegalStateException::class)
     fun testCancellation_noCancel() = runBlocking {
         verifyFeedbackCancellation { _, _ -> }
+    }
+
+    @Test
+    fun testCrash() {
+        val rushing = RuntimeException("rushing")
+        val speeding = RuntimeException("speeding", rushing)
+        val runlight = RuntimeException("Run light", speeding)
+        val crash = Feedback.Crash(RuntimeException("BOOM", runlight))
+        val map = crash.toMap()
+        printMap(map)
+
+        assertNotNull(map["cause"])
+        assertNotNull(map["cause.cause"])
+        assertNotNull(map["cause.cause"])
+    }
+
+    @Test
+    fun testAppError_exception() {
+        val rushing = RuntimeException("rushing")
+        val speeding = RuntimeException("speeding", rushing)
+        val runlight = RuntimeException("Run light", speeding)
+        val error = Feedback.AppError("reported", RuntimeException("BOOM", runlight))
+        val map = error.toMap()
+        printMap(map)
+
+        assertFalse(error.isFatal)
+        assertNotNull(map["cause"])
+        assertNotNull(map["cause.cause"])
+        assertNotNull(map["cause.cause"])
+    }
+
+    @Test
+    fun testAppError_description() {
+        val error = Feedback.AppError("reported", "The server was down while downloading blocks!")
+        val map = error.toMap()
+        printMap(map)
+
+        assertFalse(error.isFatal)
+    }
+
+    private fun printMap(map: Map<String, Any>) {
+        for (entry in map) {
+            println("%-20s = %s".format(entry.key, entry.value))
+        }
     }
 
     private fun verifyFeedbackCancellation(testBlock: suspend (Feedback, Job) -> Unit) = runBlocking {

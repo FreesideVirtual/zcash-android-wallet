@@ -4,7 +4,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -13,6 +12,9 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendAddressBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.*
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Funnel.Send
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.block.CompactBlockProcessor.WalletBalance
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 
 class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     ClipboardManager.OnPrimaryClipChangedListener {
+    override val screen = Report.Screen.SEND_ADDRESS
 
     private var maxZatoshi: Long? = null
 
@@ -32,18 +35,18 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.backButtonHitArea.onClickNavTo(R.id.action_nav_send_address_to_nav_home)
+        binding.backButtonHitArea.onClickNavTo(R.id.action_nav_send_address_to_nav_home) { tapped(SEND_ADDRESS_BACK) }
         binding.buttonNext.setOnClickListener {
-            onSubmit()
+            onSubmit().also { tapped(SEND_ADDRESS_NEXT) }
         }
         binding.textBannerAction.setOnClickListener {
-            onPaste()
+            onPaste().also { tapped(SEND_ADDRESS_PASTE) }
         }
         binding.textBannerMessage.setOnClickListener {
-            onPaste()
+            onPaste().also { tapped(SEND_ADDRESS_PASTE) }
         }
         binding.textMax.setOnClickListener {
-            onMax()
+            onMax().also { tapped(SEND_ADDRESS_MAX) }
         }
 
         // Apply View Model
@@ -60,8 +63,8 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
             binding.inputZcashAddress.setText(null)
         }
 
-        binding.inputZcashAddress.onEditorActionDone(::onSubmit)
-        binding.inputZcashAmount.onEditorActionDone(::onSubmit)
+        binding.inputZcashAddress.onEditorActionDone(::onSubmit).also { tapped(SEND_ADDRESS_DONE_ADDRESS) }
+        binding.inputZcashAmount.onEditorActionDone(::onSubmit).also { tapped(SEND_ADDRESS_DONE_AMOUNT) }
 
         binding.inputZcashAddress.apply {
             doAfterTextChanged {
@@ -75,7 +78,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
         }
 
         binding.textLayoutAddress.setEndIconOnClickListener {
-            mainActivity?.maybeOpenScan()
+            mainActivity?.maybeOpenScan().also { tapped(SEND_ADDRESS_SCAN) }
         }
     }
 
@@ -99,6 +102,7 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
         binding.inputZcashAmount.convertZecToZatoshi()?.let { sendViewModel.zatoshiAmount = it }
         sendViewModel.validate(maxZatoshi).onFirstWith(resumedScope) {
             if (it == null) {
+                sendViewModel.funnel(Send.AddressPageComplete)
                 mainActivity?.safeNavigate(R.id.action_nav_send_address_to_send_memo)
             } else {
                 resumedScope.launch {

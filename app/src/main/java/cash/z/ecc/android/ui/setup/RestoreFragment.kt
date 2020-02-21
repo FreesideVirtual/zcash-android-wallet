@@ -17,6 +17,9 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentRestoreBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.goneIf
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Funnel.Restore
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.ext.ZcashSdk
 import cash.z.wallet.sdk.ext.twig
@@ -28,6 +31,7 @@ import kotlinx.coroutines.launch
 
 
 class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListener {
+    override val screen = Report.Screen.RESTORE
 
     private val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
@@ -53,21 +57,18 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
         }
 
         binding.buttonDone.setOnClickListener {
-            onDone()
+            onDone().also { tapped(RESTORE_DONE) }
         }
 
         binding.buttonSuccess.setOnClickListener {
-            onEnterWallet()
-        }
-
-        binding.textSubtitle.setOnClickListener {
-            seedWordAdapter!!.editText.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            onEnterWallet().also { tapped(RESTORE_SUCCESS) }
         }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         mainActivity?.onFragmentBackPressed(this) {
+            tapped(RESTORE_BACK)
             if (seedWordAdapter == null || seedWordAdapter?.itemCount == 1) {
                 onExit()
             } else {
@@ -75,6 +76,7 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
                     .setMessage("Are you sure? For security, the words that you have entered will be cleared!")
                     .setTitle("Abort?")
                     .setPositiveButton("Stay") { dialog, _ ->
+                        mainActivity?.reportFunnel(Restore.Stay)
                         dialog.dismiss()
                     }
                     .setNegativeButton("Exit") { dialog, _ ->
@@ -94,16 +96,19 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
 
 
     private fun onExit() {
+        mainActivity?.reportFunnel(Restore.Exit)
         hideAutoCompleteWords()
         mainActivity?.hideKeyboard()
         mainActivity?.navController?.popBackStack()
     }
 
     private fun onEnterWallet() {
+        mainActivity?.reportFunnel(Restore.Success)
         mainActivity?.safeNavigate(R.id.action_nav_restore_to_nav_home)
     }
 
     private fun onDone() {
+        mainActivity?.reportFunnel(Restore.Done)
         mainActivity?.hideKeyboard()
         val seedPhrase = binding.chipsInput.selectedChips.joinToString(" ") {
             it.title
@@ -117,12 +122,14 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
     }
 
     private fun importWallet(seedPhrase: String, birthday: Int) {
+        mainActivity?.reportFunnel(Restore.ImportStarted)
         mainActivity?.hideKeyboard()
         mainActivity?.apply {
             lifecycleScope.launch {
                 mainActivity?.startSync(walletSetup.importWallet(seedPhrase, birthday))
                 // bugfix: if the user proceeds before the synchronizer is created the app will crash!
                 binding.buttonSuccess.isEnabled = true
+                mainActivity?.reportFunnel(Restore.ImportCompleted)
             }
             playSound("sound_receive_small.mp3")
             vibrateSuccess()
@@ -135,7 +142,6 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
     }
 
     private fun onChipsModified() {
-        twig("onChipsModified")
         seedWordAdapter?.editText?.apply {
             postDelayed({
                 requestFocus()
@@ -151,7 +157,19 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
 
     private fun setDoneEnabled() {
         val count = seedWordAdapter?.itemCount ?: 0
+        reportWords(count - 1) // subtract 1 for the editText
         binding.groupDone.goneIf(count <= 24)
+    }
+
+    private fun reportWords(count: Int) {
+        mainActivity?.run {
+//            reportFunnel(Restore.SeedWordCount(count))
+            if (count == 1) {
+                reportFunnel(Restore.SeedWordsStarted)
+            } else if (count == 24) {
+                reportFunnel(Restore.SeedWordsCompleted)
+            }
+        }
     }
 
     private fun hideAutoCompleteWords() {

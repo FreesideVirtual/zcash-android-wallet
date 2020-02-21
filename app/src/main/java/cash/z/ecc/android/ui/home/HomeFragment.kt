@@ -10,10 +10,9 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentHomeBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
-import cash.z.ecc.android.ext.disabledIf
-import cash.z.ecc.android.ext.goneIf
-import cash.z.ecc.android.ext.onClickNavTo
-import cash.z.ecc.android.ext.toColoredSpan
+import cash.z.ecc.android.ext.*
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.home.HomeFragment.BannerAction.*
 import cash.z.ecc.android.ui.send.SendViewModel
@@ -21,7 +20,10 @@ import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
-import cash.z.wallet.sdk.ext.*
+import cash.z.wallet.sdk.ext.convertZatoshiToZecString
+import cash.z.wallet.sdk.ext.convertZecToZatoshi
+import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
+import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -29,6 +31,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
+    override val screen = Report.Screen.HOME
 
     private lateinit var numberPad: List<TextView>
     private lateinit var uiModel: HomeViewModel.UiModel
@@ -88,18 +91,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 buttonNumberPadDecimal.asKey(),
                 buttonNumberPadBack.asKey()
             )
-            hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_profile)
-            iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
-            textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail)
+            hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_profile) { tapped(HOME_PROFILE) }
+            iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail) { tapped(HOME_DETAIL) }
+            textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail) { tapped(HOME_DETAIL) }
             hitAreaScan.setOnClickListener {
-                mainActivity?.maybeOpenScan()
+                mainActivity?.maybeOpenScan().also { tapped(HOME_SCAN) }
             }
 
             textBannerAction.setOnClickListener {
                 onBannerAction(BannerAction.from((it as? TextView)?.text?.toString()))
             }
             buttonSendAmount.setOnClickListener {
-                onSend()
+                onSend().also { tapped(HOME_SEND) }
             }
             setSendAmount("0", false)
 
@@ -107,7 +110,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         binding.buttonNumberPadBack.setOnLongClickListener {
-            onClearAmount()
+            onClearAmount().also { tapped(HOME_CLEAR_AMOUNT) }
             true
         }
 
@@ -175,14 +178,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     // Public UI API
     //
 
-    fun setSendEnabled(enabled: Boolean) {
+    var isSendEnabled = false
+    fun setSendEnabled(enabled: Boolean, isSynced: Boolean) {
+        isSendEnabled = enabled
         binding.buttonSendAmount.apply {
-            isEnabled = enabled
-            if (enabled) {
-//                setTextColor(resources.getColorStateList(R.color.selector_button_text_dark))
+            if (enabled || !isSynced) {
+                isEnabled = true
+                isClickable = isSynced
                 binding.lottieButtonLoading.alpha = 1.0f
             } else {
-//                setTextColor(R.color.zcashGray.toAppColor())
+                isEnabled = false
+                isClickable = false
                 binding.lottieButtonLoading.alpha = 0.32f
             }
         }
@@ -268,7 +274,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     //
 
     private fun onModelUpdated(old: HomeViewModel.UiModel?, new: HomeViewModel.UiModel) {
-        twig("onModelUpdated: $new")
+        logUpdate(old, new)
         if (binding.lottieButtonLoading.visibility != View.VISIBLE) binding.lottieButtonLoading.visibility = View.VISIBLE
         uiModel = new
         if (old?.pendingSend != new.pendingSend) {
@@ -278,7 +284,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setProgress(uiModel) // TODO: we may not need to separate anymore
 //        if (new.status = SYNCING) onSyncing(new) else onSynced(new)
         if (new.status == SYNCED) onSynced(new) else onSyncing(new)
-        setSendEnabled(new.isSendEnabled)
+        setSendEnabled(new.isSendEnabled, new.status == SYNCED)
+    }
+
+    private fun logUpdate(old: HomeViewModel.UiModel?, new: HomeViewModel.UiModel) {
+        var message = ""
+        fun maybeComma() = if (message.length > "UiModel(".length) ", " else ""
+        message = when {
+            old == null -> "$new"
+            new == null -> "null"
+            else -> {
+                buildString {
+                    append("UiModel(")
+                    if (old.status != new.status) append ("status=${new.status}")
+                    if (old.processorInfo != new.processorInfo) {
+                        append ("${maybeComma()}processorInfo=ProcessorInfo(")
+                        val startLength = length
+                        fun innerComma() = if (length > startLength) ", " else ""
+                        if (old.processorInfo.networkBlockHeight != new.processorInfo.networkBlockHeight) append("networkBlockHeight=${new.processorInfo.networkBlockHeight}")
+                        if (old.processorInfo.lastScannedHeight != new.processorInfo.lastScannedHeight) append("${innerComma()}lastScannedHeight=${new.processorInfo.lastScannedHeight}")
+                        if (old.processorInfo.lastDownloadedHeight != new.processorInfo.lastDownloadedHeight) append("${innerComma()}lastDownloadedHeight=${new.processorInfo.lastDownloadedHeight}")
+                        if (old.processorInfo.lastDownloadRange != new.processorInfo.lastDownloadRange) append("${innerComma()}lastDownloadRange=${new.processorInfo.lastDownloadRange}")
+                        if (old.processorInfo.lastScanRange != new.processorInfo.lastScanRange) append("${innerComma()}lastScanRange=${new.processorInfo.lastScanRange}")
+                        append(")")
+                    }
+                    if (old.availableBalance != new.availableBalance) append ("${maybeComma()}availableBalance=${new.availableBalance}")
+                    if (old.totalBalance != new.totalBalance) append ("${maybeComma()}totalBalance=${new.totalBalance}")
+                    if (old.pendingSend != new.pendingSend) append ("${maybeComma()}pendingSend=${new.pendingSend}")
+                    append(")")
+                }
+            }
+        }
+        twig("onModelUpdated: $message")
     }
 
     private fun onSyncing(uiModel: HomeViewModel.UiModel) {
@@ -296,7 +333,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun onSend() {
-        mainActivity?.safeNavigate(R.id.action_nav_home_to_send)
+        if (isSendEnabled) mainActivity?.safeNavigate(R.id.action_nav_home_to_send)
     }
 
     private fun onBannerAction(action: BannerAction) {
@@ -307,6 +344,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     .setTitle("No Balance")
                     .setCancelable(true)
                     .setPositiveButton("View Address") { dialog, _ ->
+                        tapped(HOME_FUND_NOW)
                         dialog.dismiss()
                         mainActivity?.safeNavigate(R.id.action_nav_home_to_nav_receive)
                     }

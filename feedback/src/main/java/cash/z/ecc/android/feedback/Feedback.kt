@@ -1,6 +1,6 @@
 package cash.z.ecc.android.feedback
 
-import android.util.Log
+//import android.util.Log
 import cash.z.ecc.android.feedback.util.CompositeJob
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
@@ -35,17 +35,8 @@ class Feedback(capacity: Int = 256) {
      * [actions] channels will remain open unless [stop] is also called on this instance.
      */
     suspend fun start(): Feedback {
-        val callStack = StringBuilder().let { s ->
-            Thread.currentThread().stackTrace.forEach {element ->
-                s.append("$element\n")
-            }
-            s.toString()
-        }
         if(::scope.isInitialized) {
-            Log.e("@TWIG","Warning: did not initialize feedback because it has already been initialized. Call stack: $callStack")
             return this
-        } else {
-            Log.e("@TWIG","Debug: Initializing feedback for the first time. Call stack: $callStack")
         }
         scope = CoroutineScope(Dispatchers.IO + SupervisorJob(coroutineContext[Job]))
         invokeOnCompletion {
@@ -143,8 +134,8 @@ class Feedback(capacity: Int = 256) {
      *
      * @param error the uncaught exception that occurred.
      */
-    fun report(error: Throwable?, fatal: Boolean = false): Feedback {
-        return report(Crash(error, fatal))
+    fun report(error: Throwable?, isFatal: Boolean = false): Feedback {
+        return if (isFatal) report(Crash(error)) else report(NonFatal(error, "reported"))
     }
 
     /**
@@ -197,12 +188,22 @@ class Feedback(capacity: Int = 256) {
         }
     }
 
-    abstract class Funnel(override val key: String) : Action {
-        override fun toMap(): MutableMap<String, Any> {
-            return mutableMapOf(
-                "key" to key
-            )
+    abstract class MappedAction private constructor(protected val propertyMap: MutableMap<String, Any> = mutableMapOf()) : Feedback.Action {
+        constructor(vararg properties: Pair<String, Any>) : this(mutableMapOf(*properties))
+
+        override fun toMap(): Map<String, Any> {
+            return propertyMap.apply { putAll(super.toMap()) }
         }
+    }
+
+    abstract class Funnel(funnelName: String, stepName: String, step: Int, vararg properties: Pair<String, Any>) : MappedAction(
+        "funnelName" to funnelName,
+        "stepName" to stepName,
+        "step" to step,
+        *properties
+    ) {
+        override fun toString() = key
+        override val key: String = "funnel.$funnelName.$stepName.$step"
     }
 
     interface Keyed<T> {
@@ -231,31 +232,52 @@ class Feedback(capacity: Int = 256) {
         }
     }
 
-    data class Crash(val error: Throwable? = null, val fatal: Boolean = true) : Action {
-        override val key: String = "crash"
-        override fun toMap(): Map<String, Any> {
-            return mutableMapOf<String, Any>(
-                "fatal" to fatal,
-                "message" to (error?.message ?: "None"),
-                "cause" to (error?.cause?.toString() ?: "None"),
-                "cause.cause" to (error?.cause?.cause?.toString() ?: "None"),
-                "cause.cause.cause" to (error?.cause?.cause?.cause?.toString() ?: "None")
-            ).apply { putAll(super.toMap()); putAll(error.stacktraceToMap()) }
+    open class AppError(name: String = "unknown", description: String? = null, isFatal: Boolean = false, vararg properties: Pair<String, Any>) : MappedAction(
+        "isError" to true,
+        "isFatal" to isFatal,
+        "errorName" to name,
+        "message" to (description ?: "None"),
+        "description" to describe(name, description, isFatal),
+        *properties
+    ) {
+        val isFatal: Boolean by propertyMap
+        val errorName: String by propertyMap
+        val description: String by propertyMap
+        constructor(name: String, exception: Throwable? = null, isFatal: Boolean = false) : this(
+            name, exception?.toString(), isFatal,
+            "exceptionString" to (exception?.toString() ?: "None"),
+            "message" to (exception?.message ?: "None"),
+            "cause" to (exception?.cause?.toString() ?: "None"),
+            "cause.cause" to (exception?.cause?.cause?.toString() ?: "None"),
+            "cause.cause.cause" to (exception?.cause?.cause?.cause?.toString() ?: "None")
+        ) {
+            propertyMap.putAll(exception.stacktraceToMap())
         }
 
-        override fun toString() = "App ${if (fatal) "crashed due to" else "caught error"}: $error"
+        override val key = "error.${if (isFatal) "fatal" else "nonfatal"}.$name"
+        override fun toString() = description
+
+        companion object {
+            fun describe(name: String, description: String?, isFatal: Boolean) =
+                "${if (isFatal) "Error: FATAL" else "Error: non-fatal"} $name error due to: ${description ?: "unknown error"}"
+        }
     }
+
+    class Crash(val exception: Throwable? = null) : AppError( "crash", exception, true)
+    class NonFatal(val exception: Throwable? = null, name: String) : AppError(name, exception, false)
 }
 
+
+
 private fun Throwable?.stacktraceToMap(chunkSize: Int = 250): Map<out String, String> {
-    val properties = mutableMapOf("stacktrace0" to "None")
+    val properties = mutableMapOf("stacktrace.0" to "None")
     if (this == null) return properties
     val stringWriter = StringWriter()
 
     printStackTrace(PrintWriter(stringWriter))
 
     stringWriter.toString().chunked(chunkSize).forEachIndexed { index, chunk ->
-        properties["stacktrace$index"] = chunk
+        properties["stacktrace.$index"] = chunk
     }
     return properties
 }
