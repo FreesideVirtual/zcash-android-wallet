@@ -33,10 +33,14 @@ import cash.z.ecc.android.di.component.SynchronizerSubcomponent
 import cash.z.ecc.android.feedback.Feedback
 import cash.z.ecc.android.feedback.FeedbackCoordinator
 import cash.z.ecc.android.feedback.LaunchMetric
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Error.NonFatal.Reorg
 import cash.z.ecc.android.feedback.Report.NonUserAction.FEEDBACK_STOPPED
 import cash.z.ecc.android.feedback.Report.NonUserAction.SYNC_START
+import cash.z.ecc.android.feedback.Report.Tap.COPY_ADDRESS
 import cash.z.wallet.sdk.Initializer
 import cash.z.wallet.sdk.exception.CompactBlockProcessorException
+import cash.z.wallet.sdk.ext.ZcashSdk
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -59,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private val mediaPlayer: MediaPlayer = MediaPlayer()
     private var snackbar: Snackbar? = null
     private var dialog: Dialog? = null
+    private var ignoreScanFailure: Boolean = false
 
     lateinit var component: MainActivitySubcomponent
     lateinit var synchronizerComponent: SynchronizerSubcomponent
@@ -165,11 +170,22 @@ class MainActivity : AppCompatActivity() {
             feedback.report(SYNC_START)
             synchronizerComponent.synchronizer().let { synchronizer ->
                 synchronizer.onProcessorErrorHandler = ::onProcessorError
+                synchronizer.onChainErrorHandler = ::onChainError
                 synchronizer.start(lifecycleScope)
             }
         } else {
             twig("Ignoring request to start sync because sync has already been started!")
         }
+    }
+
+    fun reportScreen(screen: Report.Screen?) = reportAction(screen)
+
+    fun reportTap(tap: Report.Tap?) = reportAction(tap)
+
+    fun reportFunnel(step: Feedback.Funnel?) = reportAction(step)
+
+    private fun reportAction(action: Feedback.Action?) {
+        action?.let { feedback.report(it) }
     }
 
     fun playSound(fileName: String) {
@@ -197,6 +213,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun copyAddress(view: View? = null) {
+        reportTap(COPY_ADDRESS)
         lifecycleScope.launch {
             clipboard.setPrimaryClip(
                 ClipData.newPlainText(
@@ -258,14 +275,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showKeyboard(focusedView: View) {
-        twig("SHOWING KEYBOARD")
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(focusedView, InputMethodManager.SHOW_FORCED)
     }
 
     fun hideKeyboard() {
-        twig("HIDING KEYBOARD")
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(findViewById<View>(android.R.id.content).windowToken, 0)
     }
@@ -309,10 +324,13 @@ class MainActivity : AppCompatActivity() {
         showSnackbar("Well, this is awkward. You denied permission for the camera.")
     }
 
+    private var ignoredErrors = 0
     private fun onProcessorError(error: Throwable?): Boolean {
+        var notified = false
         when (error) {
             is CompactBlockProcessorException.Uninitialized -> {
-                if (dialog == null)
+                if (dialog == null) {
+                    notified = true
                     runOnUiThread {
                         dialog = MaterialAlertDialogBuilder(this)
                             .setTitle("Wallet Improperly Initialized")
@@ -324,9 +342,83 @@ class MainActivity : AppCompatActivity() {
                             }
                             .show()
                     }
+                }
+            }
+            is CompactBlockProcessorException.FailedScan -> {
+                if (dialog == null && !ignoreScanFailure) throttle("scanFailure", 20_000L) {
+                    notified = true
+                    runOnUiThread {
+                        dialog = MaterialAlertDialogBuilder(this)
+                            .setTitle("Scan Failure")
+                            .setMessage("${error.message}${if (error.cause != null) "\n\nCaused by: ${error.cause}" else ""}")
+                            .setCancelable(true)
+                            .setPositiveButton("Retry") { d, _ ->
+                                d.dismiss()
+                                dialog = null
+                            }
+                            .setNegativeButton("Ignore") { d, _ ->
+                                d.dismiss()
+                                ignoreScanFailure = true
+                                dialog = null
+                            }
+                            .show()
+                    }
+                }
             }
         }
+        if (!notified) {
+            ignoredErrors++
+        }
+        if (ignoredErrors >= ZcashSdk.RETRIES) {
+            if (dialog == null) {
+                notified = true
+                runOnUiThread {
+                    dialog = MaterialAlertDialogBuilder(this)
+                        .setTitle("Processor Error")
+                        .setMessage(error?.message ?: "Critical error while processing blocks!")
+                        .setCancelable(false)
+                        .setPositiveButton("Retry") { d, _ ->
+                            d.dismiss()
+                            dialog = null
+                        }
+                        .setNegativeButton("Exit") { dialog, _ ->
+                            dialog.dismiss()
+                            throw error
+                                ?: RuntimeException("Critical error while processing blocks and the user chose to exit.")
+                        }
+                        .show()
+                }
+            }
+        }
+        twig("MainActivity has received an error${if (notified) " and notified the user" else ""} and reported it to crashlytics and mixpanel.")
         feedback.report(error)
         return true
+    }
+
+    private fun onChainError(errorHeight: Int, rewindHeight: Int) {
+        feedback.report(Reorg(errorHeight, rewindHeight))
+    }
+
+
+    // TODO: maybe move this quick helper code somewhere general or throttle the dialogs differently (like with a flow and stream operators, instead)
+
+    private val throttles = mutableMapOf<String, () -> Any>()
+    private val noWork = {}
+    private fun throttle(key: String, delay: Long, block: () -> Any) {
+        // if the key exists, just add the block to run later and exit
+        if (throttles.containsKey(key)) {
+            throttles[key] = block
+            return
+        }
+        block()
+
+        // after doing the work, check back in later and if another request came in, throttle it, otherwise exit
+        throttles[key] = noWork
+        findViewById<View>(android.R.id.content).postDelayed({
+            throttles[key]?.let { pendingWork ->
+                throttles.remove(key)
+                if (pendingWork !== noWork) throttle(key, delay, pendingWork)
+            }
+        }, delay)
     }
 }
