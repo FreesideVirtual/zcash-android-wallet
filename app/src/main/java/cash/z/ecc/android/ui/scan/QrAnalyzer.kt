@@ -2,6 +2,8 @@ package cash.z.ecc.android.ui.scan
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import cash.z.wallet.sdk.ext.retrySimple
+import cash.z.wallet.sdk.ext.retryUpTo
 import cash.z.wallet.sdk.ext.twig
 import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.FirebaseVision
@@ -27,22 +29,25 @@ class QrAnalyzer(val scanCallback: (qrContent: String, image: ImageProxy) -> Uni
         if (rotation < 0) {
             rotation += 360
         }
-        val mediaImage = FirebaseVisionImage.fromMediaImage(
-            image.image!!, when (rotation) {
-                0 -> FirebaseVisionImageMetadata.ROTATION_0
-                90 -> FirebaseVisionImageMetadata.ROTATION_90
-                180 -> FirebaseVisionImageMetadata.ROTATION_180
-                270 -> FirebaseVisionImageMetadata.ROTATION_270
-                else -> {
-                    FirebaseVisionImageMetadata.ROTATION_0
+
+        retrySimple {
+            val mediaImage = FirebaseVisionImage.fromMediaImage(
+                image.image!!, when (rotation) {
+                    0 -> FirebaseVisionImageMetadata.ROTATION_0
+                    90 -> FirebaseVisionImageMetadata.ROTATION_90
+                    180 -> FirebaseVisionImageMetadata.ROTATION_180
+                    270 -> FirebaseVisionImageMetadata.ROTATION_270
+                    else -> {
+                        FirebaseVisionImageMetadata.ROTATION_0
+                    }
                 }
+            )
+            pendingTask = detector.detectInImage(mediaImage).also {
+                it.addOnSuccessListener { result ->
+                    onImageScan(result, image)
+                }
+                it.addOnFailureListener(::onImageScanFailure)
             }
-        )
-        pendingTask = detector.detectInImage(mediaImage).also {
-            it.addOnSuccessListener { result ->
-                onImageScan(result, image)
-            }
-            it.addOnFailureListener(::onImageScanFailure)
         }
     }
 
