@@ -20,6 +20,17 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="cash.z.ecc.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:writePermission="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <!-- Firebase options -->
         <meta-data android:name="com.google.firebase.ml.vision.DEPENDENCIES" android:value="barcode" />
 

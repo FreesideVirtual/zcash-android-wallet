@@ -5,12 +5,15 @@ import okio.Okio
 import java.io.File
 import java.text.SimpleDateFormat
 
-class FeedbackFile(fileName: String = "feedback.log") :
+class FeedbackFile(fileName: String = "user_log.txt") :
     FeedbackCoordinator.FeedbackObserver {
 
-    val file = File(ZcashWalletApp.instance.noBackupFilesDir, fileName)
+    val file = File("${ZcashWalletApp.instance.filesDir}/logs", fileName)
     private val format = SimpleDateFormat("MM-dd HH:mm:ss.SSS")
 
+    init {
+        if (!file.parentFile.exists()) file.parentFile.mkdirs()
+    }
 
     override fun onMetric(metric: Feedback.Metric) {
         appendToFile(metric.toString())
