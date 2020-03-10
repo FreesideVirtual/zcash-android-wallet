@@ -1,23 +1,34 @@
 package cash.z.ecc.android.ui.profile
 
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.content.FileProvider.getUriForFile
 import cash.z.ecc.android.BuildConfig
 import cash.z.ecc.android.R
+import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentProfileBinding
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClick
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.feedback.FeedbackFile
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.ext.toAbbreviatedAddress
+import cash.z.wallet.sdk.ext.twig
 import kotlinx.coroutines.launch
 import okio.Okio
+import java.io.File
+import java.io.IOException
+
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
+    override val screen = Report.Screen.PROFILE
 
     private val viewModel: ProfileViewModel by viewModel()
 
@@ -26,13 +37,20 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.hitAreaClose.onClickNavBack()
-        binding.buttonBackup.onClickNavTo(R.id.action_nav_profile_to_nav_backup)
+        binding.hitAreaClose.onClickNavBack() { tapped(PROFILE_CLOSE) }
+        binding.buttonBackup.onClickNavTo(R.id.action_nav_profile_to_nav_backup) { tapped(PROFILE_BACKUP) }
         binding.textVersion.text = BuildConfig.VERSION_NAME
         onClick(binding.buttonLogs) {
+            tapped(PROFILE_VIEW_USER_LOGS)
             onViewLogs()
         }
+        binding.buttonLogs.setOnLongClickListener {
+            tapped(PROFILE_VIEW_DEV_LOGS)
+            onViewDevLogs()
+            true
+        }
         onClick(binding.buttonFeedback) {
+            tapped(PROFILE_SEND_FEEDBACK)
             onSendFeedback()
         }
     }
@@ -45,31 +63,63 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
     private fun onViewLogs() {
-        loadLogFileAsText().let { logText ->
-            if (logText == null) {
-                mainActivity?.showSnackbar("Log file not found!")
-            } else {
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, logText)
-                    type = "text/plain"
-                }
+        shareFile(userLogFile())
+    }
 
-                val shareIntent = Intent.createChooser(sendIntent, "Share Log File")
-                startActivity(shareIntent)
+    private fun onViewDevLogs() {
+        shareFile(writeLogcat())
+    }
+
+    private fun shareFiles(vararg files: File?) {
+        val uris = arrayListOf<Uri>().apply {
+            files.filterNotNull().mapNotNull {
+                getUriForFile(ZcashWalletApp.instance, "${BuildConfig.APPLICATION_ID}.fileprovider", it)
+            }.forEach {
+                add(it)
             }
         }
+        val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+            type = "text/*"
+        }
+        startActivity(Intent.createChooser(intent, "Share Log Files"))
+    }
+
+    fun shareFile(file: File?) {
+        file ?: return
+        val uri = getUriForFile(ZcashWalletApp.instance, "${BuildConfig.APPLICATION_ID}.fileprovider", file)
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(intent, "Share Log File"))
     }
 
     private fun onSendFeedback() {
         mainActivity?.showSnackbar("Feedback feature coming soon!")
     }
 
+    private fun userLogFile(): File? {
+        return mainActivity?.feedbackCoordinator?.findObserver<FeedbackFile>()?.file
+    }
+
     private fun loadLogFileAsText(): String? {
-        val feedbackFile: FeedbackFile =
-            mainActivity?.feedbackCoordinator?.findObserver() ?: return null
-        Okio.buffer(Okio.source(feedbackFile.file)).use {
+        val feedbackFile: File = userLogFile() ?: return null
+        Okio.buffer(Okio.source(feedbackFile)).use {
             return it.readUtf8()
         }
+    }
+
+    private fun writeLogcat(): File? {
+        try {
+            val outputFile = File("${ZcashWalletApp.instance.filesDir}/logs", "developer_log.txt")
+            val cmd = arrayOf("/bin/sh", "-c", "logcat -v time -d | grep \"@TWIG\" > ${outputFile.absolutePath}")
+            Runtime.getRuntime().exec(cmd)
+            return outputFile
+        } catch (e: IOException) {
+            e.printStackTrace()
+            twig("Failed to create log")
+        }
+        return null
     }
 }

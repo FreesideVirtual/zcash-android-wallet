@@ -15,7 +15,10 @@ import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentBackupBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
+import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.MetricType.SEED_PHRASE_LOADED
+import cash.z.ecc.android.feedback.Report.Tap.BACKUP_DONE
+import cash.z.ecc.android.feedback.Report.Tap.BACKUP_VERIFY
 import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.base.BaseFragment
@@ -30,6 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class BackupFragment : BaseFragment<FragmentBackupBinding>() {
+    override val screen = Report.Screen.BACKUP
+
     val walletSetup: WalletSetupViewModel by activityViewModel(false)
 
     private var hasBackUp: Boolean = true //TODO: implement backup and then check for it here-ish
@@ -52,9 +57,9 @@ class BackupFragment : BaseFragment<FragmentBackupBinding>() {
             )
         }
         binding.buttonPositive.setOnClickListener {
-            onEnterWallet()
+            onEnterWallet().also { if (hasBackUp) tapped(BACKUP_DONE) else tapped(BACKUP_VERIFY) }
         }
-        if (hasBackUp == true) {
+        if (hasBackUp) {
             binding.buttonPositive.text = "Done"
         }
     }

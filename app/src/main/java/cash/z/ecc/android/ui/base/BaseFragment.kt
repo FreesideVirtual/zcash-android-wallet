@@ -8,6 +8,7 @@ import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.ui.MainActivity
 import kotlinx.coroutines.*
 
@@ -17,6 +18,8 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     lateinit var binding: T
 
     lateinit var resumedScope: CoroutineScope
+
+    open val screen: Report.Screen? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +32,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        mainActivity?.reportScreen(screen)
         resumedScope = lifecycleScope.coroutineContext.let {
             CoroutineScope(Dispatchers.Main + SupervisorJob(it[Job]))
         }
@@ -43,9 +47,15 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     // each fragment must call FragmentMyLayoutBinding.inflate(inflater)
     abstract fun inflate(@NonNull inflater: LayoutInflater): T
 
-    fun onBackPressNavTo(navResId: Int) {
+    fun onBackPressNavTo(navResId: Int, block: (() -> Unit) = {}) {
         mainActivity?.onFragmentBackPressed(this) {
+            block()
             mainActivity?.safeNavigate(navResId)
         }
     }
+
+    fun tapped(tap: Report.Tap) {
+        mainActivity?.reportTap(tap)
+    }
+
 }

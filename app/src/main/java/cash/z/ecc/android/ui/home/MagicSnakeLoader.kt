@@ -85,7 +85,6 @@ class MagicSnakeLoader(
         } else {
             // once we're ready to show scan progress, do it! Don't do extra loops.
             if (frame >= scanningStartFrame || frame in acceptablePauseFrames) {
-                twig("ZZZ pausing so we can scan!  ${if(frame<scanningStartFrame) "WE STOPPED EARLY!" else ""}")
                 pause()
             }
         }
@@ -107,17 +106,14 @@ class MagicSnakeLoader(
 
     private fun playToCompletion() {
         removeLoops()
-        twig("ZZZ playing to completion")
         unpause()
     }
 
     private fun removeLoops() {
         lottie.frame.let {frame ->
             if (frame in 33..67) {
-                twig("ZZZ removing 1 loop!")
                 lottie.frame = frame + 34
             } else if (frame in 0..33) {
-                twig("ZZZ removing 2 loops!")
                 lottie.frame = frame + 67
             }
         }

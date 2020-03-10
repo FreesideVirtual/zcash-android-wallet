@@ -17,6 +17,8 @@ import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.send.SendViewModel
 import com.google.common.util.concurrent.ListenableFuture
@@ -24,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 class ScanFragment : BaseFragment<FragmentScanBinding>() {
-
+    override val screen = Report.Screen.SCAN
     private val viewModel: ScanViewModel by viewModel()
 
     private val sendViewModel: SendViewModel by activityViewModel()
@@ -37,8 +39,8 @@ class ScanFragment : BaseFragment<FragmentScanBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonReceive.onClickNavTo(R.id.action_nav_scan_to_nav_receive)
-        binding.backButtonHitArea.onClickNavBack()
+        binding.buttonReceive.onClickNavTo(R.id.action_nav_scan_to_nav_receive) { tapped(SCAN_RECEIVE) }
+        binding.backButtonHitArea.onClickNavBack() { tapped(SCAN_BACK) }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -56,7 +58,7 @@ class ScanFragment : BaseFragment<FragmentScanBinding>() {
 
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
         Preview.Builder().setTargetName("Preview").build().let { preview ->
-            preview.previewSurfaceProvider = binding.preview.previewSurfaceProvider
+            preview.setSurfaceProvider(binding.preview.previewSurfaceProvider)
 
             val cameraSelector = CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)

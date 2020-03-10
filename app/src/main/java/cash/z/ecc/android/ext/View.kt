@@ -22,16 +22,18 @@ fun View.disabledIf(isDisabled: Boolean) {
     isEnabled = !isDisabled
 }
 
-fun View.onClickNavTo(navResId: Int) {
+fun View.onClickNavTo(navResId: Int, block: (() -> Any) = {}) {
     setOnClickListener {
+        block()
         (context as? MainActivity)?.safeNavigate(navResId)
             ?: throw IllegalStateException("Cannot navigate from this activity. " +
                     "Expected MainActivity but found ${context.javaClass.simpleName}")
     }
 }
 
-fun View.onClickNavUp() {
+fun View.onClickNavUp(block: (() -> Any) = {}) {
     setOnClickListener {
+        block()
         (context as? MainActivity)?.navController?.navigateUp()
             ?: throw IllegalStateException(
                 "Cannot navigate from this activity. " +
@@ -40,8 +42,9 @@ fun View.onClickNavUp() {
     }
 }
 
-fun View.onClickNavBack() {
+fun View.onClickNavBack(block: (() -> Any) = {}) {
     setOnClickListener {
+        block()
         (context as? MainActivity)?.navController?.popBackStack()
             ?: throw IllegalStateException(
                 "Cannot navigate from this activity. " +

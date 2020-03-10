@@ -7,6 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ext.toAppColor
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Funnel.Restore
+import cash.z.ecc.android.ui.MainActivity
 import cash.z.ecc.android.ui.setup.SeedWordChip
 import cash.z.wallet.sdk.ext.twig
 
@@ -46,7 +49,6 @@ class SeedWordAdapter :  ChipsAdapter {
 
     override fun onChipDataSourceChanged() {
         super.onChipDataSourceChanged()
-        twig("onChipDataSourceChanged")
         onDataSetChangedListener?.invoke()
     }
 
@@ -69,14 +71,11 @@ class SeedWordAdapter :  ChipsAdapter {
         }
     }
 
-
     override fun onKeyboardDelimiter(text: String) {
-        twig("onKeyboardDelimiter: $text   ${mDataSource.filteredChips.size}")
         if (mDataSource.filteredChips.size > 0) {
             onKeyboardActionDone((mDataSource.filteredChips.first() as SeedWordChip).word)
         }
     }
-
 
     private inner class SeedWordHolder(chipView: SeedWordChipView) : ChipsAdapter.ChipHolder(chipView) {
         val seedChipView = super.chipView as SeedWordChipView

@@ -9,13 +9,12 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentSendFinalBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.goneIf
-import cash.z.ecc.android.feedback.Feedback
 import cash.z.ecc.android.feedback.Report
-import cash.z.ecc.android.feedback.Report.MetricType.*
+import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.entity.*
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
+import cash.z.wallet.sdk.ext.toAbbreviatedAddress
 import cash.z.wallet.sdk.ext.twig
 import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.delay
@@ -25,6 +24,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlin.random.Random
 
 class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
+    override val screen = Report.Screen.SEND_FINAL
 
     val sendViewModel: SendViewModel by activityViewModel()
 
@@ -34,13 +34,13 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonNext.setOnClickListener {
-            onExit()
+            onExit().also { tapped(SEND_FINAL_EXIT) }
         }
         binding.buttonRetry.setOnClickListener {
-            onRetry()
+            onRetry().also { tapped(SEND_FINAL_RETRY) }
         }
         binding.backButtonHitArea.setOnClickListener {
-            onExit()
+            onExit().also { tapped(SEND_FINAL_CLOSE) }
         }
         binding.textConfirmation.text =
             "Sending ${sendViewModel.zatoshiAmount.convertZatoshiToZecString(8)} ZEC to ${sendViewModel.toAddress.toAbbreviatedAddress()}"
@@ -81,24 +81,19 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
             val id = pendingTransaction?.id ?: -1
             var isSending = true
             var isFailure = false
+            var step: Report.Funnel.Send? = null
             val message = when {
-                pendingTransaction == null -> "Transaction not found"
-                pendingTransaction.isMined() -> "Transaction Mined!\n\nSEND COMPLETE".also { isSending = false }
-                pendingTransaction.isSubmitSuccess() -> "Successfully submitted transaction!\nAwaiting confirmation . . ."
-                pendingTransaction.isFailedEncoding() -> "ERROR: failed to encode transaction! (id: $id)".also { isSending = false; isFailure = true }
-                pendingTransaction.isFailedSubmit() -> "ERROR: failed to submit transaction! (id: $id)".also { isSending = false; isFailure = true }
-                pendingTransaction.isCreated() -> "Transaction creation complete!"
-                pendingTransaction.isCreating() -> "Creating transaction . . ."
+                pendingTransaction == null -> "Transaction not found".also { step = Report.Funnel.Send.ErrorNotFound }
+                pendingTransaction.isMined() -> "Transaction Mined!\n\nSEND COMPLETE".also { isSending = false; step = Report.Funnel.Send.Mined(pendingTransaction.minedHeight) }
+                pendingTransaction.isSubmitSuccess() -> "Successfully submitted transaction!\nAwaiting confirmation . . .".also { step = Report.Funnel.Send.Submitted }
+                pendingTransaction.isFailedEncoding() -> "ERROR: failed to encode transaction! (id: $id)".also { isSending = false; isFailure = true; step = Report.Funnel.Send.ErrorEncoding(pendingTransaction?.errorCode, pendingTransaction?.errorMessage) }
+                pendingTransaction.isFailedSubmit() -> "ERROR: failed to submit transaction! (id: $id)".also { isSending = false; isFailure = true; step = Report.Funnel.Send.ErrorSubmitting(pendingTransaction?.errorCode, pendingTransaction?.errorMessage) }
+                pendingTransaction.isCreated() -> "Transaction creation complete!".also { step = Report.Funnel.Send.Created(id) }
+                pendingTransaction.isCreating() -> "Creating transaction . . .".also { step = Report.Funnel.Send.Creating }
                 else -> "Transaction updated!".also { twig("Unhandled TX state: $pendingTransaction") }
             }
 
-            // TODO: make this error tracking easier to use and more spiffy
-            if (pendingTransaction?.isFailedSubmit() == true) {
-                sendViewModel.feedback.report(Report.Send.SubmitFailure(pendingTransaction?.errorCode, pendingTransaction?.errorMessage))
-            }
-            if (pendingTransaction?.isFailedEncoding() == true) {
-                sendViewModel.feedback.report(Report.Send.EncodingFailure(pendingTransaction?.errorCode, pendingTransaction?.errorMessage))
-            }
+            sendViewModel.funnel(step)
 
             twig("Pending TX (id: ${pendingTransaction?.id} Updated with message: $message")
             binding.textStatus.apply {

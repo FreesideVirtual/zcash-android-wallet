@@ -57,4 +57,9 @@ class AppModule {
     @Singleton
     @IntoSet
     fun provideFeedbackMixpanel(): FeedbackCoordinator.FeedbackObserver = FeedbackMixpanel()
+
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideFeedbackCrashlytics(): FeedbackCoordinator.FeedbackObserver = FeedbackCrashlytics()
 }

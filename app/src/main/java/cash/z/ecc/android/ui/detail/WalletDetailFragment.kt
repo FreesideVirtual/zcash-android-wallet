@@ -12,6 +12,8 @@ import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.onClickNavUp
 import cash.z.ecc.android.ext.toColoredSpan
+import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Tap.DETAIL_BACK
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.block.CompactBlockProcessor.WalletBalance
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
@@ -23,7 +25,7 @@ import kotlinx.coroutines.launch
 
 
 class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
-
+    override val screen = Report.Screen.DETAIL
     private val viewModel: WalletDetailViewModel by viewModel()
 
     private lateinit var adapter: TransactionAdapter<ConfirmedTransaction>
@@ -33,7 +35,7 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.backButtonHitArea.onClickNavUp()
+        binding.backButtonHitArea.onClickNavUp { tapped(DETAIL_BACK) }
         lifecycleScope.launch {
             binding.textAddress.text = viewModel.getAddress().toAbbreviatedAddress()
         }

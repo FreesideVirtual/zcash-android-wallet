@@ -8,10 +8,7 @@ import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.ext.toAppColor
 import cash.z.ecc.android.ui.MainActivity
 import cash.z.wallet.sdk.entity.ConfirmedTransaction
-import cash.z.wallet.sdk.ext.ZcashSdk
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.isShielded
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
+import cash.z.wallet.sdk.ext.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
@@ -30,7 +27,8 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         // update view
         var lineOne: String = ""
         var lineTwo: String = ""
-        var amount: String = ""
+        var amountZec: String = ""
+        var amountDisplay: String = ""
         var amountColor: Int = 0
         var indicatorBackground: Int = 0
 
@@ -38,7 +36,7 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
             itemView.setOnClickListener {
                 onTransactionClicked(this)
             }
-            amount = value.convertZatoshiToZecString()
+            amountZec = value.convertZatoshiToZecString()
             // TODO: these might be good extension functions
             val timestamp = formatter.format(blockTimeInSeconds * 1000L)
             val isMined = blockTimeInSeconds != 0L
@@ -46,14 +44,14 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
                 !toAddress.isNullOrEmpty() -> {
                     lineOne = "You paid ${toAddress?.toAbbreviatedAddress()}"
                     lineTwo = if (isMined) "Sent $timestamp" else "Pending confirmation"
-                    amount = "- $amount"
+                    amountDisplay = "- $amountZec"
                     amountColor = R.color.zcashRed
                     indicatorBackground = R.drawable.background_indicator_outbound
                 }
                 raw == null || raw?.isEmpty() == true -> {
                     lineOne = "Unknown paid you"
                     lineTwo = "Received $timestamp"
-                    amount = "+ $amount"
+                    amountDisplay = "+ $amountZec"
                     amountColor = R.color.zcashGreen
                     indicatorBackground = R.drawable.background_indicator_inbound
                 }
@@ -64,14 +62,16 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
             }
 
             // sanitize amount
-            if (value < ZcashSdk.MINERS_FEE_ZATOSHI) amount = "< 0.001"
-            else if (amount.length > 8) amount = "tap to view"
+            if (value < ZcashSdk.MINERS_FEE_ZATOSHI) amountDisplay = "< 0.001"
+            else if (amountZec.length > 10) { // 10 allows 3 digits to the left and 6 to the right of the decimal
+                amountDisplay = "tap to view"
+            }
         }
 
 
         topText.text = lineOne
         bottomText.text = lineTwo
-        amountText.text = amount
+        amountText.text = amountDisplay
         amountText.setTextColor(amountColor.toAppColor())
         val context = itemView.context
         indicator.background = context.resources.getDrawable(indicatorBackground)
