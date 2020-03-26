@@ -30,7 +30,7 @@ class SendConfirmFragment : BaseFragment<FragmentSendConfirmBinding>() {
         binding.buttonNext.setOnClickListener {
             onSend().also { tapped(SEND_CONFIRM_NEXT) }
         }
-        R.id.action_nav_send_confirm_to_nav_send_memo.let {
+        R.id.action_nav_send_confirm_to_nav_send.let {
             binding.backButtonHitArea.onClickNavTo(it) { tapped(SEND_CONFIRM_BACK) }
             onBackPressNavTo(it) { tapped(SEND_CONFIRM_BACK) }
         }

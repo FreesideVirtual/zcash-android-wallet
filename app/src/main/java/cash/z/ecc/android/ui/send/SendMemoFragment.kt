@@ -36,7 +36,7 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
             onClearMemo().also { tapped(SEND_MEMO_CLEAR) }
         }
 
-        R.id.action_nav_send_memo_to_nav_send_address.let {
+        R.id.action_nav_send_memo_to_nav_send.let {
             binding.backButtonHitArea.onClickNavTo(it) { tapped(SEND_MEMO_BACK) }
             onBackPressNavTo(it) { tapped(SEND_MEMO_BACK) }
         }
@@ -102,7 +102,7 @@ class SendMemoFragment : BaseFragment<FragmentSendMemoBinding>() {
             sendViewModel.memo = binding.inputMemo.text.toString()
             onNext()
         } else {
-            mainActivity?.safeNavigate(R.id.action_nav_send_memo_to_nav_send_address)
+            mainActivity?.safeNavigate(R.id.action_nav_send_memo_to_nav_send)
         }
     }
 

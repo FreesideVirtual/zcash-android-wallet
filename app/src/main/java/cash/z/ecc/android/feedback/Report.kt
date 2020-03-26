@@ -6,9 +6,11 @@ object Report {
 
     object Funnel {
         sealed class Send(stepName: String, step: Int, vararg properties: Pair<String, Any>) : Feedback.Funnel("send", stepName, step, *properties) {
+            object SendPageComplete : Send("sendpagecomplete", 11)
+            object ConfirmPageComplete : Send("confirmpagecomplete", 30)
+            // todo remove these
             object AddressPageComplete : Send("addresspagecomplete", 10)
             object MemoPageComplete : Send("memopagecomplete", 20)
-            object ConfirmPageComplete : Send("confirmpagecomplete", 30)
 
             // Beginning of send
             object SendSelected : Send("sendselected", 50)
@@ -87,6 +89,7 @@ object Report {
         RECEIVE,
         RESTORE,
         SCAN,
+        SEND,
         SEND_ADDRESS("send.address"),
         SEND_CONFIRM("send.confirm"),
         SEND_FINAL("send.final"),
@@ -127,6 +130,15 @@ object Report {
         RESTORE_BACK("restore.back"),
         SCAN_RECEIVE("scan.receive"),
         SCAN_BACK("scan.back"),
+        SEND_BACK("send.back"),
+        SEND_MAX("send.max"),
+        SEND_NEXT("send.next"),
+        SEND_PASTE("send.paste"),
+        SEND_DONE_ADDRESS("send.done.address"),
+        SEND_DONE_AMOUNT("send.done.amount"),
+        SEND_SCAN("send.scan"),
+
+        //TODO: remove these before PR
         SEND_ADDRESS_MAX("send.address.max"),
         SEND_ADDRESS_NEXT("send.address.next"),
         SEND_ADDRESS_PASTE("send.address.paste"),
@@ -134,13 +146,16 @@ object Report {
         SEND_ADDRESS_DONE_ADDRESS("send.address.done.address"),
         SEND_ADDRESS_DONE_AMOUNT("send.address.done.amount"),
         SEND_ADDRESS_SCAN("send.address.scan"),
+
+
+
         SEND_CONFIRM_BACK("send.confirm.back"),
         SEND_CONFIRM_NEXT("send.confirm.next"),
         SEND_FINAL_EXIT("send.final.exit"),
         SEND_FINAL_RETRY("send.final.retry"),
         SEND_FINAL_CLOSE("send.final.close"),
-        SEND_MEMO_INCLUDE("send.memo.include"),
-        SEND_MEMO_EXCLUDE("send.memo.exclude"),
+        SEND_MEMO_INCLUDE("send.address.include"),
+        SEND_MEMO_EXCLUDE("send.address.exclude"),
         SEND_MEMO_NEXT("send.memo.next"),
         SEND_MEMO_SKIP("send.memo.skip"),
         SEND_MEMO_CLEAR("send.memo.clear"),

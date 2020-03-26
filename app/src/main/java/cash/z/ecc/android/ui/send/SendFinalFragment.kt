@@ -122,7 +122,7 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
     }
 
     private fun onRetry() {
-        mainActivity?.navController?.popBackStack(R.id.nav_send_address, false)
+        mainActivity?.navController?.popBackStack(R.id.nav_send, false)
     }
 
 }

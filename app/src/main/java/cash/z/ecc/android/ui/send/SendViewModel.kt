@@ -57,7 +57,10 @@ class SendViewModel @Inject constructor() : ViewModel() {
             field = value
         }
     val isShielded get() = toAddress.startsWith("z")
-    
+    // TODO: consider adding more complex logic here, perhaps adding an Account object that helps with determining which funds to use. This can be refactored once t-addrs actually work.
+    var useShieldedFunds = true
+    var isMemoAdded = false
+
     fun send(): Flow<PendingTransaction> {
         funnel(SendSelected)
         val memoToSend = if (includeFromAddress) "$memo\nsent from\n$fromAddress" else memo

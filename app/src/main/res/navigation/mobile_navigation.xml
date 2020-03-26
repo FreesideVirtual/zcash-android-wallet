@@ -22,7 +22,7 @@
             app:destination="@id/nav_landing" />
         <action
             android:id="@+id/action_nav_home_to_send"
-            app:destination="@id/nav_send_address"
+            app:destination="@id/nav_send"
             app:exitAnim="@anim/anim_exit_to_left"
             app:enterAnim="@anim/anim_enter_from_right"/>
         <action
@@ -50,8 +50,8 @@
         android:name="cash.z.ecc.android.ui.scan.ScanFragment"
         tools:layout="@layout/fragment_scan">
         <action
-            android:id="@+id/action_nav_scan_to_nav_send_address"
-            app:destination="@id/nav_send_address"
+            android:id="@+id/action_nav_scan_to_nav_send"
+            app:destination="@id/nav_send"
             app:popUpTo="@id/nav_scan"
             app:popUpToInclusive="true"/>
         <action
@@ -78,6 +78,25 @@
     <!--                 -->
     <!-- Send Navigation -->
     <!--                 -->
+
+    <fragment
+        android:id="@+id/nav_send"
+        android:name="cash.z.ecc.android.ui.send.SendFragment"
+        tools:layout="@layout/fragment_send" >
+        <action
+            android:id="@+id/action_nav_send_to_nav_scan"
+            app:destination="@id/nav_scan" />
+        <action
+            android:id="@+id/action_nav_send_to_nav_home"
+            app:destination="@id/nav_home"
+            app:enterAnim="@anim/anim_enter_from_left"
+            app:exitAnim="@anim/anim_exit_to_right"/>
+        <action
+            android:id="@+id/action_nav_send_to_send_confirm"
+            app:destination="@id/nav_send_confirm"
+            app:exitAnim="@anim/anim_exit_to_left"
+            app:enterAnim="@anim/anim_enter_from_right"/>
+    </fragment>
 
     <fragment
         android:id="@+id/nav_send_address"
@@ -108,8 +127,8 @@
             app:exitAnim="@anim/anim_exit_to_left"
             app:enterAnim="@anim/anim_enter_from_right"/>
         <action
-            android:id="@+id/action_nav_send_memo_to_nav_send_address"
-            app:destination="@id/nav_send_address"
+            android:id="@+id/action_nav_send_memo_to_nav_send"
+            app:destination="@id/nav_send"
             app:enterAnim="@anim/anim_enter_from_left"
             app:exitAnim="@anim/anim_exit_to_right" />
     </fragment>
@@ -125,8 +144,8 @@
             app:popUpToInclusive="true"
             app:enterAnim="@anim/anim_fade_in"/>
         <action
-            android:id="@+id/action_nav_send_confirm_to_nav_send_memo"
-            app:destination="@id/nav_send_memo"
+            android:id="@+id/action_nav_send_confirm_to_nav_send"
+            app:destination="@id/nav_send"
             app:enterAnim="@anim/anim_enter_from_left"
             app:exitAnim="@anim/anim_exit_to_right" />
     </fragment>
