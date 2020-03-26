@@ -21,8 +21,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     lateinit var uiModels: Flow<UiModel>
 
-    private val _typedChars = ConflatedBroadcastChannel<Char>()
-    private val typedChars = _typedChars.asFlow()
+    lateinit var _typedChars: ConflatedBroadcastChannel<Char>
 
     var initialized = false
 
@@ -32,12 +31,19 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             twig("Warning already initialized HomeViewModel. Ignoring call to initialize.")
             return
         }
+
+        if (::_typedChars.isInitialized) {
+            _typedChars.close()
+        }
+        _typedChars = ConflatedBroadcastChannel()
+        val typedChars = _typedChars.asFlow()
+
         val zec = typedChars.scan("0") { acc, c ->
             when {
                 // no-op cases
                 acc == "0" && c == '0'
                         || (c == '<' && acc == "0")
-                        || (c == '.' && acc.contains('.')) -> {twig("triggered: 1  acc: $acc  c: $c  $typedChars ")
+                        || (c == '.' && acc.contains('.')) -> {twig("triggered: 1  acc: $acc  c: $c")
                     acc
                }
                 c == '<' && acc.length <= 1 -> {twig("triggered: 2 $typedChars")
