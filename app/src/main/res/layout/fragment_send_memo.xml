@@ -223,7 +223,7 @@
         android:id="@+id/group_transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:visibility="visible"
+        tools:visibility="gone"
         app:constraint_referenced_ids="sad_description, sad_icon, sad_title, sad_checkbox" />
 
     <androidx.constraintlayout.widget.Group
@@ -231,5 +231,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="clear_memo, background_memo, input_memo, check_include_address, text_info_shielded"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

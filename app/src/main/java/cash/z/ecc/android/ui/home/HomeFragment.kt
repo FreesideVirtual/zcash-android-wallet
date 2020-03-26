@@ -92,7 +92,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 buttonNumberPadBack.asKey()
             )
             hitAreaReceive.onClickNavTo(R.id.action_nav_home_to_nav_profile) { tapped(HOME_PROFILE) }
-            iconDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail) { tapped(HOME_DETAIL) }
             textDetail.onClickNavTo(R.id.action_nav_home_to_nav_detail) { tapped(HOME_DETAIL) }
             hitAreaScan.setOnClickListener {
                 mainActivity?.maybeOpenScan().also { tapped(HOME_SCAN) }
