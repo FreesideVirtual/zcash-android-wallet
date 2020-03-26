@@ -8,8 +8,11 @@
     <!-- colors here should map to a material design value -->
 
     <color name="colorPrimary">@color/zcashYellow</color>
+    <color name="colorPrimaryVariant">#80FFB900</color>
     <color name="colorPrimaryMedium">#805E08</color>
     <color name="colorPrimaryDark">#4D3805</color>
+    <color name="colorSecondary">#4A90E2</color>
+    <color name="colorSecondaryVariant">#804A90E2</color>
     <color name="colorAccent">#A1A1A1</color>
     <color name="colorSurface">@color/text_light</color>
     <color name="colorOnSurface">@color/background_banner</color>
@@ -59,6 +62,7 @@
 
     <color name="background_banner">@color/zcashBlack_dark</color>
     <color name="background_banner_stroke">#282828</color>
+    <color name="background_unselected_stroke">@color/zcashBlack_54</color>
     <color name="scan_overlay_background">@color/zcashBlack_87</color>
     <color name="spacer">#1FBB666A</color>
     <color name="text_send_amount_disabled">@color/text_light</color>
