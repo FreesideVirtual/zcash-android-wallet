@@ -51,7 +51,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
     var includeFromAddress: Boolean = false
         set(value) {
             require(!value || (value && !fromAddress.isNullOrEmpty())) {
-                "Error: from address was empty while attempting to include it in the memo. Verify" +
+                "Error: fromAddress was empty while attempting to include it in the memo. Verify" +
                         " that initFromAddress() has previously been called on this viewmodel."
             }
             field = value
@@ -60,7 +60,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
     
     fun send(): Flow<PendingTransaction> {
         funnel(SendSelected)
-        val memoToSend = if (includeFromAddress) "$memo\nsent from\n$fromAddress" else memo
+        val memoToSend = createMemoToSend()
         val keys = initializer.deriveSpendingKeys(
             lockBox.getBytes(WalletSetupViewModel.LockBoxKey.SEED)!!
         )
@@ -75,6 +75,8 @@ class SendViewModel @Inject constructor() : ViewModel() {
             twig(it.toString())
         }
     }
+
+    fun createMemoToSend() = if (includeFromAddress) "$memo\nsent from\n$fromAddress" else memo
 
     private fun reportIssues(memoToSend: String) {
         if (toAddress == fromAddress) feedback.report(Issue.SelfSend)
@@ -98,13 +100,16 @@ class SendViewModel @Inject constructor() : ViewModel() {
 
         when {
             synchronizer.validateAddress(toAddress).isNotValid -> {
-                emit("Please enter a valid address")
+                emit("Please enter a valid address.")
             }
             zatoshiAmount < 1 -> {
-                emit("Too little! Please enter at least 1 Zatoshi.")
+                emit("Please enter at least 1 Zatoshi.")
             }
             maxZatoshi != null && zatoshiAmount > maxZatoshi -> {
-                emit( "Too much! Please enter no more than ${maxZatoshi.convertZatoshiToZecString(8)}")
+                emit( "Please enter no more than ${maxZatoshi.convertZatoshiToZecString(8)} ZEC.")
+            }
+            createMemoToSend().length > ZcashSdk.MAX_MEMO_SIZE -> {
+                emit( "Memo must be less than ${ZcashSdk.MAX_MEMO_SIZE} in length.")
             }
             else -> emit(null)
         }
