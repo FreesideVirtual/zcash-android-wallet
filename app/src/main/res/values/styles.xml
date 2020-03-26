@@ -10,6 +10,7 @@
 
         <item name="shapeAppearanceSmallComponent">@style/Zcash.ShapeAppearance.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/Zcash.ShapeAppearance.MediumComponent</item>
+
     </style>
 
     <style name="ZcashTheme" parent="ZcashBaseTheme"/>
@@ -67,17 +68,22 @@
 
     <!-- Shape Appearances -->
 
+    <!-- General: buttons -->
     <style name="Zcash.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">20dp</item>
+        <item name="cornerSize">8dp</item>
     </style>
+
+    <!-- General: dialogs -->
     <style name="Zcash.ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">24dp</item>
+        <item name="cornerSize">12dp</item>
     </style>
+
+    <!-- Component -->
     <style name="Zcash.ShapeAppearance.TextInputLayout" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">8dp</item>
+        <item name="cornerSize">0dp</item>
     </style>
     
     <!-- Theme Overlays -->
