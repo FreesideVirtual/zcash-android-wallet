@@ -22,6 +22,10 @@ fun View.disabledIf(isDisabled: Boolean) {
     isEnabled = !isDisabled
 }
 
+fun View.transparentIf(isTransparent: Boolean) {
+    alpha = if (isTransparent) 0.0f else 1.0f
+}
+
 fun View.onClickNavTo(navResId: Int, block: (() -> Any) = {}) {
     setOnClickListener {
         block()

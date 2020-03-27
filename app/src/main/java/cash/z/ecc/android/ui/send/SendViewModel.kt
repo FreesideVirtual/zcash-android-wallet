@@ -13,6 +13,7 @@ import cash.z.ecc.android.feedback.Report.MetricType
 import cash.z.ecc.android.feedback.Report.MetricType.*
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
+import cash.z.ecc.android.ui.util.INCLUDE_MEMO_PREFIX
 import cash.z.wallet.sdk.Initializer
 import cash.z.wallet.sdk.Synchronizer
 import cash.z.wallet.sdk.entity.*
@@ -76,7 +77,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun createMemoToSend() = if (includeFromAddress) "$memo\nsent from\n$fromAddress" else memo
+    fun createMemoToSend() = if (includeFromAddress) "$memo\n$INCLUDE_MEMO_PREFIX\n$fromAddress" else memo
 
     private fun reportIssues(memoToSend: String) {
         if (toAddress == fromAddress) feedback.report(Issue.SelfSend)
@@ -196,7 +197,6 @@ class SendViewModel @Inject constructor() : ViewModel() {
     private fun Keyed<String>.toMetricIdFor(id: Long): String = "$id.$key"
     private fun String.toRelatedMetricId(): String = "$this.related"
     private fun String.toTxId(): Long = split('.').first().toLong()
-
 }
 
 

@@ -50,7 +50,6 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-
     @Inject
     lateinit var feedback: Feedback
 
@@ -324,6 +323,7 @@ class MainActivity : AppCompatActivity() {
         showSnackbar("Well, this is awkward. You denied permission for the camera.")
     }
 
+    // TODO: clean up this error handling
     private var ignoredErrors = 0
     private fun onProcessorError(error: Throwable?): Boolean {
         var notified = false
@@ -368,25 +368,25 @@ class MainActivity : AppCompatActivity() {
         }
         if (!notified) {
             ignoredErrors++
-        }
-        if (ignoredErrors >= ZcashSdk.RETRIES) {
-            if (dialog == null) {
-                notified = true
-                runOnUiThread {
-                    dialog = MaterialAlertDialogBuilder(this)
-                        .setTitle("Processor Error")
-                        .setMessage(error?.message ?: "Critical error while processing blocks!")
-                        .setCancelable(false)
-                        .setPositiveButton("Retry") { d, _ ->
-                            d.dismiss()
-                            dialog = null
-                        }
-                        .setNegativeButton("Exit") { dialog, _ ->
-                            dialog.dismiss()
-                            throw error
-                                ?: RuntimeException("Critical error while processing blocks and the user chose to exit.")
-                        }
-                        .show()
+            if (ignoredErrors >= ZcashSdk.RETRIES) {
+                if (dialog == null) {
+                    notified = true
+                    runOnUiThread {
+                        dialog = MaterialAlertDialogBuilder(this)
+                            .setTitle("Processor Error")
+                            .setMessage(error?.message ?: "Critical error while processing blocks!")
+                            .setCancelable(false)
+                            .setPositiveButton("Retry") { d, _ ->
+                                d.dismiss()
+                                dialog = null
+                            }
+                            .setNegativeButton("Exit") { dialog, _ ->
+                                dialog.dismiss()
+                                throw error
+                                    ?: RuntimeException("Critical error while processing blocks and the user chose to exit.")
+                            }
+                            .show()
+                    }
                 }
             }
         }
