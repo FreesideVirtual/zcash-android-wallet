@@ -43,6 +43,12 @@ object Report {
             object ImportCompleted : Restore("importcompleted", 50)
             object Success : Restore("success", 100)
         }
+
+        sealed class UserFeedback(stepName: String, step: Int, vararg properties: Pair<String, Any>) : Feedback.Funnel("feedback", stepName, step, *properties) {
+            object Started : UserFeedback("started", 0)
+            object Cancelled : UserFeedback("cancelled", 1)
+            class Submitted(rating: Int, question1: String, question2: String, question3: String) : UserFeedback("submitted", 100, "rating" to rating, "question1" to question1, "question2" to question2, "question3" to question3)
+        }
     }
 
     object Error {
@@ -84,6 +90,7 @@ object Report {
         DETAIL("wallet.detail"),
         LANDING,
         PROFILE,
+        FEEDBACK,
         RECEIVE,
         RESTORE,
         SCAN,
@@ -120,6 +127,8 @@ object Report {
         PROFILE_VIEW_USER_LOGS("profile.view.user.logs"),
         PROFILE_VIEW_DEV_LOGS("profile.view.dev.logs"),
         PROFILE_SEND_FEEDBACK("profile.send.feedback"),
+        FEEDBACK_CANCEL("feedback.cancel"),
+        FEEDBACK_SUBMIT("feedback.submit"),
         RECEIVE_SCAN("receive.scan"),
         RECEIVE_BACK("receive.back"),
         RESTORE_DONE("restore.done"),

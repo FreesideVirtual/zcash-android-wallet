@@ -7,7 +7,7 @@ import com.airbnb.lottie.LottieAnimationView
 class MagicSnakeLoader(
     val lottie: LottieAnimationView,
     private val scanningStartFrame: Int = 100,
-    private val scanningEndFrame: Int = 175,
+    private val scanningEndFrame: Int = 187,
     val totalFrames: Int = 200
 ) : ValueAnimator.AnimatorUpdateListener {
     private var isPaused: Boolean = true

@@ -66,6 +66,7 @@ class WalletDetailFragment : BaseFragment<FragmentDetailBinding>() {
         adapter = TransactionAdapter()
         viewModel.transactions.collectWith(resumedScope) { onTransactionsUpdated(it) }
         binding.recyclerTransactions.adapter = adapter
+        binding.recyclerTransactions.smoothScrollToPosition(0)
     }
 
     private fun onTransactionsUpdated(transactions: PagedList<ConfirmedTransaction>) {

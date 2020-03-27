@@ -17,7 +17,7 @@ class SynchronizerModule {
     @Provides
     @SynchronizerScope
     fun provideSynchronizer(appContext: Context, initializer: Initializer): Synchronizer {
-        return Synchronizer(appContext, initializer)
+        return Synchronizer(initializer)
     }
 
 }

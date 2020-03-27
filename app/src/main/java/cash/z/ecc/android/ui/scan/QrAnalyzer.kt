@@ -54,7 +54,7 @@ class QrAnalyzer(val scanCallback: (qrContent: String, image: ImageProxy) -> Uni
     private fun onImageScan(result: List<FirebaseVisionBarcode>, image: ImageProxy) {
         result.firstOrNull()?.rawValue?.let {
             scanCallback(it, image)
-        } ?: image.close()
+        } ?: runCatching { image.close() }
     }
 
     private fun onImageScanFailure(e: Exception) {

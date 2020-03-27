@@ -1,6 +1,5 @@
 package cash.z.ecc.android.ui.profile
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,6 +16,7 @@ import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.feedback.FeedbackFile
 import cash.z.ecc.android.feedback.Report
+import cash.z.ecc.android.feedback.Report.Funnel.UserFeedback
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.wallet.sdk.ext.toAbbreviatedAddress
@@ -39,6 +39,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         super.onViewCreated(view, savedInstanceState)
         binding.hitAreaClose.onClickNavBack() { tapped(PROFILE_CLOSE) }
         binding.buttonBackup.onClickNavTo(R.id.action_nav_profile_to_nav_backup) { tapped(PROFILE_BACKUP) }
+        binding.buttonFeedback.onClickNavTo(R.id.action_nav_profile_to_nav_feedback) {
+            tapped(PROFILE_SEND_FEEDBACK)
+            mainActivity?.reportFunnel(UserFeedback.Started)
+            Unit
+        }
         binding.textVersion.text = BuildConfig.VERSION_NAME
         onClick(binding.buttonLogs) {
             tapped(PROFILE_VIEW_USER_LOGS)
@@ -48,10 +53,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             tapped(PROFILE_VIEW_DEV_LOGS)
             onViewDevLogs()
             true
-        }
-        onClick(binding.buttonFeedback) {
-            tapped(PROFILE_SEND_FEEDBACK)
-            onSendFeedback()
         }
     }
 
@@ -93,10 +94,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             type = "text/plain"
         }
         startActivity(Intent.createChooser(intent, "Share Log File"))
-    }
-
-    private fun onSendFeedback() {
-        mainActivity?.showSnackbar("Feedback feature coming soon!")
     }
 
     private fun userLogFile(): File? {
