@@ -102,6 +102,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         val isDownloading = status == DOWNLOADING
         val isScanning = status == SCANNING
         val isValidating = status == VALIDATING
+        val isDisconnected = status == DISCONNECTED
         val downloadProgress: Int get() {
             return processorInfo.run {
                 if (lastDownloadRange.isEmpty()) {

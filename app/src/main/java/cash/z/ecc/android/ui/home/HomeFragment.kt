@@ -19,7 +19,8 @@ import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.NO_SEED
 import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.Synchronizer.Status.SYNCED
+import cash.z.wallet.sdk.Synchronizer.Status.*
+import cash.z.wallet.sdk.block.CompactBlockProcessor
 import cash.z.wallet.sdk.ext.convertZatoshiToZecString
 import cash.z.wallet.sdk.ext.convertZecToZatoshi
 import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
@@ -194,8 +195,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     fun setProgress(uiModel: HomeViewModel.UiModel) {
-        if (!uiModel.processorInfo.hasData) {
-            twig("Warning: ignoring progress update because the processor has not started.")
+        if (!uiModel.processorInfo.hasData && !uiModel.isDisconnected) {
+            twig("Warning: ignoring progress update because the processor is still starting.")
             return
         }
 
@@ -206,28 +207,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         val sendText = when {
+            uiModel.status == DISCONNECTED -> "Reconnecting . . ."
             uiModel.isSynced -> if (uiModel.hasFunds) "SEND AMOUNT" else "NO FUNDS AVAILABLE"
-            uiModel.status == Synchronizer.Status.DISCONNECTED -> "DISCONNECTED"
-            uiModel.status == Synchronizer.Status.STOPPED -> "IDLE"
+            uiModel.status == STOPPED -> "IDLE"
             uiModel.isDownloading -> "Downloading . . . ${snake.downloadProgress}%"
             uiModel.isValidating -> "Validating . . ."
             uiModel.isScanning -> "Scanning . . . ${snake.scanProgress}%"
             else -> "Updating"
         }
 
-//        binding.lottieButtonLoading.progress = if (uiModel.isSynced) 1.0f else uiModel.totalProgress * 0.82f // line fully closes at 82% mark
         binding.buttonSendAmount.text = sendText
-//        twig("Lottie progress set to ${binding.lottieButtonLoading.progress}  (isSynced? ${uiModel.isSynced})")
         twig("Send button set to: $sendText")
 
         val resId = if (uiModel.isSynced) R.color.selector_button_text_dark else R.color.selector_button_text_light
         binding.buttonSendAmount.setTextColor(resources.getColorStateList(resId))
-
-//        if (uiModel.status == DISCONNECTED || uiModel.status == STOPPED) {
-//            binding.buttonSendAmount.backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.zcashGray))
-//        } else {
-//            binding.buttonSendAmount.backgroundTintList = null
-//        }
+        binding.lottieButtonLoading.invisibleIf(uiModel.isDisconnected)
     }
 
     /**
@@ -242,10 +236,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     fun setAvailable(availableBalance: Long = -1L, totalBalance: Long = -1L) {
-        val availableString = if (availableBalance < 0) "Updating" else availableBalance.convertZatoshiToZecString()
+        val missingBalance = availableBalance < 0
+        val availableString = if (missingBalance) "Updating" else availableBalance.convertZatoshiToZecString()
         binding.textBalanceAvailable.text = availableString
+        binding.textBalanceAvailable.transparentIf(missingBalance)
+        binding.labelBalance.transparentIf(missingBalance)
         binding.textBalanceDescription.apply {
-            goneIf(availableBalance < 0)
+            goneIf(missingBalance)
             text = if (availableBalance != -1L && (availableBalance < totalBalance)) {
                 val change = (totalBalance - availableBalance).convertZatoshiToZecString()
                 "(expecting +$change ZEC)".toColoredSpan(R.color.text_light, "+$change")
@@ -274,12 +271,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun onModelUpdated(old: HomeViewModel.UiModel?, new: HomeViewModel.UiModel) {
         logUpdate(old, new)
-        if (binding.lottieButtonLoading.visibility != View.VISIBLE) binding.lottieButtonLoading.visibility = View.VISIBLE
         uiModel = new
         if (old?.pendingSend != new.pendingSend) {
             setSendAmount(new.pendingSend)
         }
-        // TODO: handle stopped and disconnected flows
         setProgress(uiModel) // TODO: we may not need to separate anymore
 //        if (new.status = SYNCING) onSyncing(new) else onSynced(new)
         if (new.status == SYNCED) onSynced(new) else onSyncing(new)
