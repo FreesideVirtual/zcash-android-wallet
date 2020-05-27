@@ -16,7 +16,7 @@ object Deps {
         const val CONSTRAINT_LAYOUT =       "androidx.constraintlayout:constraintlayout:1.1.3"
         const val FRAGMENT_KTX =            "androidx.fragment:fragment-ktx:1.1.0-beta01"
         const val MULTIDEX =                "androidx.multidex:multidex:2.0.1"
-        object Navigation :     Version("2.1.0") {
+        object Navigation :     Version("2.2.0") {
             val FRAGMENT_KTX =              "androidx.navigation:navigation-fragment-ktx:$version"
             val UI_KTX =                    "androidx.navigation:navigation-ui-ktx:$version"
         }
@@ -44,6 +44,20 @@ object Deps {
             val TEST =                      "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
         }
     }
+    object Zcash {
+        val ANDROID_WALLET_PLUGINS = "com.github.zcash:zcash-android-wallet-plugins:1.0.0"
+    }
+    object Misc {
+        object Plugins {
+            val SECURE_STORAGE = "de.adorsys.android:securestoragelibrary:1.2.2"
+            object Mnemonics {
+                val SPONGY_CASTLE = "com.madgag.spongycastle:core:1.58.0.0"
+                val NOVACRYPTO_BIP39 = "io.github.novacrypto:BIP39:2019.01.27"
+                val NOVACRYPTO_SECURESTRING = "io.github.novacrypto:securestring:2019.01.27"
+            }
+            val QR_SCANNER = "com.google.zxing:core:3.2.1"
+        }
+    }
 
     object Test {
         const val JUNIT =                   "junit:junit:4.12"
@@ -56,31 +70,3 @@ object Deps {
 
 open class Version(@JvmField val version: String)
 
-//zzz
-//zzz "androidx.constraintlayout:constraintlayout:2.0.0-alpha3"
-//zzz "androidx.core:core:1.1.0-alpha05"
-//zzz "androidx.core:core-ktx:1.0.0"
-//zzz "androidx.fragment:fragment:1.1.0-beta01"
-//zzz "androidx.fragment:fragment-ktx:1.1.0-beta01"
-//zzz "androidx.multidex:multidex:2.0.1"
-//zzz "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
-//zzz "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
-//zzz "androidx.test.espresso:espresso-core:3.1.0"
-//zzz "androidx.test:runner:1.1.0"
-//zzz "cash.z.android.wallet:zcash-android-testnet:1.9.1-alpha@aar"
-//zzz "com.airbnb.android:lottie:3.0.0"
-//zzz "com.facebook.stetho:stetho:1.5.1"
-//zzz "com.google.android.material:material:1.1.0-alpha06"
-//zzz "com.google.dagger:dagger-android-processor:${versions.dagger}"
-//zzz "com.google.dagger:dagger-android-support:${versions.dagger}"
-//zzz "com.google.dagger:dagger-compiler:${versions.dagger}"
-//zzz "com.leinardi.android:speed-dial:2.0.0"
-//zzz "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
-//zzz "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}"
-//zzz "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
-//zzz "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
-//zzz "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
-//zzz "org.junit.jupiter:junit-jupiter-api:${versions.junit5}"
-//zzz "org.junit.jupiter:junit-jupiter-api:${versions.junit5}"
-//zzz "org.junit.jupiter:junit-jupiter-engine:${versions.junit5}"
-//zzz "org.mockito:mockito-junit-jupiter:2.26.0",

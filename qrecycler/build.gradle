@@ -30,5 +30,5 @@ dependencies {
     implementation Deps.Kotlin.STDLIB
 
     // dependencies specific to this module, not shared with other modules
-    implementation 'com.google.zxing:core:3.2.1'
+    implementation Deps.Misc.Plugins.QR_SCANNER
 }

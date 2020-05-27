@@ -113,6 +113,7 @@ dependencies {
     implementation project(':mnemonic')
     implementation project(':lockbox')
     implementation project(':sdk')
+    implementation project(':chipsinputlayout')
 
     // Zcash
     implementation 'com.github.zcash:zcash-android-wallet-plugins:1.0.0'
@@ -177,7 +178,6 @@ dependencies {
     // check for build errors at https://jitpack.io/com/github/gmale/chips-input-layout/<version>/build.log
 //    implementation 'com.github.gmale:chips-input-layout:4750760a7222bc04ca48266b387456d2b03541a7'
 
-    implementation project(':chipsinputlayout')
     implementation 'androidx.annotation:annotation:1.1.0'
 
     // Tests
