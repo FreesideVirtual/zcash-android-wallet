@@ -7,11 +7,11 @@ dependencies {
     implementation Deps.Kotlin.STDLIB
 
     // Zcash
-    implementation 'com.github.zcash:zcash-android-wallet-plugins:1.0.0'
+    implementation Deps.Zcash.ANDROID_WALLET_PLUGINS
 
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'io.github.novacrypto:BIP39:2019.01.27'
-    implementation 'io.github.novacrypto:securestring:2019.01.27'
+    implementation Deps.Misc.Plugins.Mnemonics.SPONGY_CASTLE
+    implementation Deps.Misc.Plugins.Mnemonics.NOVACRYPTO_BIP39
+    implementation Deps.Misc.Plugins.Mnemonics.NOVACRYPTO_SECURESTRING
 
     testImplementation Deps.Test.JUNIT
 }
