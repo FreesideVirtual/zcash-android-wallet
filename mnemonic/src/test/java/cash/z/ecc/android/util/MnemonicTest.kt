@@ -1,23 +1,17 @@
 package cash.z.ecc.android.util
 
-import cash.z.ecc.kotlin.mnemonic.MnemonicProvider
+import cash.z.android.plugin.MnemonicPlugin
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
-import io.github.novacrypto.SecureCharBuffer
-import io.github.novacrypto.bip39.MnemonicGenerator
-import io.github.novacrypto.bip39.SeedCalculator
-import io.github.novacrypto.bip39.Words
-import io.github.novacrypto.bip39.wordlists.English
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.lang.Math.max
-import java.security.SecureRandom
+import java.util.*
 
 
 class MnemonicTest {
 
-    lateinit var mnemonics: MnemonicProvider
+    lateinit var mnemonics: MnemonicPlugin
 
     @Before
     fun start() {
@@ -58,51 +52,25 @@ class MnemonicTest {
     @Test
     fun testMnemonic_longestWord() {
         var max = 0
+        val englishWordList = mnemonics.fullWordList(Locale.ENGLISH.language)
         repeat(2048) {
-            max = max(max, English.INSTANCE.getWord(it).length)
+            max = max(max, englishWordList[it].length)
         }
         assertEquals(8, max)
     }
 
     private fun validate(words: List<String>) {
+        val englishWordList = mnemonics.fullWordList(Locale.ENGLISH.language)
         // return or crash!
         words.forEach { word ->
             var i = 0
             while (true) {
-                if (English.INSTANCE.getWord(i++) == word) {
+                if (englishWordList[i++] == word) {
                     println(word)
                     break
                 }
 
             }
-        }
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    //       Sample code for working with SecureCharBuffer
-    //       (but the underlying implementation isn't compatible with SeedCalculator.calculateSeed)
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    @Test
-    fun testMneumonicFromSeed_secure() {
-        SecureCharBuffer().use { secure ->
-            val entropy = ByteArray(Words.TWENTY_FOUR.byteLength()).also {
-                SecureRandom().nextBytes(it)
-                MnemonicGenerator(English.INSTANCE).createMnemonic(it, secure::append)
-            }
-            val words = secure.toWords()
-            assertEquals(24, words.size)
-
-            words.forEach { word ->
-                // verify no spaces
-                assertTrue(word.all { it != ' ' })
-            }
-
-            val mnemonic = secure.toStringAble().toString()
-            val seed = SeedCalculator().calculateSeed(mnemonic, "")
-
-            assertEquals(64, seed.size)
         }
     }
 }

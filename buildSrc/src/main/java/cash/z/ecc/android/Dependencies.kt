@@ -45,16 +45,12 @@ object Deps {
         }
     }
     object Zcash {
-        val ANDROID_WALLET_PLUGINS = "com.github.zcash:zcash-android-wallet-plugins:1.0.0"
+        val ANDROID_WALLET_PLUGINS = "com.github.zcash:zcash-android-wallet-plugins:1.0.1"
     }
     object Misc {
         object Plugins {
             val SECURE_STORAGE = "de.adorsys.android:securestoragelibrary:1.2.2"
-            object Mnemonics {
-                val SPONGY_CASTLE = "com.madgag.spongycastle:core:1.58.0.0"
-                val NOVACRYPTO_BIP39 = "io.github.novacrypto:BIP39:2019.01.27"
-                val NOVACRYPTO_SECURESTRING = "io.github.novacrypto:securestring:2019.01.27"
-            }
+            val ANDROID_BIP39 = "cash.z.ecc.android:android-bip39:1.0.0-beta07"
             val QR_SCANNER = "com.google.zxing:core:3.2.1"
         }
     }
