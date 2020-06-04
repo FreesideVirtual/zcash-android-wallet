@@ -8,10 +8,7 @@ dependencies {
 
     // Zcash
     implementation Deps.Zcash.ANDROID_WALLET_PLUGINS
-
-    implementation Deps.Misc.Plugins.Mnemonics.SPONGY_CASTLE
-    implementation Deps.Misc.Plugins.Mnemonics.NOVACRYPTO_BIP39
-    implementation Deps.Misc.Plugins.Mnemonics.NOVACRYPTO_SECURESTRING
+    implementation Deps.Misc.Plugins.ANDROID_BIP39
 
     testImplementation Deps.Test.JUNIT
 }

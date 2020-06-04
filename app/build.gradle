@@ -142,11 +142,6 @@ dependencies {
     kapt Deps.Dagger.ANDROID_PROCESSOR
     kapt Deps.Dagger.COMPILER
 
-    // Testing these BIP39 dependencies
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'io.github.novacrypto:BIP39:2019.01.27'
-    implementation 'io.github.novacrypto:securestring:2019.01.27'
-
     // grpc-java
     implementation "io.grpc:grpc-okhttp:1.25.0"
     implementation "io.grpc:grpc-android:1.25.0"

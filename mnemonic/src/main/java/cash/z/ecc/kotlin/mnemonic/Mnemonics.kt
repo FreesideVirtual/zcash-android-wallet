@@ -1,22 +1,20 @@
 package cash.z.ecc.kotlin.mnemonic
 
 import cash.z.android.plugin.MnemonicPlugin
-import io.github.novacrypto.bip39.MnemonicGenerator
-import io.github.novacrypto.bip39.SeedCalculator
-import io.github.novacrypto.bip39.Words
-import io.github.novacrypto.bip39.wordlists.English
-import java.security.SecureRandom
+import cash.z.ecc.android.bip39.Mnemonics.MnemonicCode
+import cash.z.ecc.android.bip39.Mnemonics.WordCount
+import cash.z.ecc.android.bip39.toEntropy
+import cash.z.ecc.android.bip39.toSeed
+import java.util.*
 import javax.inject.Inject
 
-// TODO: either find another library that allows for doing this without strings or modify this code
-//  to leverage SecureCharBuffer (which doesn't work well with SeedCalculator.calculateSeed,
-//  which expects a string so for that reason, we just use Strings here)
 class Mnemonics @Inject constructor(): MnemonicPlugin {
+    override fun fullWordList(languageCode: String): List<String> {
+        return cash.z.ecc.android.bip39.Mnemonics.getCachedWords(Locale.ENGLISH.language)
+    }
 
     override fun nextEntropy(): ByteArray {
-        return ByteArray(Words.TWENTY_FOUR.byteLength()).apply {
-            SecureRandom().nextBytes(this)
-        }
+        return WordCount.COUNT_24.toEntropy()
     }
 
     override fun nextMnemonic(): CharArray {
@@ -24,12 +22,7 @@ class Mnemonics @Inject constructor(): MnemonicPlugin {
     }
 
     override fun nextMnemonic(entropy: ByteArray): CharArray {
-        return StringBuilder().let { builder ->
-            MnemonicGenerator(English.INSTANCE).createMnemonic(entropy) { c ->
-                builder.append(c)
-            }
-            builder.toString().toCharArray()
-        }
+        return MnemonicCode(entropy).chars
     }
 
     override fun nextMnemonicList(): List<CharArray> {
@@ -37,17 +30,11 @@ class Mnemonics @Inject constructor(): MnemonicPlugin {
     }
 
     override fun nextMnemonicList(entropy: ByteArray): List<CharArray> {
-        return WordListBuilder().let { builder ->
-            MnemonicGenerator(English.INSTANCE).createMnemonic(entropy) { c ->
-                builder.append(c)
-            }
-            builder.wordList
-        }
+        return MnemonicCode(entropy).map { it.toCharArray() }
     }
 
     override fun toSeed(mnemonic: CharArray): ByteArray {
-        // TODO: either find another library that allows for doing this without strings or modify this code to leverage SecureCharBuffer (which doesn't work well with SeedCalculator.calculateSeed, which expects a string so for that reason, we just use Strings here)
-        return SeedCalculator().calculateSeed(String(mnemonic), "")
+        return MnemonicCode(mnemonic).toSeed()
     }
 
     override fun toWordList(mnemonic: CharArray): List<CharArray> {
@@ -66,22 +53,5 @@ class Mnemonics @Inject constructor(): MnemonicPlugin {
             }
         }
         return wordList
-    }
-
-    class WordListBuilder {
-        val wordList = mutableListOf<CharArray>()
-        fun append(c: CharSequence) {
-            if (c[0] != English.INSTANCE.space) addWord(c)
-        }
-
-        private fun addWord(c: CharSequence) {
-            c.length.let { size ->
-                val word = CharArray(size)
-                repeat(size) {
-                    word[it] = c[it]
-                }
-                wordList.add(word)
-            }
-        }
     }
 }
