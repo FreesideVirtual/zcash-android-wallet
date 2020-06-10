@@ -86,6 +86,7 @@ object Deps {
     }
     object Misc {
         const val LOTTIE =                   "com.airbnb.android:lottie:3.1.0"
+        const val CHIPS =                    "com.github.gmale:chips-input-layout:2.3.1"
         object Plugins {
             const val SECURE_STORAGE =       "de.adorsys.android:securestoragelibrary:1.2.2"
             const val QR_SCANNER =           "com.google.zxing:core:3.2.1"

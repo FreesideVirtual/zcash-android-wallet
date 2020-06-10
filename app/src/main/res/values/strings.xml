@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">zECC Wallet</string>
+    <string name="app_name">ECC Wallet</string>
     <string name="receive_address_title">Your Shielded Address</string>
 
 

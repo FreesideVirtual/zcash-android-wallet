@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-    fun copyText(textToCopy: String, label: String = "zECC Wallet Text") {
+    fun copyText(textToCopy: String, label: String = "ECC Wallet Text") {
         clipboard.setPrimaryClip(
             ClipData.newPlainText(label, textToCopy)
         )
