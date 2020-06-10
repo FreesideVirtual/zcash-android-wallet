@@ -8,10 +8,10 @@ import androidx.camera.core.CameraXConfig
 import cash.z.ecc.android.di.component.AppComponent
 import cash.z.ecc.android.di.component.DaggerAppComponent
 import cash.z.ecc.android.feedback.FeedbackCoordinator
-import cash.z.wallet.sdk.ext.SilentTwig
-import cash.z.wallet.sdk.ext.TroubleshootingTwig
-import cash.z.wallet.sdk.ext.Twig
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.SilentTwig
+import cash.z.ecc.android.sdk.ext.TroubleshootingTwig
+import cash.z.ecc.android.sdk.ext.Twig
+import cash.z.ecc.android.sdk.ext.twig
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -37,7 +37,6 @@ class ZcashWalletApp : Application(), CameraXConfig.Provider {
 
     override fun onCreate() {
         Thread.setDefaultUncaughtExceptionHandler(ExceptionReporter(Thread.getDefaultUncaughtExceptionHandler()))
-        Twig.plant(TroubleshootingTwig())
         creationTime = System.currentTimeMillis()
         instance = this
         // Setup handler for uncaught exceptions.

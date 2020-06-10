@@ -19,8 +19,8 @@ import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Funnel.UserFeedback
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.toAbbreviatedAddress
+import cash.z.ecc.android.sdk.ext.twig
 import kotlinx.coroutines.launch
 import okio.Okio
 import java.io.File

@@ -1,6 +1,6 @@
 package cash.z.ecc.android.feedback
 
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class FeedbackCrashlytics : FeedbackCoordinator.FeedbackObserver {
     /**
@@ -18,7 +18,7 @@ class FeedbackCrashlytics : FeedbackCoordinator.FeedbackObserver {
             )
             else -> null
         }
-        exception?.let { Crashlytics.logException(it) }
+        exception?.let { FirebaseCrashlytics.getInstance().recordException(it) }
     }
 
     private class ReorgException(errorHeight: Int, rewindHeight: Int, reorgMesssage: String) :

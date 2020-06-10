@@ -1,8 +1,8 @@
 package cash.z.ecc.android.ui.detail
 
 import androidx.lifecycle.ViewModel
-import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.Synchronizer
+import cash.z.ecc.android.sdk.ext.twig
 import javax.inject.Inject
 
 class WalletDetailViewModel @Inject constructor() : ViewModel() {

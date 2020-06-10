@@ -2,7 +2,7 @@ package cash.z.ecc.android
 
 import cash.z.ecc.android.feedback.Feedback
 import cash.z.ecc.android.ui.send.SendViewModel
-import cash.z.wallet.sdk.entity.*
+import cash.z.ecc.android.sdk.entity.*
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever

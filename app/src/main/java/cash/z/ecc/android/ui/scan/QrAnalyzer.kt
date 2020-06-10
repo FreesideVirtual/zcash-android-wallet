@@ -2,9 +2,9 @@ package cash.z.ecc.android.ui.scan
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import cash.z.wallet.sdk.ext.retrySimple
-import cash.z.wallet.sdk.ext.retryUpTo
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.retrySimple
+import cash.z.ecc.android.sdk.ext.retryUpTo
+import cash.z.ecc.android.sdk.ext.twig
 import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode

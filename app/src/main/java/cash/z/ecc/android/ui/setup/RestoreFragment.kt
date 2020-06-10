@@ -17,12 +17,13 @@ import cash.z.ecc.android.R
 import cash.z.ecc.android.databinding.FragmentRestoreBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
 import cash.z.ecc.android.ext.goneIf
+import cash.z.ecc.android.ext.showInvalidSeedPhraseError
 import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Funnel.Restore
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.ZcashSdk
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.ZcashSdk
+import cash.z.ecc.android.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tylersuehr.chips.Chip
 import com.tylersuehr.chips.ChipsAdapter
@@ -118,7 +119,12 @@ class RestoreFragment : BaseFragment<FragmentRestoreBinding>(), View.OnKeyListen
                 if (birthdateString.isNullOrEmpty()) ZcashSdk.SAPLING_ACTIVATION_HEIGHT else birthdateString.toInt()
             }.coerceAtLeast(ZcashSdk.SAPLING_ACTIVATION_HEIGHT)
 
-        importWallet(seedPhrase, birthday)
+        try {
+            walletSetup.validatePhrase(seedPhrase)
+            importWallet(seedPhrase, birthday)
+        } catch (t: Throwable) {
+            mainActivity?.showInvalidSeedPhraseError(t)
+        }
     }
 
     private fun importWallet(seedPhrase: String, birthday: Int) {

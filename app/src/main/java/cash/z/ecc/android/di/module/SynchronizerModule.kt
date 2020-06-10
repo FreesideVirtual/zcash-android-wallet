@@ -2,8 +2,8 @@ package cash.z.ecc.android.di.module
 
 import android.content.Context
 import cash.z.ecc.android.di.annotation.SynchronizerScope
-import cash.z.wallet.sdk.Initializer
-import cash.z.wallet.sdk.Synchronizer
+import cash.z.ecc.android.sdk.Initializer
+import cash.z.ecc.android.sdk.Synchronizer
 import dagger.Module
 import dagger.Provides
 

@@ -3,8 +3,8 @@ package cash.z.ecc.android.di.component
 import androidx.lifecycle.ViewModelProvider
 import cash.z.ecc.android.di.annotation.SynchronizerScope
 import cash.z.ecc.android.di.module.SynchronizerModule
-import cash.z.wallet.sdk.Initializer
-import cash.z.wallet.sdk.Synchronizer
+import cash.z.ecc.android.sdk.Initializer
+import cash.z.ecc.android.sdk.Synchronizer
 import dagger.BindsInstance
 import dagger.Subcomponent
 import javax.inject.Named

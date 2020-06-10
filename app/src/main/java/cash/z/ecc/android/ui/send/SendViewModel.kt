@@ -14,13 +14,13 @@ import cash.z.ecc.android.feedback.Report.MetricType.*
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel
 import cash.z.ecc.android.ui.util.INCLUDE_MEMO_PREFIX
-import cash.z.wallet.sdk.Initializer
-import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.entity.*
-import cash.z.wallet.sdk.ext.ZcashSdk
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.twig
-import com.crashlytics.android.Crashlytics
+import cash.z.ecc.android.sdk.Initializer
+import cash.z.ecc.android.sdk.Synchronizer
+import cash.z.ecc.android.sdk.db.entity.*
+import cash.z.ecc.android.sdk.ext.ZcashSdk
+import cash.z.ecc.android.sdk.ext.convertZatoshiToZecString
+import cash.z.ecc.android.sdk.ext.twig
+import cash.z.ecc.android.sdk.validate.AddressType
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -94,7 +94,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    suspend fun validateAddress(address: String): Synchronizer.AddressType =
+    suspend fun validateAddress(address: String): AddressType =
         synchronizer.validateAddress(address)
 
     fun validate(maxZatoshi: Long?) = flow<String?> {
@@ -143,7 +143,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
                 report(metricId)
             }
         } catch (t: Throwable) {
-            Crashlytics.logException(RuntimeException("Error while updating Metrics", t))
+            feedback.report(t)
         }
     }
 

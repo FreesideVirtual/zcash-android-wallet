@@ -4,7 +4,7 @@ import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.annotation.ActivityScope
 import cash.z.ecc.android.di.annotation.SynchronizerScope
 import cash.z.ecc.android.di.module.InitializerModule
-import cash.z.wallet.sdk.Initializer
+import cash.z.ecc.android.sdk.Initializer
 import dagger.BindsInstance
 import dagger.Subcomponent
 

@@ -63,6 +63,7 @@ object Report {
                 val errorHeight: Int by propertyMap
                 val rewindHeight: Int by propertyMap
             }
+            class TxUpdateFailed(t: Throwable) : Feedback.AppError("txupdate", t, false)
         }
     }
 

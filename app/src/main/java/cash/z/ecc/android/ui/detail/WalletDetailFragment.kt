@@ -15,12 +15,12 @@ import cash.z.ecc.android.ext.toColoredSpan
 import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Tap.DETAIL_BACK
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.block.CompactBlockProcessor.WalletBalance
-import cash.z.wallet.sdk.entity.ConfirmedTransaction
-import cash.z.wallet.sdk.ext.collectWith
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.block.CompactBlockProcessor.WalletBalance
+import cash.z.ecc.android.sdk.db.entity.ConfirmedTransaction
+import cash.z.ecc.android.sdk.ext.collectWith
+import cash.z.ecc.android.sdk.ext.convertZatoshiToZecString
+import cash.z.ecc.android.sdk.ext.toAbbreviatedAddress
+import cash.z.ecc.android.sdk.ext.twig
 import kotlinx.coroutines.launch
 
 

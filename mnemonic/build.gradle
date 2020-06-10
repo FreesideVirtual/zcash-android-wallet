@@ -8,7 +8,7 @@ dependencies {
 
     // Zcash
     implementation Deps.Zcash.ANDROID_WALLET_PLUGINS
-    implementation Deps.Misc.Plugins.ANDROID_BIP39
+    implementation Deps.Zcash.KOTLIN_BIP39
 
     testImplementation Deps.Test.JUNIT
 }
