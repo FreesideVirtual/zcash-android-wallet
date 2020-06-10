@@ -171,7 +171,7 @@
         android:gravity="center"
         android:paddingStart="32dp"
         android:paddingEnd="32dp"
-        android:text="Your privacy is protected, if you use your wallet to store your funds. Using the zECC wallet to pass funds through a z-address could compromise your privacy."
+        android:text="Your privacy is protected, if you use your wallet to store your funds. Using the ECC Wallet to pass funds through a z-address could compromise your privacy."
         android:textColor="@color/text_light"
         android:textSize="18dp"
         app:layout_constraintBottom_toTopOf="@id/sad_checkbox"

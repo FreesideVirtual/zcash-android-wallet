@@ -180,7 +180,7 @@
         android:paddingBottom="8dp"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="zECC App"
+        android:text="ECC Wallet"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textColor="@color/selector_button_text_light"
         app:layout_constraintEnd_toEndOf="@id/guideline_content_end"
