@@ -5,8 +5,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'io.fabric'
-apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'com.google.firebase.crashlytics'
 //apply plugin: 'com.github.ben-manes.versions'
 
 archivesBaseName = 'zcash-android-wallet'
@@ -102,10 +101,6 @@ android {
     }
 }
 
-crashlytics {
-    enableNdk true
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':qrecycler')
@@ -161,9 +156,6 @@ dependencies {
 
     // Analytics (for dogfooding/crash-reporting/feedback only on internal team builds)
     implementation Deps.Analytics.CRASHLYTICS
-    implementation Deps.Analytics.CRASHLYTICS_NDK
-    implementation Deps.Analytics.FIREBASE
-    implementation Deps.Analytics.FIREBASE_PERF
     implementation Deps.Analytics.MIXPANEL
 
     // Misc.

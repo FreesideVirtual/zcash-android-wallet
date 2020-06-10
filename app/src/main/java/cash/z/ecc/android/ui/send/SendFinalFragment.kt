@@ -16,7 +16,6 @@ import cash.z.ecc.android.sdk.db.entity.*
 import cash.z.ecc.android.sdk.ext.convertZatoshiToZecString
 import cash.z.ecc.android.sdk.ext.toAbbreviatedAddress
 import cash.z.ecc.android.sdk.ext.twig
-import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
@@ -112,8 +111,8 @@ class SendFinalFragment : BaseFragment<FragmentSendFinalBinding>() {
         } catch(t: Throwable) {
             val message = "ERROR: error while handling pending transaction update! $t"
             twig(message)
-            Crashlytics.log(message)
-            Crashlytics.logException(t)
+            mainActivity?.feedback?.report(Report.Error.NonFatal.TxUpdateFailed(t))
+            mainActivity?.feedback?.report(t)
         }
     }
 

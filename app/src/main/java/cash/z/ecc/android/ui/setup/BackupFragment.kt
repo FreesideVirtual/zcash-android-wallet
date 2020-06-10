@@ -10,11 +10,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
-import cash.z.ecc.android.R
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.databinding.FragmentBackupBinding
 import cash.z.ecc.android.di.viewmodel.activityViewModel
-import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.MetricType.SEED_PHRASE_LOADED
 import cash.z.ecc.android.feedback.Report.Tap.BACKUP_DONE

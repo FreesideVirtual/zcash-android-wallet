@@ -29,73 +29,75 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
     private val formatter = SimpleDateFormat("M/d h:mma", Locale.getDefault())
     private val addressRegex = """zs\d\w{65,}""".toRegex()
 
-    fun bindTo(transaction: T?) = (itemView.context as MainActivity).lifecycleScope.launch {
-        // update view
-        var lineOne: String = ""
-        var lineTwo: String = ""
-        var amountZec: String = ""
-        var amountDisplay: String = ""
-        var amountColor: Int = R.color.text_light_dimmed
-        var lineOneColor: Int = R.color.text_light
-        var lineTwoColor: Int = R.color.text_light_dimmed
-        var indicatorBackground: Int = R.drawable.background_indicator_unknown
+    fun bindTo(transaction: T?) {
+        (itemView.context as MainActivity).lifecycleScope.launch {
+            // update view
+            var lineOne: String = ""
+            var lineTwo: String = ""
+            var amountZec: String = ""
+            var amountDisplay: String = ""
+            var amountColor: Int = R.color.text_light_dimmed
+            var lineOneColor: Int = R.color.text_light
+            var lineTwoColor: Int = R.color.text_light_dimmed
+            var indicatorBackground: Int = R.drawable.background_indicator_unknown
 
-        transaction?.apply {
-            itemView.setOnClickListener {
-                onTransactionClicked(this)
-            }
-            itemView.setOnLongClickListener {
-                onTransactionLongPressed(this)
-                true
-            }
-            amountZec = value.convertZatoshiToZecString()
-            // TODO: these might be good extension functions
-            val timestamp = formatter.format(blockTimeInSeconds * 1000L)
-            val isMined = blockTimeInSeconds != 0L
-            when {
-                !toAddress.isNullOrEmpty() -> {
-                    lineOne = "You paid ${toAddress?.toAbbreviatedAddress()}"
-                    lineTwo = if (isMined) "Sent $timestamp" else "Pending confirmation"
-                    amountDisplay = "- $amountZec"
-                    if (isMined) {
-                        amountColor = R.color.zcashRed
-                        indicatorBackground = R.drawable.background_indicator_outbound
-                    } else {
-                        lineOneColor = R.color.text_light_dimmed
-                        lineTwoColor = R.color.text_light
+            transaction?.apply {
+                itemView.setOnClickListener {
+                    onTransactionClicked(this)
+                }
+                itemView.setOnLongClickListener {
+                    onTransactionLongPressed(this)
+                    true
+                }
+                amountZec = value.convertZatoshiToZecString()
+                // TODO: these might be good extension functions
+                val timestamp = formatter.format(blockTimeInSeconds * 1000L)
+                val isMined = blockTimeInSeconds != 0L
+                when {
+                    !toAddress.isNullOrEmpty() -> {
+                        lineOne = "You paid ${toAddress?.toAbbreviatedAddress()}"
+                        lineTwo = if (isMined) "Sent $timestamp" else "Pending confirmation"
+                        amountDisplay = "- $amountZec"
+                        if (isMined) {
+                            amountColor = R.color.zcashRed
+                            indicatorBackground = R.drawable.background_indicator_outbound
+                        } else {
+                            lineOneColor = R.color.text_light_dimmed
+                            lineTwoColor = R.color.text_light
+                        }
+                    }
+                    toAddress.isNullOrEmpty() && value > 0L && minedHeight > 0 -> {
+                        lineOne = getSender(transaction)
+                        lineTwo = "Received $timestamp"
+                        amountDisplay = "+ $amountZec"
+                        amountColor = R.color.zcashGreen
+                        indicatorBackground = R.drawable.background_indicator_inbound
+                    }
+                    else -> {
+                        lineOne = "Unknown"
+                        lineTwo = "Unknown"
+                        amountDisplay = "$amountZec"
+                        amountColor = R.color.text_light
                     }
                 }
-                toAddress.isNullOrEmpty() && value > 0L && minedHeight > 0 -> {
-                    lineOne = getSender(transaction)
-                    lineTwo = "Received $timestamp"
-                    amountDisplay = "+ $amountZec"
-                    amountColor = R.color.zcashGreen
-                    indicatorBackground = R.drawable.background_indicator_inbound
-                }
-                else -> {
-                    lineOne = "Unknown"
-                    lineTwo = "Unknown"
-                    amountDisplay = "$amountZec"
-                    amountColor = R.color.text_light
+                // sanitize amount
+                if (value < ZcashSdk.MINERS_FEE_ZATOSHI) amountDisplay = "< 0.001"
+                else if (amountZec.length > 10) { // 10 allows 3 digits to the left and 6 to the right of the decimal
+                    amountDisplay = "tap to view"
                 }
             }
-            // sanitize amount
-            if (value < ZcashSdk.MINERS_FEE_ZATOSHI) amountDisplay = "< 0.001"
-            else if (amountZec.length > 10) { // 10 allows 3 digits to the left and 6 to the right of the decimal
-                amountDisplay = "tap to view"
-            }
+
+
+            topText.text = lineOne
+            bottomText.text = lineTwo
+            amountText.text = amountDisplay
+            amountText.setTextColor(amountColor.toAppColor())
+            topText.setTextColor(lineOneColor.toAppColor())
+            bottomText.setTextColor(lineTwoColor.toAppColor())
+            val context = itemView.context
+            indicator.background = context.resources.getDrawable(indicatorBackground)
+            shieldIcon.goneIf((transaction?.raw != null || transaction?.expiryHeight != null) && !transaction?.toAddress.isShielded())
         }
-
-
-        topText.text = lineOne
-        bottomText.text = lineTwo
-        amountText.text = amountDisplay
-        amountText.setTextColor(amountColor.toAppColor())
-        topText.setTextColor(lineOneColor.toAppColor())
-        bottomText.setTextColor(lineTwoColor.toAppColor())
-        val context = itemView.context
-        indicator.background = context.resources.getDrawable(indicatorBackground)
-        shieldIcon.goneIf((transaction?.raw != null || transaction?.expiryHeight != null) && !transaction?.toAddress.isShielded())
     }
 
     private suspend fun getSender(transaction: ConfirmedTransaction): String {

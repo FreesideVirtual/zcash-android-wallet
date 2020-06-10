@@ -2,9 +2,14 @@ package cash.z.ecc.android.di.module
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.SharedPreferences
 import cash.z.ecc.android.ZcashWalletApp
 import cash.z.ecc.android.di.component.MainActivitySubcomponent
 import cash.z.ecc.android.feedback.*
+import cash.z.ecc.android.sdk.ext.SilentTwig
+import cash.z.ecc.android.sdk.ext.TroubleshootingTwig
+import cash.z.ecc.android.sdk.ext.Twig
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -29,14 +34,27 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun providePreferences(context: Context): SharedPreferences
+            = context.getSharedPreferences("Application", Context.MODE_PRIVATE)
+
+    @Provides
+    @Singleton
     fun provideFeedback(): Feedback = Feedback()
 
     @Provides
     @Singleton
     fun provideFeedbackCoordinator(
         feedback: Feedback,
+        preferences: SharedPreferences,
         defaultObservers: Set<@JvmSuppressWildcards FeedbackCoordinator.FeedbackObserver>
-    ): FeedbackCoordinator = FeedbackCoordinator(feedback, defaultObservers)
+    ): FeedbackCoordinator {
+        return preferences.getBoolean(FeedbackCoordinator.ENABLED, false).let { isEnabled ->
+            // observe nothing unless feedback is enabled
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(isEnabled)
+            Twig.plant(if (isEnabled) TroubleshootingTwig() else SilentTwig())
+            FeedbackCoordinator(feedback, if (isEnabled) defaultObservers else setOf())
+        }
+    }
 
 
     //

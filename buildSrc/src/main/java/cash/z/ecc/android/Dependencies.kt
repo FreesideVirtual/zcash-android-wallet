@@ -61,10 +61,7 @@ object Deps {
         val STUB =                          "io.grpc:grpc-stub:$version"
     }
     object Analytics { // for dogfooding/crash-reporting/feedback only on internal team builds
-        val CRASHLYTICS =                   "com.crashlytics.sdk.android:crashlytics:2.10.1"
-        val CRASHLYTICS_NDK =               "com.crashlytics.sdk.android:crashlytics-ndk:2.1.1"
-        val FIREBASE =                      "com.google.firebase:firebase-analytics:17.4.3"
-        val FIREBASE_PERF =                 "com.google.firebase:firebase-perf:19.0.7"
+        val CRASHLYTICS =                   "com.google.firebase:firebase-crashlytics:17.0.1"
         val MIXPANEL =                      "com.mixpanel.android:mixpanel-android:5.6.3"
     }
     object JavaX {

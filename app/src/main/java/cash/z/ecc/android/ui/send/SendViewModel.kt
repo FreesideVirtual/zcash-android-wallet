@@ -21,7 +21,6 @@ import cash.z.ecc.android.sdk.ext.ZcashSdk
 import cash.z.ecc.android.sdk.ext.convertZatoshiToZecString
 import cash.z.ecc.android.sdk.ext.twig
 import cash.z.ecc.android.sdk.validate.AddressType
-import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -144,7 +143,7 @@ class SendViewModel @Inject constructor() : ViewModel() {
                 report(metricId)
             }
         } catch (t: Throwable) {
-            Crashlytics.logException(RuntimeException("Error while updating Metrics", t))
+            feedback.report(t)
         }
     }
 
