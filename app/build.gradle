@@ -168,3 +168,5 @@ dependencies {
     androidTestImplementation Deps.Test.Android.JUNIT
     androidTestImplementation Deps.Test.Android.ESPRESSO
 }
+
+defaultTasks 'clean', 'installZcashmainnetDebug'
