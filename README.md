@@ -41,8 +41,7 @@ There are some known areas for improvement:
 - Since this was created as a dogfooding tool, think of it less like a wallet and more like a proof of concept, which can result in bugs up to and including loss-of-funds
 - So **please backup your seed phrase** and wallet birthday (block height)
 - This app has been developed and run exclusively on `mainnet` it might not work at all on `testnet`
-- We've done our best to disable everything we are using internally for feedback but understand this app is designed for getting feedback so it will refrence some of the libraries that we use in-house for that purpose.
-
+- Getting feedback was one of the original design goals of this app so it is mainly intended for learning and improving the related libraries that it uses.
 
 See the [Wallet App Threat Model](https://zcash.readthedocs.io/en/latest/rtd_pages/wallet_threat_model.html)
 for more information about the security and privacy limitations of the wallet.
