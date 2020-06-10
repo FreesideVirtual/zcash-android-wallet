@@ -224,6 +224,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    suspend fun isValidAddress(address: String): Boolean {
+        try {
+            return !synchronizerComponent.synchronizer().validateAddress(address).isNotValid
+        } catch (t: Throwable) { }
+        return false
+    }
+
     fun copyText(textToCopy: String, label: String = "zECC Wallet Text") {
         clipboard.setPrimaryClip(
             ClipData.newPlainText(label, textToCopy)

@@ -3,6 +3,7 @@ package cash.z.ecc.android.ui.detail
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import cash.z.ecc.android.R
 import cash.z.ecc.android.ext.goneIf
@@ -14,6 +15,7 @@ import cash.z.ecc.android.ui.util.toUtf8Memo
 import cash.z.ecc.android.sdk.db.entity.ConfirmedTransaction
 import cash.z.ecc.android.sdk.ext.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,8 +29,7 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
     private val formatter = SimpleDateFormat("M/d h:mma", Locale.getDefault())
     private val addressRegex = """zs\d\w{65,}""".toRegex()
 
-    fun bindTo(transaction: T?) {
-
+    fun bindTo(transaction: T?) = (itemView.context as MainActivity).lifecycleScope.launch {
         // update view
         var lineOne: String = ""
         var lineTwo: String = ""
@@ -97,19 +98,19 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         shieldIcon.goneIf((transaction?.raw != null || transaction?.expiryHeight != null) && !transaction?.toAddress.isShielded())
     }
 
-    private fun getSender(transaction: ConfirmedTransaction): String {
+    private suspend fun getSender(transaction: ConfirmedTransaction): String {
         val memo = transaction.memo.toUtf8Memo()
         return when {
             memo.contains(INCLUDE_MEMO_PREFIX) -> {
-                val address = memo.split(INCLUDE_MEMO_PREFIX)[1].trim()
+                val address = memo.split(INCLUDE_MEMO_PREFIX)[1].trim().validateAddress() ?: "Unknown"
                 "${address.toAbbreviatedAddress()} paid you"
             }
             memo.contains("eply to:") -> {
-                val address = memo.split("eply to:")[1].trim()
+                val address = memo.split("eply to:")[1].trim().validateAddress() ?: "Unknown"
                 "${address.toAbbreviatedAddress()} paid you"
             }
             memo.contains("zs") -> {
-                val who = extractAddress(memo)?.toAbbreviatedAddress() ?: "Unknown"
+                val who = extractAddress(memo).validateAddress()?.toAbbreviatedAddress() ?: "Unknown"
                 "$who paid you"
             }
             else -> "Unknown paid you"
@@ -144,6 +145,11 @@ class TransactionViewHolder<T : ConfirmedTransaction>(itemView: View) : Recycler
         (transaction.toAddress ?: extractAddress(transaction.memo.toUtf8Memo()))?.let {
             (itemView.context as MainActivity).copyText(it, "Transaction Address")
         }
+    }
+
+    private suspend fun String?.validateAddress(): String? {
+        if (this == null) return null
+        return if ((itemView.context as MainActivity).isValidAddress(this)) this else null
     }
 }
 
