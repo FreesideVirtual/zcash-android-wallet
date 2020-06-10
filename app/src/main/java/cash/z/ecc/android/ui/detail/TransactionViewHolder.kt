@@ -11,8 +11,8 @@ import cash.z.ecc.android.ui.MainActivity
 import cash.z.ecc.android.ui.send.SendViewModel
 import cash.z.ecc.android.ui.util.INCLUDE_MEMO_PREFIX
 import cash.z.ecc.android.ui.util.toUtf8Memo
-import cash.z.wallet.sdk.entity.ConfirmedTransaction
-import cash.z.wallet.sdk.ext.*
+import cash.z.ecc.android.sdk.db.entity.ConfirmedTransaction
+import cash.z.ecc.android.sdk.ext.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat

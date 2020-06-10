@@ -16,9 +16,10 @@ import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Funnel.Send
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.block.CompactBlockProcessor.WalletBalance
-import cash.z.wallet.sdk.ext.*
+import cash.z.ecc.android.sdk.Synchronizer
+import cash.z.ecc.android.sdk.block.CompactBlockProcessor.WalletBalance
+import cash.z.ecc.android.sdk.ext.*
+import cash.z.ecc.android.sdk.validate.AddressType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -85,9 +86,9 @@ class SendAddressFragment : BaseFragment<FragmentSendAddressBinding>(),
     private fun onAddressChanged(address: String) {
         resumedScope.launch {
             var type = when (sendViewModel.validateAddress(address)) {
-                is Synchronizer.AddressType.Transparent -> "This is a valid transparent address" to R.color.zcashGreen
-                is Synchronizer.AddressType.Shielded -> "This is a valid shielded address" to R.color.zcashGreen
-                is Synchronizer.AddressType.Invalid -> "This address appears to be invalid" to R.color.zcashRed
+                is AddressType.Transparent -> "This is a valid transparent address" to R.color.zcashGreen
+                is AddressType.Shielded -> "This is a valid shielded address" to R.color.zcashGreen
+                is AddressType.Invalid -> "This address appears to be invalid" to R.color.zcashRed
             }
             if (address == sendViewModel.synchronizer.getAddress()) type =
                 "Warning, this appears to be your address!" to R.color.zcashRed

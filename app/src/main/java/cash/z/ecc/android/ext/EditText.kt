@@ -3,9 +3,9 @@ package cash.z.ecc.android.ext
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.widget.EditText
 import android.widget.TextView
-import cash.z.wallet.sdk.ext.convertZecToZatoshi
-import cash.z.wallet.sdk.ext.safelyConvertToBigDecimal
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.convertZecToZatoshi
+import cash.z.ecc.android.sdk.ext.safelyConvertToBigDecimal
+import cash.z.ecc.android.sdk.ext.twig
 
 fun EditText.onEditorActionDone(block: (EditText) -> Unit) {
     this.setOnEditorActionListener { _, actionId, _ ->

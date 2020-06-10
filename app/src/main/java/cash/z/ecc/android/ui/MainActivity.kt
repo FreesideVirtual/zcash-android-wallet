@@ -38,10 +38,10 @@ import cash.z.ecc.android.feedback.Report.Error.NonFatal.Reorg
 import cash.z.ecc.android.feedback.Report.NonUserAction.FEEDBACK_STOPPED
 import cash.z.ecc.android.feedback.Report.NonUserAction.SYNC_START
 import cash.z.ecc.android.feedback.Report.Tap.COPY_ADDRESS
-import cash.z.wallet.sdk.Initializer
-import cash.z.wallet.sdk.exception.CompactBlockProcessorException
-import cash.z.wallet.sdk.ext.ZcashSdk
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.Initializer
+import cash.z.ecc.android.sdk.exception.CompactBlockProcessorException
+import cash.z.ecc.android.sdk.ext.ZcashSdk
+import cash.z.ecc.android.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch

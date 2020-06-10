@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
-import cash.z.wallet.sdk.Initializer
+import cash.z.ecc.android.sdk.Initializer
 import okio.Buffer
 import okio.GzipSink
 import okio.Okio

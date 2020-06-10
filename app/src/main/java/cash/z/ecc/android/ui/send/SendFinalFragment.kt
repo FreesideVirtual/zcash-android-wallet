@@ -12,10 +12,10 @@ import cash.z.ecc.android.ext.goneIf
 import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.entity.*
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.db.entity.*
+import cash.z.ecc.android.sdk.ext.convertZatoshiToZecString
+import cash.z.ecc.android.sdk.ext.toAbbreviatedAddress
+import cash.z.ecc.android.sdk.ext.twig
 import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow

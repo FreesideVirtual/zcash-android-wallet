@@ -8,11 +8,11 @@ import cash.z.ecc.android.feedback.measure
 import cash.z.ecc.android.lockbox.LockBox
 import cash.z.ecc.android.ui.setup.WalletSetupViewModel.WalletSetupState.*
 import cash.z.ecc.kotlin.mnemonic.Mnemonics
-import cash.z.wallet.sdk.Initializer
-import cash.z.wallet.sdk.Initializer.DefaultBirthdayStore
-import cash.z.wallet.sdk.Initializer.DefaultBirthdayStore.Companion.ImportedWalletBirthdayStore
-import cash.z.wallet.sdk.Initializer.DefaultBirthdayStore.Companion.NewWalletBirthdayStore
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.Initializer
+import cash.z.ecc.android.sdk.Initializer.DefaultBirthdayStore
+import cash.z.ecc.android.sdk.Initializer.DefaultBirthdayStore.Companion.ImportedWalletBirthdayStore
+import cash.z.ecc.android.sdk.Initializer.DefaultBirthdayStore.Companion.NewWalletBirthdayStore
+import cash.z.ecc.android.sdk.ext.twig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

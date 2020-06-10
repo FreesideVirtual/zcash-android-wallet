@@ -1,4 +1,3 @@
 rootProject.name='Zcash Wallet'
-include ':app', ':qrecycler', ':feedback', ':mnemonic', ':lockbox', ':sdk', ':chipsinputlayout'
-project(":sdk").projectDir =  file("../zcash-android-wallet-sdk")
+include ':app', ':qrecycler', ':feedback', ':mnemonic', ':lockbox', ':chipsinputlayout'
 project(":chipsinputlayout").projectDir =  file("../../clones/chips-input-layout/library")

@@ -3,12 +3,10 @@ package cash.z.ecc.android.ui.scan
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import cash.z.ecc.android.R
@@ -18,11 +16,15 @@ import cash.z.ecc.android.di.viewmodel.viewModel
 import cash.z.ecc.android.ext.onClickNavBack
 import cash.z.ecc.android.ext.onClickNavTo
 import cash.z.ecc.android.feedback.Report
-import cash.z.ecc.android.feedback.Report.Tap.*
+import cash.z.ecc.android.feedback.Report.Tap.SCAN_BACK
+import cash.z.ecc.android.feedback.Report.Tap.SCAN_RECEIVE
+import cash.z.ecc.android.sdk.ext.twig
 import cash.z.ecc.android.ui.base.BaseFragment
 import cash.z.ecc.android.ui.send.SendViewModel
+import com.crashlytics.android.Crashlytics
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.launch
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class ScanFragment : BaseFragment<FragmentScanBinding>() {
@@ -33,11 +35,15 @@ class ScanFragment : BaseFragment<FragmentScanBinding>() {
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
+    private var cameraExecutor: ExecutorService? = null
+
     override fun inflate(inflater: LayoutInflater): FragmentScanBinding =
         FragmentScanBinding.inflate(inflater)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (cameraExecutor != null) cameraExecutor?.shutdown()
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
         binding.buttonReceive.onClickNavTo(R.id.action_nav_scan_to_nav_receive) { tapped(SCAN_RECEIVE) }
         binding.backButtonHitArea.onClickNavBack() { tapped(SCAN_BACK) }
@@ -56,24 +62,65 @@ class ScanFragment : BaseFragment<FragmentScanBinding>() {
         }, ContextCompat.getMainExecutor(context))
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cameraExecutor?.shutdown()
+        cameraExecutor = null
+    }
+
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
-        Preview.Builder().setTargetName("Preview").build().let { preview ->
-            preview.setSurfaceProvider(binding.preview.previewSurfaceProvider)
+        // Most of the code here is adapted from: https://github.com/android/camera-samples/blob/master/CameraXBasic/app/src/main/java/com/android/example/cameraxbasic/fragments/CameraFragment.kt
+        // it's worth keeping tabs on that implementation because they keep making breaking changes to these APIs!
 
-            val cameraSelector = CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build()
+        // Get screen metrics used to setup camera for full screen resolution
+        val metrics = DisplayMetrics().also { binding.preview.display.getRealMetrics(it) }
+        val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
+        val rotation = binding.preview.display.rotation
 
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
+        val preview =
+            Preview.Builder().setTargetName("Preview").setTargetAspectRatio(screenAspectRatio)
+                .setTargetRotation(rotation).build()
 
-            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), QrAnalyzer { q, i ->
-                onQrScanned(q, i)
-            })
+        val cameraSelector = CameraSelector.Builder()
+            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+            .build()
+
+        val imageAnalysis = ImageAnalysis.Builder().setTargetAspectRatio(screenAspectRatio)
+            .setTargetRotation(rotation)
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+
+        imageAnalysis.setAnalyzer(cameraExecutor!!, QrAnalyzer { q, i ->
+            onQrScanned(q, i)
+        })
+
+        // Must unbind the use-cases before rebinding them
+        cameraProvider.unbindAll()
+
+        try {
             cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+            preview.setSurfaceProvider(binding.preview.createSurfaceProvider())
+        } catch (t: Throwable) {
+            // TODO: consider bubbling this up to the user
+            Crashlytics.logException(t)
+            twig("Error while opening the camera: $t")
         }
 
+    }
+
+    /**
+     * Adapted from: https://github.com/android/camera-samples/blob/master/CameraXBasic/app/src/main/java/com/android/example/cameraxbasic/fragments/CameraFragment.kt#L350
+     */
+    private fun aspectRatio(width: Int, height: Int): Int {
+        val previewRatio = kotlin.math.max(width, height).toDouble() / kotlin.math.min(
+            width,
+            height
+        )
+        if (kotlin.math.abs(previewRatio - (4.0 / 3.0))
+            <= kotlin.math.abs(previewRatio - (16.0 / 9.0))) {
+            return AspectRatio.RATIO_4_3
+        }
+        return AspectRatio.RATIO_16_9
     }
 
     private fun onQrScanned(qrContent: String, image: ImageProxy) {

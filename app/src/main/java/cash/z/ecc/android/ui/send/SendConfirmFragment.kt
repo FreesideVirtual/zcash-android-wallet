@@ -13,8 +13,8 @@ import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Funnel.Send
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.toAbbreviatedAddress
-import cash.z.wallet.sdk.ext.convertZatoshiToZecString
+import cash.z.ecc.android.sdk.ext.toAbbreviatedAddress
+import cash.z.ecc.android.sdk.ext.convertZatoshiToZecString
 import kotlinx.coroutines.launch
 
 class SendConfirmFragment : BaseFragment<FragmentSendConfirmBinding>() {

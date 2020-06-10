@@ -11,7 +11,7 @@ import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Funnel.Restore
 import cash.z.ecc.android.ui.MainActivity
 import cash.z.ecc.android.ui.setup.SeedWordChip
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.twig
 
 class SeedWordAdapter :  ChipsAdapter {
 

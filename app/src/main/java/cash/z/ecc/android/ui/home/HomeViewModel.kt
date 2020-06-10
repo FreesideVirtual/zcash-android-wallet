@@ -1,14 +1,14 @@
 package cash.z.ecc.android.ui.home
 
 import androidx.lifecycle.ViewModel
-import cash.z.wallet.sdk.SdkSynchronizer
-import cash.z.wallet.sdk.Synchronizer
-import cash.z.wallet.sdk.Synchronizer.Status.*
-import cash.z.wallet.sdk.block.CompactBlockProcessor
-import cash.z.wallet.sdk.exception.RustLayerException
-import cash.z.wallet.sdk.ext.ZcashSdk.MINERS_FEE_ZATOSHI
-import cash.z.wallet.sdk.ext.ZcashSdk.ZATOSHI_PER_ZEC
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.SdkSynchronizer
+import cash.z.ecc.android.sdk.Synchronizer
+import cash.z.ecc.android.sdk.Synchronizer.Status.*
+import cash.z.ecc.android.sdk.block.CompactBlockProcessor
+import cash.z.ecc.android.sdk.exception.RustLayerException
+import cash.z.ecc.android.sdk.ext.ZcashSdk.MINERS_FEE_ZATOSHI
+import cash.z.ecc.android.sdk.ext.ZcashSdk.ZATOSHI_PER_ZEC
+import cash.z.ecc.android.sdk.ext.twig
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject

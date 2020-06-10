@@ -1,7 +1,7 @@
 package cash.z.ecc.android.ui.home
 
 import android.animation.ValueAnimator
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.twig
 import com.airbnb.lottie.LottieAnimationView
 
 class MagicSnakeLoader(

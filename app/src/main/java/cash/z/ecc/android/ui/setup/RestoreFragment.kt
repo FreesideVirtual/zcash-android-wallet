@@ -21,8 +21,8 @@ import cash.z.ecc.android.feedback.Report
 import cash.z.ecc.android.feedback.Report.Funnel.Restore
 import cash.z.ecc.android.feedback.Report.Tap.*
 import cash.z.ecc.android.ui.base.BaseFragment
-import cash.z.wallet.sdk.ext.ZcashSdk
-import cash.z.wallet.sdk.ext.twig
+import cash.z.ecc.android.sdk.ext.ZcashSdk
+import cash.z.ecc.android.sdk.ext.twig
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tylersuehr.chips.Chip
 import com.tylersuehr.chips.ChipsAdapter
