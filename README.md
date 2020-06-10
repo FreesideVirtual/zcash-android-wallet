@@ -27,7 +27,7 @@ cd /path/to/zcash-android-wallet
 ## Disclaimers
 There are some known areas for improvement:
 
-- This app so it is mainly intended for learning and improving the related libraries that it uses. There may be bugs.
+- This app is mainly intended for learning and improving the related libraries that it uses. There may be bugs.
 - This wallet currently only supports receiving at shielded addresses, which makes it incompatible with wallets that do not support sending to shielded addresses. 
 - The wallet requires a trust in the server to display accurate transaction information. 
 - This app has been developed and run exclusively on `mainnet` it might not work on `testnet`.  
