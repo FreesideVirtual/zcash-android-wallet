@@ -142,6 +142,13 @@ class WalletSetupViewModel @Inject constructor() : ViewModel() {
        }
    }
 
+    /**
+     * Throw an exception if the seed phrase is bad.
+     */
+    fun validatePhrase(seedPhrase: String) {
+        mnemonics.validate(seedPhrase.toCharArray())
+    }
+
     object LockBoxKey {
         const val SEED = "cash.z.ecc.android.SEED"
         const val SEED_PHRASE = "cash.z.ecc.android.SEED_PHRASE"

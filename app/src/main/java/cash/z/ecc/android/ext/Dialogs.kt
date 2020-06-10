@@ -46,6 +46,18 @@ fun Context.showUninitializedError(error: Throwable? = null, onDismiss: () -> Un
         .show()
 }
 
+fun Context.showInvalidSeedPhraseError(error: Throwable? = null, onDismiss: () -> Unit = {}): Dialog {
+    return MaterialAlertDialogBuilder(this)
+        .setTitle("Oops! Invalid Seed Phrase")
+        .setMessage("That seed phrase appears to be invalid! Please double-check it and try again.\n\n${error?.message ?: ""}")
+        .setCancelable(false)
+        .setPositiveButton("Retry") { dialog, _ ->
+            dialog.dismiss()
+            onDismiss()
+        }
+        .show()
+}
+
 fun Context.showScanFailure(error: Throwable?, onCancel: () -> Unit = {}, onDismiss: () -> Unit = {}): Dialog {
     val message = if (error == null) {
         "Unknown error"

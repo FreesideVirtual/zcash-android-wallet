@@ -19,4 +19,8 @@ class Mnemonics @Inject constructor() : MnemonicPlugin {
     override fun nextMnemonicList(entropy: ByteArray): List<CharArray> = MnemonicCode(entropy).words
     override fun toSeed(mnemonic: CharArray): ByteArray = MnemonicCode(mnemonic).toSeed()
     override fun toWordList(mnemonic: CharArray): List<CharArray> = MnemonicCode(mnemonic).words
+
+    fun validate(mnemonic: CharArray) {
+        MnemonicCode(mnemonic).validate()
+    }
 }
